@@ -1,0 +1,27 @@
+# Flutter
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+
+# Python
+backend/__pycache__/
+backend/.venv/
+backend/*.pyc
+ml/__pycache__/
+ml/.venv/
+
+# Node
+portal/node_modules/
+portal/.next/
+
+# Android
+*.apk
+*.aab
+
+# Docker
+.env
+
+# OS
+.DS_Store
+Thumbs.db
