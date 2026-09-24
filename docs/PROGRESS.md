@@ -4,7 +4,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 1 (Scaffolding & Architecture)
+## Current Status: Phase 2 (Core Data Tier & Schemas) Complete
 
 ### Completed Items
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
@@ -17,16 +17,16 @@ Living record of project deliverables, milestones completed, and pending roadmap
 - [x] Docker Orchestration: `docker-compose.yml` with PostgreSQL 16 + PostGIS, Backend FastAPI, and Portal Next.js.
 - [x] Root `Makefile` targeting `py -3.11` and CI workflows (`.github/workflows/ci.yml`).
 - [x] Synthetic data generator pipeline with provenance tracking (`data/synthetic/generate_synthetic_data.py`).
-- [x] Code quality checks: Ruff linter & Pytest passing across `/backend` and `/ml` using `py -3.11`.
+- [x] Comprehensive Data Dictionary ([DATA_DICTIONARY.md](file:///c:/dev/kabadiwala-connect/docs/DATA_DICTIONARY.md)) with Mermaid ER diagram.
+- [x] PostgreSQL 16 + PostGIS Schema & SQLAlchemy ORM models ([schema.py](file:///c:/dev/kabadiwala-connect/backend/app/models/schema.py)) covering all 10 core entities with spatial GiST indexes, check constraints, and audit timestamps.
+- [x] Alembic Migrations ([0001_initial_schema.py](file:///c:/dev/kabadiwala-connect/backend/alembic/versions/0001_initial_schema.py)) with PostGIS extension activation and full upgrade/downgrade paths.
+- [x] Matching Drift (SQLite) Tables on Mobile ([tables.dart](file:///c:/dev/kabadiwala-connect/mobile/lib/data/tables.dart) & [local_database.dart](file:///c:/dev/kabadiwala-connect/mobile/lib/data/local_database.dart)) covering the offline-first subset.
+- [x] Automated test suites: Migration tests and model tests in `/backend` and smoke tests in `/ml` all passing (11/11 tests green).
+- [x] Code formatting & linting: Ruff checks clean across all modules using `py -3.11`.
 
 ---
 
 ## Pending Next Phase Tasks
-
-### Phase 2: Core Data Tier & Schemas
-- [ ] Initialize Alembic migrations for PostgreSQL + PostGIS schema.
-- [ ] Create synthetic data generator with strict provenance tracking (`source: synthetic`).
-- [ ] Configure Drift SQLite schema & migrations in Flutter client.
 
 ### Phase 3: Backend & API Services
 - [ ] Implement JWT / OTP authentication service.
