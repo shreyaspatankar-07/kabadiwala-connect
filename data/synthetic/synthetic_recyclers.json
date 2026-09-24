@@ -1,0 +1,40 @@
+[
+  {
+    "recycler_id": "REC-SYNTH-001",
+    "legal_name": "Maharashtra Green E-Solutions (Synthetic)",
+    "cpcb_reg_no": "CPCB/SYNTH/EPR/2026/001",
+    "latitude": 19.076,
+    "longitude": 72.8777,
+    "region": "MH_MUMBAI",
+    "capacity_mt_per_month": 150.0,
+    "accepted_categories": [
+      "pcb_grade_a",
+      "pcb_grade_b",
+      "lithium_ion_battery"
+    ],
+    "provenance": {
+      "source": "synthetic",
+      "generator_version": "0.1.0",
+      "generated_at": "2026-09-24T18:34:34.179225+00:00"
+    }
+  },
+  {
+    "recycler_id": "REC-SYNTH-002",
+    "legal_name": "Pune Circular Resources Pvt Ltd (Synthetic)",
+    "cpcb_reg_no": "CPCB/SYNTH/EPR/2026/002",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "region": "MH_PUNE",
+    "capacity_mt_per_month": 220.0,
+    "accepted_categories": [
+      "crt_monitor",
+      "flat_display",
+      "mixed_e_waste"
+    ],
+    "provenance": {
+      "source": "synthetic",
+      "generator_version": "0.1.0",
+      "generated_at": "2026-09-24T18:34:34.179225+00:00"
+    }
+  }
+]

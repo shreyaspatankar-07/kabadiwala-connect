@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "appTitle": "Kabadiwala Connect",
+  "welcomeMessage": "Sell e-waste at fair authorized rates",
+  "createLotAction": "Add New Lot",
+  "viewPricesAction": "Today's Price Board",
+  "handoverAction": "Handover Lot",
+  "ledgerAction": "My Ledger",
+  "syncPending": "Saved safely on device, will sync when online",
+  "syncSuccess": "Successfully registered and verified",
+  "listenPrompt": "Tap to listen"
+}

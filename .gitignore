@@ -8,8 +8,13 @@ mobile/.flutter-plugins-dependencies
 backend/__pycache__/
 backend/.venv/
 backend/*.pyc
+backend/.pytest_cache/
+backend/.ruff_cache/
 ml/__pycache__/
 ml/.venv/
+ml/*.pyc
+ml/.pytest_cache/
+ml/.ruff_cache/
 
 # Node
 portal/node_modules/

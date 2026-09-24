@@ -1,0 +1,26 @@
+[project]
+name = "kabadiwala-ml"
+version = "0.1.0"
+description = "Machine learning and pricing benchmarking models for Kabadiwala Connect"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "numpy>=1.26.4",
+    "pandas>=2.2.1",
+    "scikit-learn>=1.4.1.post1",
+    "lightgbm>=4.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.2",
+    "ruff>=0.3.0",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

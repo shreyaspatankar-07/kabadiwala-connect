@@ -1,0 +1,48 @@
+name: kabadiwala_mobile
+description: "Vernacular, low-literacy offline-tolerant mobile client for informal e-waste collectors"
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+
+  # State Management & Architecture
+  flutter_riverpod: ^2.5.1
+
+  # Offline-first SQLite persistence
+  drift: ^2.16.0
+  sqlite3_flutter_libs: ^0.5.21
+  path_provider: ^2.1.2
+  path: ^1.9.0
+
+  # Device Hardware (Camera & Location)
+  camera: ^0.10.5+9
+  geolocator: ^11.0.0
+  permission_handler: ^11.3.0
+
+  # Connectivity & Sync
+  connectivity_plus: ^5.0.2
+  http: ^1.2.1
+  uuid: ^4.3.3
+
+  # Audio & Low-Literacy Support
+  audioplayers: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  drift_dev: ^2.16.0
+  build_runner: ^2.4.8
+
+flutter:
+  uses-material-design: true
+  generate: true

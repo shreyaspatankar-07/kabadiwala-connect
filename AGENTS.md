@@ -36,11 +36,12 @@ STACK
 - Mobile: Flutter, Drift (SQLite), Riverpod, TFLite, geolocator, camera.
 - Backend: FastAPI, PostgreSQL + PostGIS, SQLAlchemy, Alembic, Pydantic.
 - Recycler/Admin portal: Next.js + Tailwind + TypeScript.
-- ML: Python, scikit-learn, LightGBM, TensorFlow/Keras -> TFLite.
+- ML: Python 3.11 (`py -3.11`), scikit-learn, LightGBM, TensorFlow/Keras -> TFLite.
 - Monorepo layout: /mobile, /backend, /portal, /ml, /data, /docs.
 
 WORKING RULES
 
+- For all Python commands, always use `py -3.11` instead of `python` or `python3` (e.g. `py -3.11 -m venv .venv`, scripts, Makefiles).
 - Write tests for every module. Keep functions small and typed.
 - After every task: run tests, update /docs/PROGRESS.md, list what is done/pending.
 - Never invent real recycler data. Use clearly labelled synthetic data and mark

@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    branches: [main, master, dev]
+
+jobs:
+  backend-and-ml:
+    name: Backend & ML (Python 3.11)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Ruff & Pytest
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest pytest-asyncio httpx pydantic pydantic-settings fastapi uvicorn
+
+      - name: Lint Backend and ML
+        run: |
+          ruff check backend
+          ruff check ml
+
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          pytest
+
+      - name: Run ML Tests
+        run: |
+          cd ml
+          pytest
+
+  portal:
+    name: Portal (Next.js & TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: portal/package.json
+
+      - name: Install Portal Dependencies
+        run: |
+          cd portal
+          npm install
+
+      - name: Lint Portal
+        run: |
+          cd portal
+          npm run lint
+
+  mobile:
+    name: Mobile (Flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Verify Flutter Installation
+        run: flutter --version

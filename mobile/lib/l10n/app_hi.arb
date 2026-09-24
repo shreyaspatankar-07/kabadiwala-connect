@@ -1,0 +1,12 @@
+{
+  "@@locale": "hi",
+  "appTitle": "कबाड़ीवाला कनेक्ट",
+  "welcomeMessage": "ई-कचरा सही दाम पर बेचें",
+  "createLotAction": "नया माल जोड़ें",
+  "viewPricesAction": "आज का भाव देखें",
+  "handoverAction": "माल जमा करें",
+  "ledgerAction": "मेरा हिसाब",
+  "syncPending": "जानकारी फोन में सुरक्षित है, इंटरनेट आने पर भेज दी जाएगी",
+  "syncSuccess": "जानकारी सफलतापूर्वक दर्ज हो गई है",
+  "listenPrompt": "सुनने के लिए यहाँ दबाएं"
+}
