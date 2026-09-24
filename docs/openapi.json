@@ -1,0 +1,3307 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Kabadiwala Connect API",
+    "description": "Vernacular, low-literacy offline-tolerant platform connecting informal e-waste collectors with authorized recyclers.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/auth/otp/request": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Request OTP for collector phone login",
+        "operationId": "request_otp_api_v1_auth_otp_request_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OTPRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/otp/verify": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify OTP and obtain access token",
+        "operationId": "verify_otp_api_v1_auth_otp_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/pin/setup": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Setup 4-digit PIN for collector",
+        "operationId": "setup_pin_api_v1_auth_pin_setup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PINSetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/pin/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login collector using 4-digit PIN",
+        "operationId": "login_with_pin_api_v1_auth_pin_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PINLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login recycler or admin using email and password",
+        "operationId": "login_email_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register recycler or admin account",
+        "operationId": "register_api_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get current authenticated user profile",
+        "operationId": "get_me_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/materials": {
+      "get": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "List materials catalog",
+        "operationId": "list_materials_api_v1_materials_get",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by broad category",
+              "title": "Category"
+            },
+            "description": "Filter by broad category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MaterialResponse"
+                  },
+                  "title": "Response List Materials Api V1 Materials Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "Add material to catalog (Admin only)",
+        "operationId": "create_material_api_v1_materials_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaterialCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaterialResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/materials/{material_id}": {
+      "get": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "Get material by ID",
+        "operationId": "get_material_api_v1_materials__material_id__get",
+        "parameters": [
+          {
+            "name": "material_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Material Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaterialResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Materials"
+        ],
+        "summary": "Update material entry (Admin only)",
+        "operationId": "update_material_api_v1_materials__material_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "material_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Material Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaterialUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaterialResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recyclers": {
+      "get": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "List authorized recyclers",
+        "operationId": "list_recyclers_api_v1_recyclers_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by authorization status",
+              "title": "Status"
+            },
+            "description": "Filter by authorization status"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by accepted category",
+              "title": "Category"
+            },
+            "description": "Filter by accepted category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecyclerResponse"
+                  },
+                  "title": "Response List Recyclers Api V1 Recyclers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Register a new recycler facility",
+        "operationId": "create_recycler_api_v1_recyclers_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecyclerCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recyclers/{recycler_id}": {
+      "get": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Get recycler by ID",
+        "operationId": "get_recycler_api_v1_recyclers__recycler_id__get",
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Update recycler details",
+        "operationId": "update_recycler_api_v1_recyclers__recycler_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecyclerUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recyclers/{recycler_id}/verify": {
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Admin approves & verifies recycler authorization",
+        "operationId": "verify_recycler_api_v1_recyclers__recycler_id__verify_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recyclers/{recycler_id}/suspend": {
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Admin suspends recycler authorization",
+        "operationId": "suspend_recycler_api_v1_recyclers__recycler_id__suspend_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recyclers/jobs/audit-expired": {
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Audit job: auto-flag recyclers with expired EPR authorization",
+        "operationId": "audit_expired_authorizations_api_v1_recyclers_jobs_audit_expired_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/prices": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "summary": "List recorded scrap benchmark prices",
+        "operationId": "list_prices_api_v1_prices_get",
+        "parameters": [
+          {
+            "name": "district",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by district",
+              "title": "District"
+            },
+            "description": "Filter by district"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by category",
+              "title": "Category"
+            },
+            "description": "Filter by category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PriceResponse"
+                  },
+                  "title": "Response List Prices Api V1 Prices Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Prices"
+        ],
+        "summary": "Record a new benchmark price quote",
+        "operationId": "create_price_api_v1_prices_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prices/board": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "summary": "Get active price board for district",
+        "operationId": "get_price_board_api_v1_prices_board_get",
+        "parameters": [
+          {
+            "name": "district",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "District name, e.g. Mumbai, Pune",
+              "default": "Mumbai Suburban",
+              "title": "District"
+            },
+            "description": "District name, e.g. Mumbai, Pune"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceBoardResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prices/{price_id}": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "summary": "Get price record by ID",
+        "operationId": "get_price_api_v1_prices__price_id__get",
+        "parameters": [
+          {
+            "name": "price_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Price Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lots": {
+      "get": {
+        "tags": [
+          "Lots & Transactions"
+        ],
+        "summary": "List e-waste lots",
+        "operationId": "list_lots_api_v1_lots_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by transaction status",
+              "title": "Status"
+            },
+            "description": "Filter by transaction status"
+          },
+          {
+            "name": "collector_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by collector",
+              "title": "Collector Id"
+            },
+            "description": "Filter by collector"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotResponse"
+                  },
+                  "title": "Response List Lots Api V1 Lots Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Lots & Transactions"
+        ],
+        "summary": "Create e-waste lot (idempotent via client_lot_id)",
+        "operationId": "create_lot_api_v1_lots_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lots/{lot_id}": {
+      "get": {
+        "tags": [
+          "Lots & Transactions"
+        ],
+        "summary": "Get lot details by ID",
+        "operationId": "get_lot_api_v1_lots__lot_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lot Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/lots/{lot_id}/status": {
+      "patch": {
+        "tags": [
+          "Lots & Transactions"
+        ],
+        "summary": "Update lot state machine status",
+        "operationId": "update_lot_status_api_v1_lots__lot_id__status_patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lot Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/entries": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "List collector ledger entries",
+        "operationId": "list_ledger_entries_api_v1_ledger_entries_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LedgerEntryResponse"
+                  },
+                  "title": "Response List Ledger Entries Api V1 Ledger Entries Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Record a cash receipt or transaction entry in ledger",
+        "operationId": "create_ledger_entry_api_v1_ledger_entries_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LedgerEntryCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerEntryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/summary": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Get collector ledger balance summary",
+        "operationId": "get_ledger_summary_api_v1_ledger_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerSummary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sync/push": {
+      "post": {
+        "tags": [
+          "Offline Synchronization"
+        ],
+        "summary": "Batch upload offline client operations (Idempotent)",
+        "operationId": "sync_push_api_v1_sync_push_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncPushRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncPushResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/sync/pull": {
+      "get": {
+        "tags": [
+          "Offline Synchronization"
+        ],
+        "summary": "Delta download updated master data, prices, recyclers, and collector records",
+        "operationId": "sync_pull_api_v1_sync_pull_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO-8601 timestamp cursor",
+              "title": "Since"
+            },
+            "description": "ISO-8601 timestamp cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncPullResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health Check",
+        "description": "Health check endpoint for container probes and load balancers.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Check Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ping": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Ping",
+        "description": "Basic ping endpoint for network latency and connectivity checks.",
+        "operationId": "ping_api_v1_ping_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Ping Api V1 Ping Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailLoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "EmailLoginRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LedgerEntryCreate": {
+        "properties": {
+          "client_entry_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Entry Id",
+            "description": "Offline client UUID for idempotency"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "entry_type": {
+            "type": "string",
+            "pattern": "^(credit|debit)$",
+            "title": "Entry Type"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Amount"
+          },
+          "payment_mode": {
+            "type": "string",
+            "pattern": "^(cash_received|pending|digital_paid)$",
+            "title": "Payment Mode",
+            "default": "cash_received"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "Description"
+          },
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry_type",
+          "amount",
+          "description"
+        ],
+        "title": "LedgerEntryCreate"
+      },
+      "LedgerEntryResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "collector_id": {
+            "type": "string",
+            "title": "Collector Id"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "entry_type": {
+            "type": "string",
+            "title": "Entry Type"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "payment_mode": {
+            "type": "string",
+            "title": "Payment Mode"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "balance_after": {
+            "type": "number",
+            "title": "Balance After"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "collector_id",
+          "lot_id",
+          "entry_type",
+          "amount",
+          "payment_mode",
+          "description",
+          "balance_after",
+          "recorded_at",
+          "created_at"
+        ],
+        "title": "LedgerEntryResponse"
+      },
+      "LedgerSummary": {
+        "properties": {
+          "collector_id": {
+            "type": "string",
+            "title": "Collector Id"
+          },
+          "total_earned_inr": {
+            "type": "number",
+            "title": "Total Earned Inr"
+          },
+          "cash_received_inr": {
+            "type": "number",
+            "title": "Cash Received Inr"
+          },
+          "pending_inr": {
+            "type": "number",
+            "title": "Pending Inr"
+          },
+          "current_balance_inr": {
+            "type": "number",
+            "title": "Current Balance Inr"
+          },
+          "total_transactions": {
+            "type": "integer",
+            "title": "Total Transactions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "collector_id",
+          "total_earned_inr",
+          "cash_received_inr",
+          "pending_inr",
+          "current_balance_inr",
+          "total_transactions"
+        ],
+        "title": "LedgerSummary"
+      },
+      "LotCreate": {
+        "properties": {
+          "client_lot_id": {
+            "type": "string",
+            "title": "Client Lot Id",
+            "description": "Client-generated unique UUID for offline idempotency"
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Category"
+          },
+          "weight_kg": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight Kg"
+          },
+          "quoted_price": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Quoted Price"
+          },
+          "collection_lat": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Collection Lat"
+          },
+          "collection_lng": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Collection Lng"
+          },
+          "created_at_utc": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At Utc"
+          },
+          "photo_hashes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Photo Hashes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_lot_id",
+          "category",
+          "weight_kg",
+          "quoted_price",
+          "collection_lat",
+          "collection_lng"
+        ],
+        "title": "LotCreate"
+      },
+      "LotResponse": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "title": "Lot Id"
+          },
+          "collector_id": {
+            "type": "string",
+            "title": "Collector Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "weight_kg": {
+            "type": "number",
+            "title": "Weight Kg"
+          },
+          "quoted_price": {
+            "type": "number",
+            "title": "Quoted Price"
+          },
+          "final_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Price"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id"
+          },
+          "collection_lat": {
+            "type": "number",
+            "title": "Collection Lat"
+          },
+          "collection_lng": {
+            "type": "number",
+            "title": "Collection Lng"
+          },
+          "handover_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handover Lat"
+          },
+          "handover_lng": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handover Lng"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "handover_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handover At"
+          },
+          "payment_status": {
+            "type": "string",
+            "title": "Payment Status"
+          },
+          "transaction_status": {
+            "type": "string",
+            "title": "Transaction Status"
+          },
+          "anomaly_flag": {
+            "type": "boolean",
+            "title": "Anomaly Flag"
+          },
+          "anomaly_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomaly Reason"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "collector_id",
+          "category",
+          "weight_kg",
+          "quoted_price",
+          "final_price",
+          "recycler_id",
+          "collection_lat",
+          "collection_lng",
+          "handover_lat",
+          "handover_lng",
+          "created_at",
+          "handover_at",
+          "payment_status",
+          "transaction_status",
+          "anomaly_flag",
+          "anomaly_reason",
+          "updated_at"
+        ],
+        "title": "LotResponse"
+      },
+      "LotStatusUpdate": {
+        "properties": {
+          "transaction_status": {
+            "type": "string",
+            "pattern": "^(draft|listed|matched|handover_pending|handed_over|confirmed|disputed|cancelled)$",
+            "title": "Transaction Status"
+          },
+          "final_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Price"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id"
+          },
+          "handover_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handover Lat"
+          },
+          "handover_lng": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handover Lng"
+          },
+          "anomaly_flag": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomaly Flag"
+          },
+          "anomaly_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomaly Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "transaction_status"
+        ],
+        "title": "LotStatusUpdate"
+      },
+      "MaterialCreate": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Category"
+          },
+          "sub_category": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Sub Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "image_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Ref"
+          },
+          "approx_weight_kg": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Approx Weight Kg"
+          },
+          "condition": {
+            "type": "string",
+            "pattern": "^(working|broken|damaged|burnt)$",
+            "title": "Condition",
+            "default": "broken"
+          },
+          "source_type": {
+            "type": "string",
+            "pattern": "^(household|office|shop|repair_unit|other)$",
+            "title": "Source Type",
+            "default": "household"
+          },
+          "estimated_value": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Estimated Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "sub_category",
+          "description",
+          "approx_weight_kg",
+          "estimated_value"
+        ],
+        "title": "MaterialCreate"
+      },
+      "MaterialResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "sub_category": {
+            "type": "string",
+            "title": "Sub Category"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "image_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Ref"
+          },
+          "approx_weight_kg": {
+            "type": "number",
+            "title": "Approx Weight Kg"
+          },
+          "condition": {
+            "type": "string",
+            "title": "Condition"
+          },
+          "source_type": {
+            "type": "string",
+            "title": "Source Type"
+          },
+          "estimated_value": {
+            "type": "number",
+            "title": "Estimated Value"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "sub_category",
+          "description",
+          "image_ref",
+          "approx_weight_kg",
+          "condition",
+          "source_type",
+          "estimated_value",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MaterialResponse"
+      },
+      "MaterialUpdate": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "approx_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approx Weight Kg"
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(working|broken|damaged|burnt)$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition"
+          },
+          "source_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(household|office|shop|repair_unit|other)$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Type"
+          },
+          "estimated_value": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Value"
+          }
+        },
+        "type": "object",
+        "title": "MaterialUpdate"
+      },
+      "OTPRequest": {
+        "properties": {
+          "phone": {
+            "type": "string",
+            "pattern": "^\\+?[1-9]\\d{9,14}$",
+            "title": "Phone",
+            "description": "E.164 phone number"
+          },
+          "language": {
+            "type": "string",
+            "pattern": "^(mr|hi|en)$",
+            "title": "Language",
+            "description": "Preferred language",
+            "default": "mr"
+          }
+        },
+        "type": "object",
+        "required": [
+          "phone"
+        ],
+        "title": "OTPRequest"
+      },
+      "OTPRequestResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "otp_sent"
+          },
+          "retry_after_seconds": {
+            "type": "integer",
+            "title": "Retry After Seconds",
+            "default": 60
+          },
+          "mock_otp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mock Otp"
+          }
+        },
+        "type": "object",
+        "title": "OTPRequestResponse"
+      },
+      "OTPVerifyRequest": {
+        "properties": {
+          "phone": {
+            "type": "string",
+            "pattern": "^\\+?[1-9]\\d{9,14}$",
+            "title": "Phone"
+          },
+          "otp": {
+            "type": "string",
+            "maxLength": 8,
+            "minLength": 4,
+            "title": "Otp"
+          },
+          "operating_area": {
+            "type": "string",
+            "title": "Operating Area",
+            "description": "Operating district",
+            "default": "Mumbai Suburban"
+          }
+        },
+        "type": "object",
+        "required": [
+          "phone",
+          "otp"
+        ],
+        "title": "OTPVerifyRequest"
+      },
+      "PINLoginRequest": {
+        "properties": {
+          "phone": {
+            "type": "string",
+            "pattern": "^\\+?[1-9]\\d{9,14}$",
+            "title": "Phone"
+          },
+          "pin": {
+            "type": "string",
+            "pattern": "^\\d{4}$",
+            "title": "Pin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "phone",
+          "pin"
+        ],
+        "title": "PINLoginRequest"
+      },
+      "PINSetupRequest": {
+        "properties": {
+          "pin": {
+            "type": "string",
+            "pattern": "^\\d{4}$",
+            "title": "Pin",
+            "description": "4-digit numeric PIN"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pin"
+        ],
+        "title": "PINSetupRequest"
+      },
+      "PriceBoardCategory": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "sub_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Category"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "min_rate_inr": {
+            "type": "number",
+            "title": "Min Rate Inr"
+          },
+          "max_rate_inr": {
+            "type": "number",
+            "title": "Max Rate Inr"
+          },
+          "avg_buying_price": {
+            "type": "number",
+            "title": "Avg Buying Price"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "sub_category",
+          "unit",
+          "min_rate_inr",
+          "max_rate_inr",
+          "avg_buying_price"
+        ],
+        "title": "PriceBoardCategory"
+      },
+      "PriceBoardResponse": {
+        "properties": {
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Valid Until"
+          },
+          "rates": {
+            "items": {
+              "$ref": "#/components/schemas/PriceBoardCategory"
+            },
+            "type": "array",
+            "title": "Rates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "district",
+          "valid_until",
+          "rates"
+        ],
+        "title": "PriceBoardResponse"
+      },
+      "PriceCreate": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Category"
+          },
+          "sub_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Category"
+          },
+          "district": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "District"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "buying_price": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Buying Price"
+          },
+          "selling_quoted_price": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Selling Quoted Price"
+          },
+          "unit": {
+            "type": "string",
+            "pattern": "^(kg|piece)$",
+            "title": "Unit",
+            "default": "kg"
+          },
+          "market_min": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Market Min"
+          },
+          "market_max": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Market Max"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id"
+          },
+          "source": {
+            "type": "string",
+            "pattern": "^(recycler_quote|field_survey|synthetic)$",
+            "title": "Source",
+            "default": "synthetic"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "district",
+          "latitude",
+          "longitude",
+          "buying_price",
+          "selling_quoted_price",
+          "market_min",
+          "market_max"
+        ],
+        "title": "PriceCreate"
+      },
+      "PriceResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "sub_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Category"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At"
+          },
+          "buying_price": {
+            "type": "number",
+            "title": "Buying Price"
+          },
+          "selling_quoted_price": {
+            "type": "number",
+            "title": "Selling Quoted Price"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "market_min": {
+            "type": "number",
+            "title": "Market Min"
+          },
+          "market_max": {
+            "type": "number",
+            "title": "Market Max"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "sub_category",
+          "district",
+          "city",
+          "latitude",
+          "longitude",
+          "recorded_at",
+          "buying_price",
+          "selling_quoted_price",
+          "unit",
+          "market_min",
+          "market_max",
+          "recycler_id",
+          "source",
+          "created_at"
+        ],
+        "title": "PriceResponse"
+      },
+      "RecyclerCreate": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 36,
+            "title": "Id",
+            "description": "e.g. REC-MH-042"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "title": "Name"
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "materials_accepted": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Materials Accepted"
+          },
+          "authorization_number": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Authorization Number"
+          },
+          "authorization_body": {
+            "type": "string",
+            "pattern": "^(CPCB|SPCB|OTHER)$",
+            "title": "Authorization Body",
+            "default": "CPCB"
+          },
+          "authorization_valid_till": {
+            "type": "string",
+            "format": "date",
+            "title": "Authorization Valid Till"
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20,
+            "title": "Phone"
+          },
+          "offered_rates": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Offered Rates"
+          },
+          "pickup_available": {
+            "type": "boolean",
+            "title": "Pickup Available",
+            "default": false
+          },
+          "pickup_radius_km": {
+            "type": "number",
+            "title": "Pickup Radius Km",
+            "default": 0.0
+          },
+          "service_area": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Service Area"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "latitude",
+          "longitude",
+          "authorization_number",
+          "authorization_valid_till",
+          "phone"
+        ],
+        "title": "RecyclerCreate"
+      },
+      "RecyclerResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "materials_accepted": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Materials Accepted"
+          },
+          "authorization_number": {
+            "type": "string",
+            "title": "Authorization Number"
+          },
+          "authorization_body": {
+            "type": "string",
+            "title": "Authorization Body"
+          },
+          "authorization_status": {
+            "type": "string",
+            "title": "Authorization Status"
+          },
+          "authorization_valid_till": {
+            "type": "string",
+            "format": "date",
+            "title": "Authorization Valid Till"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "offered_rates": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Offered Rates"
+          },
+          "pickup_available": {
+            "type": "boolean",
+            "title": "Pickup Available"
+          },
+          "pickup_radius_km": {
+            "type": "number",
+            "title": "Pickup Radius Km"
+          },
+          "service_area": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Service Area"
+          },
+          "rating": {
+            "type": "number",
+            "title": "Rating"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "latitude",
+          "longitude",
+          "materials_accepted",
+          "authorization_number",
+          "authorization_body",
+          "authorization_status",
+          "authorization_valid_till",
+          "phone",
+          "offered_rates",
+          "pickup_available",
+          "pickup_radius_km",
+          "service_area",
+          "rating",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "RecyclerResponse"
+      },
+      "RecyclerUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "materials_accepted": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Materials Accepted"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "offered_rates": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offered Rates"
+          },
+          "pickup_available": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pickup Available"
+          },
+          "pickup_radius_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pickup Radius Km"
+          },
+          "service_area": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Area"
+          }
+        },
+        "type": "object",
+        "title": "RecyclerUpdate"
+      },
+      "SafetyContentItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "hazard_level": {
+            "type": "string",
+            "title": "Hazard Level"
+          },
+          "pictogram_url": {
+            "type": "string",
+            "title": "Pictogram Url"
+          },
+          "audio_prompt_urls": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Audio Prompt Urls"
+          },
+          "title_vernacular": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Title Vernacular"
+          },
+          "instructions_vernacular": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Instructions Vernacular"
+          },
+          "dos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dos"
+          },
+          "donts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Donts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "hazard_level",
+          "pictogram_url",
+          "audio_prompt_urls",
+          "title_vernacular",
+          "instructions_vernacular",
+          "dos",
+          "donts"
+        ],
+        "title": "SafetyContentItem"
+      },
+      "SyncOperation": {
+        "properties": {
+          "client_tx_id": {
+            "type": "string",
+            "title": "Client Tx Id",
+            "description": "Unique client transaction UUID for idempotency"
+          },
+          "action": {
+            "type": "string",
+            "pattern": "^(create_lot|update_lot|record_cash_payment)$",
+            "title": "Action"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          },
+          "client_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Client Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_tx_id",
+          "action",
+          "payload",
+          "client_timestamp"
+        ],
+        "title": "SyncOperation"
+      },
+      "SyncPullResponse": {
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "title": "Cursor"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/MaterialResponse"
+            },
+            "type": "array",
+            "title": "Materials"
+          },
+          "prices": {
+            "items": {
+              "$ref": "#/components/schemas/PriceResponse"
+            },
+            "type": "array",
+            "title": "Prices"
+          },
+          "recyclers": {
+            "items": {
+              "$ref": "#/components/schemas/RecyclerResponse"
+            },
+            "type": "array",
+            "title": "Recyclers"
+          },
+          "safety_content": {
+            "items": {
+              "$ref": "#/components/schemas/SafetyContentItem"
+            },
+            "type": "array",
+            "title": "Safety Content"
+          },
+          "my_lots": {
+            "items": {
+              "$ref": "#/components/schemas/LotResponse"
+            },
+            "type": "array",
+            "title": "My Lots"
+          },
+          "my_ledger": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerEntryResponse"
+            },
+            "type": "array",
+            "title": "My Ledger"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cursor",
+          "server_time",
+          "materials",
+          "prices",
+          "recyclers",
+          "safety_content",
+          "my_lots",
+          "my_ledger"
+        ],
+        "title": "SyncPullResponse"
+      },
+      "SyncPushRequest": {
+        "properties": {
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/SyncOperation"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "title": "Operations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "operations"
+        ],
+        "title": "SyncPushRequest"
+      },
+      "SyncPushResponse": {
+        "properties": {
+          "processed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Processed",
+            "description": "List of processed client_tx_ids"
+          },
+          "conflicts": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Conflicts"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "processed",
+          "server_time"
+        ],
+        "title": "SyncPushResponse"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "collector_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collector Id"
+          },
+          "has_pin": {
+            "type": "boolean",
+            "title": "Has Pin",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "role"
+        ],
+        "title": "TokenResponse"
+      },
+      "UserProfileResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "collector_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collector Id"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "is_active",
+          "created_at"
+        ],
+        "title": "UserProfileResponse"
+      },
+      "UserRegisterRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "title": "Password"
+          },
+          "role": {
+            "type": "string",
+            "pattern": "^(recycler|admin)$",
+            "title": "Role",
+            "default": "recycler"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "UserRegisterRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

@@ -26,6 +26,8 @@ from app.models.schema import (
     Traceability,
     Transaction,
     TransactionStatus,
+    User,
+    UserRole,
 )
 
 __all__ = [
@@ -54,4 +56,6 @@ __all__ = [
     "MLTrainingSample",
     "DataProvenanceSource",
     "PreferredLanguage",
+    "User",
+    "UserRole",
 ]

@@ -161,6 +161,12 @@ class DataProvenanceSource(enum.StrEnum):
     SCRAPED_PUBLIC = "scraped_public"
 
 
+class UserRole(enum.StrEnum):
+    COLLECTOR = "collector"
+    RECYCLER = "recycler"
+    ADMIN = "admin"
+
+
 # -----------------------------------------------------------------------------
 # Models
 # -----------------------------------------------------------------------------
@@ -172,6 +178,8 @@ class Collector(Base):
     __tablename__ = "collectors"
 
     collector_id: Mapped[str] = mapped_column(String(32), primary_key=True, index=True)
+    phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
+    pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     preferred_language: Mapped[PreferredLanguage] = mapped_column(
         Enum(PreferredLanguage), default=PreferredLanguage.MR, nullable=False
     )
@@ -513,3 +521,34 @@ class MLTrainingSample(Base):
     )
 
     __table_args__ = (Index("idx_ml_samples_location", location, postgresql_using="gist"),)
+
+
+class User(Base):
+    """User account credentials and role mapping (collector, recycler, admin)."""
+
+    __tablename__ = "users"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
+    phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole), nullable=False, default=UserRole.COLLECTOR, index=True
+    )
+    collector_id: Mapped[str | None] = mapped_column(
+        String(32), ForeignKey("collectors.collector_id"), nullable=True
+    )
+    recycler_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("recyclers.id"), nullable=True
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
