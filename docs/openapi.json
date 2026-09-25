@@ -1734,6 +1734,201 @@
         }
       }
     },
+    "/api/v1/handover/initiate": {
+      "post": {
+        "tags": [
+          "Handover & Traceability"
+        ],
+        "summary": "Initiate verifiable handover and generate signed QR payload",
+        "description": "Collector initiates handover, producing a unique 6-character short code\n\nand a tamper-evident HMAC-SHA256 signed QR payload.",
+        "operationId": "initiate_handover_api_v1_handover_initiate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoverInitiateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoverInitiateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/handover/confirm": {
+      "post": {
+        "tags": [
+          "Handover & Traceability"
+        ],
+        "summary": "Recycler confirms physical handover via QR scan or short code",
+        "description": "Recycler confirms physical handover by scanning the signed QR code or entering the 6-character code.\n\nEnforces weight mismatch tolerance (10%) and appends to the immutable hash chain.",
+        "operationId": "confirm_handover_api_v1_handover_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoverConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoverConfirmResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/handover/{lot_id}/downstream": {
+      "post": {
+        "tags": [
+          "Handover & Traceability"
+        ],
+        "summary": "Update EPR downstream processing lifecycle stage",
+        "description": "Updates downstream lifecycle progress (received -> dismantled -> processed -> certificate_issued).",
+        "operationId": "update_downstream_status_api_v1_handover__lot_id__downstream_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lot Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DownstreamStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownstreamStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verify/{handover_ref_no}": {
+      "get": {
+        "tags": [
+          "Public Verification"
+        ],
+        "summary": "Public verification of handover authenticity and cryptographic integrity",
+        "description": "Allows any stakeholder or auditor to verify the authenticity, weight, and status\n\nof an e-waste handover record using its 6-character reference code without authentication.",
+        "operationId": "verify_handover_api_v1_verify__handover_ref_no__get",
+        "parameters": [
+          {
+            "name": "handover_ref_no",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Handover Ref No"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoverVerificationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/matching/rank": {
       "post": {
         "tags": [
@@ -2202,6 +2397,201 @@
         ]
       }
     },
+    "/handover/initiate": {
+      "post": {
+        "tags": [
+          "Handover & Traceability"
+        ],
+        "summary": "Initiate verifiable handover and generate signed QR payload",
+        "description": "Collector initiates handover, producing a unique 6-character short code\n\nand a tamper-evident HMAC-SHA256 signed QR payload.",
+        "operationId": "initiate_handover_handover_initiate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoverInitiateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoverInitiateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/handover/confirm": {
+      "post": {
+        "tags": [
+          "Handover & Traceability"
+        ],
+        "summary": "Recycler confirms physical handover via QR scan or short code",
+        "description": "Recycler confirms physical handover by scanning the signed QR code or entering the 6-character code.\n\nEnforces weight mismatch tolerance (10%) and appends to the immutable hash chain.",
+        "operationId": "confirm_handover_handover_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandoverConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoverConfirmResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/handover/{lot_id}/downstream": {
+      "post": {
+        "tags": [
+          "Handover & Traceability"
+        ],
+        "summary": "Update EPR downstream processing lifecycle stage",
+        "description": "Updates downstream lifecycle progress (received -> dismantled -> processed -> certificate_issued).",
+        "operationId": "update_downstream_status_handover__lot_id__downstream_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lot Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DownstreamStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownstreamStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify/{handover_ref_no}": {
+      "get": {
+        "tags": [
+          "Public Verification"
+        ],
+        "summary": "Public verification of handover authenticity and cryptographic integrity",
+        "description": "Allows any stakeholder or auditor to verify the authenticity, weight, and status\n\nof an e-waste handover record using its 6-character reference code without authentication.",
+        "operationId": "verify_handover_verify__handover_ref_no__get",
+        "parameters": [
+          {
+            "name": "handover_ref_no",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Handover Ref No"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandoverVerificationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -2257,6 +2647,45 @@
   },
   "components": {
     "schemas": {
+      "DownstreamStatusResponse": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "title": "Lot Id"
+          },
+          "downstream_status": {
+            "type": "string",
+            "title": "Downstream Status"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "downstream_status",
+          "updated_at"
+        ],
+        "title": "DownstreamStatusResponse"
+      },
+      "DownstreamStatusUpdate": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^(received|dismantled|processed|certificate_issued)$",
+            "title": "Status",
+            "description": "EPR downstream processing lifecycle stage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "DownstreamStatusUpdate"
+      },
       "EmailLoginRequest": {
         "properties": {
           "email": {
@@ -2289,6 +2718,325 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HandoverConfirmRequest": {
+        "properties": {
+          "handover_ref_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handover Ref No",
+            "description": "6-character alphanumeric reference code"
+          },
+          "qr_payload": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr Payload",
+            "description": "Full scanned QR JSON payload with HMAC signature"
+          },
+          "measured_weight_kg": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Measured Weight Kg",
+            "description": "Recycler scale weight in kg"
+          },
+          "final_price": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Final Price",
+            "description": "Agreed final settlement price in INR"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id",
+            "description": "Authorized recycler facility ID confirming handover"
+          }
+        },
+        "type": "object",
+        "required": [
+          "measured_weight_kg",
+          "final_price"
+        ],
+        "title": "HandoverConfirmRequest"
+      },
+      "HandoverConfirmResponse": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "title": "Lot Id"
+          },
+          "handover_ref_no": {
+            "type": "string",
+            "title": "Handover Ref No"
+          },
+          "transaction_status": {
+            "type": "string",
+            "title": "Transaction Status"
+          },
+          "is_disputed": {
+            "type": "boolean",
+            "title": "Is Disputed"
+          },
+          "dispute_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dispute Reason"
+          },
+          "measured_weight_kg": {
+            "type": "number",
+            "title": "Measured Weight Kg"
+          },
+          "original_weight_kg": {
+            "type": "number",
+            "title": "Original Weight Kg"
+          },
+          "final_price": {
+            "type": "number",
+            "title": "Final Price"
+          },
+          "record_hash": {
+            "type": "string",
+            "title": "Record Hash"
+          },
+          "confirmed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Confirmed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "handover_ref_no",
+          "transaction_status",
+          "is_disputed",
+          "measured_weight_kg",
+          "original_weight_kg",
+          "final_price",
+          "record_hash",
+          "confirmed_at"
+        ],
+        "title": "HandoverConfirmResponse"
+      },
+      "HandoverInitiateRequest": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "title": "Lot Id",
+            "description": "Lot identifier to initiate handover for"
+          },
+          "weight_kg": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight Kg",
+            "description": "Collector-measured final weight in kg"
+          },
+          "photo_hashes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Photo Hashes",
+            "description": "Fresh SHA-256 photo hashes"
+          },
+          "gps_lat": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Gps Lat",
+            "description": "Handover GPS latitude"
+          },
+          "gps_lng": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Gps Lng",
+            "description": "Handover GPS longitude"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp",
+            "description": "Handover creation timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "weight_kg",
+          "gps_lat",
+          "gps_lng"
+        ],
+        "title": "HandoverInitiateRequest"
+      },
+      "HandoverInitiateResponse": {
+        "properties": {
+          "lot_id": {
+            "type": "string",
+            "title": "Lot Id"
+          },
+          "handover_ref_no": {
+            "type": "string",
+            "title": "Handover Ref No"
+          },
+          "qr_payload": {
+            "type": "string",
+            "title": "Qr Payload"
+          },
+          "signature": {
+            "type": "string",
+            "title": "Signature"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "handover_ref_no",
+          "qr_payload",
+          "signature",
+          "created_at"
+        ],
+        "title": "HandoverInitiateResponse"
+      },
+      "HandoverVerificationResponse": {
+        "properties": {
+          "handover_ref_no": {
+            "type": "string",
+            "title": "Handover Ref No"
+          },
+          "is_valid": {
+            "type": "boolean",
+            "title": "Is Valid"
+          },
+          "lot_id": {
+            "type": "string",
+            "title": "Lot Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "collector_weight_kg": {
+            "type": "number",
+            "title": "Collector Weight Kg"
+          },
+          "measured_weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measured Weight Kg"
+          },
+          "final_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Price"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "recycler_confirmed": {
+            "type": "boolean",
+            "title": "Recycler Confirmed"
+          },
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed At"
+          },
+          "confirmed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed By"
+          },
+          "downstream_status": {
+            "type": "string",
+            "title": "Downstream Status"
+          },
+          "record_hash": {
+            "type": "string",
+            "title": "Record Hash"
+          },
+          "integrity_status": {
+            "type": "string",
+            "title": "Integrity Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "handover_ref_no",
+          "is_valid",
+          "lot_id",
+          "category",
+          "collector_weight_kg",
+          "timestamp",
+          "recycler_confirmed",
+          "downstream_status",
+          "record_hash",
+          "integrity_status"
+        ],
+        "title": "HandoverVerificationResponse"
       },
       "LedgerEntryCreate": {
         "properties": {

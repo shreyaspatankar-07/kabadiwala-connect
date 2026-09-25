@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "dev_secret_key_change_in_production_e9f2a8c14b"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
+    HANDOVER_WEIGHT_TOLERANCE_PERCENT: float = 10.0
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

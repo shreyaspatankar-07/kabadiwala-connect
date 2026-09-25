@@ -71,6 +71,25 @@ class DuplicateRequestError(AppError):
         )
 
 
+class ConflictError(AppError):
+    def __init__(self, message: str, code: str = "CONFLICT"):
+        super().__init__(
+            code=code,
+            message=message,
+            status_code=status.HTTP_409_CONFLICT,
+        )
+
+
+class BadRequestError(AppError):
+    def __init__(self, message: str, code: str = "BAD_REQUEST", details: Any = None):
+        super().__init__(
+            code=code,
+            message=message,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            details=details,
+        )
+
+
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
     """Consistent JSON response format for AppError exceptions."""
     return JSONResponse(

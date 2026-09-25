@@ -4,7 +4,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 4 (Mobile Collector App Shell) Complete
+## Current Status: Phase 6 (Verifiable Handover Record & Signed QR Flow) Complete
 
 ### Completed Items
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
@@ -92,15 +92,27 @@ Living record of project deliverables, milestones completed, and pending roadmap
     - **Shared Test Fixture (`matching_fixture.json`)**: Proves backend and Flutter matching engines generate identical scores and breakdowns down to 4 decimal places!
     - **Mobile Test Suite**: 8 new comprehensive widget and repository unit tests in `mobile/test/best_buyers_screen_test.dart`. All 31 mobile tests pass cleanly (`flutter test`) and `flutter analyze` reports 0 issues.
 
+- [x] Verifiable Handover Record & Signed QR Flow (Backend & Mobile):
+  - **Backend Handover Engine (`backend/app/services/handover_service.py` & `/backend/app/api/v1/handover.py`)**:
+    - `POST /handover/initiate`: Collector submits final weight, photo hashes, GPS, timestamp, and lot ID. Generates unique 6-char alphanumeric uppercase `handover_ref_no` (excluding ambiguous characters: `0`, `O`, `1`, `I`), constructs sorted JSON payload, and generates server HMAC-SHA256 signature. Inserts initial `Traceability` record with base hash and transitions lot status to `handover_pending`.
+    - `POST /handover/confirm`: Recycler scans QR or enters 6-char code, submits measured weight and final price. Verifies cryptographic HMAC-SHA256 signature, enforces configurable weight mismatch tolerance (`HANDOVER_WEIGHT_TOLERANCE_PERCENT = 10%`), appends immutable SHA-256 hash chain (`record_hash = SHA256(payload:prev_hash:weight:price:recycler:time)`), transitions transaction status to `handed_over` (or `disputed` if mismatch $> 10\%$), creates financial credit entry in collector ledger, and marks recycler confirmation.
+    - `POST /handover/{lot_id}/downstream`: Recycler updates processing lifecycle status (`received` $\rightarrow$ `dismantled` $\rightarrow$ `processed` $\rightarrow$ `certificate_issued`).
+    - `GET /verify/{handover_ref_no}`: Public verification endpoint requiring zero authentication; returns tamper-evident cryptographic validity status, collector weight, category, confirmation timestamp, recycler name, and downstream processing stage.
+    - **Security Test Suite (`backend/tests/test_handover_api.py`)**: 5 comprehensive security tests covering happy path lifecycle, tampered QR payload detection (HTTP 400), forged HMAC signature rejection (HTTP 400), replay attack prevention on already confirmed handovers (HTTP 409), and weight mismatch $> 10\%$ dispute flagging. All 52 backend tests pass (`py -3.11 -m pytest -q`).
+  - **Mobile Handover & QR Flow (`mobile/lib/core/handover/` & `mobile/lib/ui/`)**:
+    - `OfflineHandoverService`: Client-side cryptographic HMAC-SHA256 signing, sorted canonical serialization, 6-character short code generator, local Drift `LocalTraceability` persistence, and background synchronization via `SyncQueueEntries` FIFO queue.
+    - `HandoverInitiateScreen`: Triggered from lot detail when status is `matched`. Allows entering final weight via `BigKeypad`, shows summary card (lot ID, weight, estimated value, recycler name), displays full-screen QR code (`qr_flutter`), and prominent 6-character short code badge below QR for manual entry.
+    - `RecyclerConfirmScreen`: Recycler enters 6-char code or scans QR, enters measured weight and price; dynamically displays live weight mismatch warning banner (`Key('weight_mismatch_warning')`) if weight differs by $> 10\%$, and transitions transaction to `handed_over` or `disputed`.
+    - `HandoverReceiptCard`: High-contrast digital receipt card rendering QR code, spaced 6-character short code, lot ID, material category, final weight, authorized recycler name, and timestamp. Captures to PNG via `RepaintBoundary` and triggers Android share sheet.
+    - `DownstreamTimelineWidget`: 4-step pictorial progression timeline (`received` $\rightarrow$ `dismantled` $\rightarrow$ `processed` $\rightarrow$ `certificate_issued`) with green checkmarks, active status rings, and vernacular labels.
+    - `VerifyHandoverScreen`: Public in-app verification screen allowing anyone to enter a 6-character reference code, displaying cryptographic integrity status badge, weight, recycler confirmation status, and embedded downstream timeline.
+    - **Mobile Test Suite (`mobile/test/handover_flow_test.dart`)**: 6 comprehensive widget tests covering QR display, 6-char code rendering, offline cryptographic HMAC-SHA256 signature verification, live weight mismatch warning banner, receipt sharing callback, and downstream timeline progression. All 37 mobile tests pass cleanly (`flutter test`) and `flutter analyze` reports 0 issues.
+
 ---
 
 ## Pending Next Phase Tasks
 
-### Phase 6: Dual Handover & Recycler Verification Flow
-- [ ] QR code generation for tamper-evident offline dual-handover audit trail.
-- [ ] Bluetooth scale real driver integration (replacing stub).
-- [ ] Offline handover certificate signing.
-
 ### Phase 7: Recycler & Admin Portal (Next.js)
 - [ ] Build Recycler dashboard (incoming lots, weight scale verification, EPR digital receipts).
 - [ ] Build Admin/JNARDDC compliance & mass balance overview.
+

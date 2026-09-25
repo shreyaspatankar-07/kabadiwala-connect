@@ -1594,6 +1594,320 @@
       ]
     },
     {
+      "name": "Handover & Traceability",
+      "item": [
+        {
+          "name": "Initiate verifiable handover and generate signed QR payload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/handover/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "handover",
+                "initiate"
+              ]
+            },
+            "description": "Collector initiates handover, producing a unique 6-character short code\n\nand a tamper-evident HMAC-SHA256 signed QR payload.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recycler confirms physical handover via QR scan or short code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/handover/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "handover",
+                "confirm"
+              ]
+            },
+            "description": "Recycler confirms physical handover by scanning the signed QR code or entering the 6-character code.\n\nEnforces weight mismatch tolerance (10%) and appends to the immutable hash chain.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update EPR downstream processing lifecycle stage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/handover/{lot_id}/downstream",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "handover",
+                "{lot_id}",
+                "downstream"
+              ]
+            },
+            "description": "Updates downstream lifecycle progress (received -> dismantled -> processed -> certificate_issued).",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Initiate verifiable handover and generate signed QR payload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/handover/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "handover",
+                "initiate"
+              ]
+            },
+            "description": "Collector initiates handover, producing a unique 6-character short code\n\nand a tamper-evident HMAC-SHA256 signed QR payload.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recycler confirms physical handover via QR scan or short code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/handover/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "handover",
+                "confirm"
+              ]
+            },
+            "description": "Recycler confirms physical handover by scanning the signed QR code or entering the 6-character code.\n\nEnforces weight mismatch tolerance (10%) and appends to the immutable hash chain.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update EPR downstream processing lifecycle stage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/handover/{lot_id}/downstream",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "handover",
+                "{lot_id}",
+                "downstream"
+              ]
+            },
+            "description": "Updates downstream lifecycle progress (received -> dismantled -> processed -> certificate_issued).",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Verification",
+      "item": [
+        {
+          "name": "Public verification of handover authenticity and cryptographic integrity",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/verify/{handover_ref_no}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "verify",
+                "{handover_ref_no}"
+              ]
+            },
+            "description": "Allows any stakeholder or auditor to verify the authenticity, weight, and status\n\nof an e-waste handover record using its 6-character reference code without authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Public verification of handover authenticity and cryptographic integrity",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/verify/{handover_ref_no}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "verify",
+                "{handover_ref_no}"
+              ]
+            },
+            "description": "Allows any stakeholder or auditor to verify the authenticity, weight, and status\n\nof an e-waste handover record using its 6-character reference code without authentication."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Health",
       "item": [
         {
