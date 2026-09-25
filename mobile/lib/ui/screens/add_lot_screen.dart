@@ -12,6 +12,7 @@ import '../../data/matching/offline_matching_engine.dart';
 import '../../data/models/lot_item_draft.dart';
 import '../../data/repositories/lot_repository.dart';
 import '../../data/repositories/price_repository.dart';
+import '../../data/safety_repository.dart';
 import '../widgets/big_keypad.dart';
 import '../widgets/big_tile.dart';
 import '../widgets/camera_capture_card.dart';
@@ -20,6 +21,8 @@ import '../widgets/reference_weight_helper.dart';
 import '../widgets/speaker_button.dart';
 import '../widgets/value_estimate_card.dart';
 import 'best_buyers_screen.dart';
+import 'safety_card_detail_screen.dart';
+
 
 class AddLotScreen extends StatefulWidget {
   const AddLotScreen({
@@ -252,11 +255,93 @@ class _AddLotScreenState extends State<AddLotScreen> {
       final totalWeight = _draftItems.fold(0.0, (acc, item) => acc + item.weightKg);
       final totalQuotedPrice = _draftItems.fold(0.0, (acc, item) => acc + item.estimatedTotalValue);
       final primaryCategory = _draftItems.isNotEmpty ? _draftItems.first.category : _selectedCategory;
+      final effectiveCondition = _draftItems.isNotEmpty ? _draftItems.first.condition.dbValue : _selectedCondition.dbValue;
+
+
+      // Check contextual safety nudge (CRT, Batteries, Burnt condition)
+      final nudgeCard = SafetyRepository().getContextualNudge(
+        category: primaryCategory,
+        condition: effectiveCondition,
+        locale: widget.locale,
+      );
+
+      if (nudgeCard != null && !nudgeCard.isAcknowledged) {
+        final isDanger = nudgeCard.hazardLevel == 'danger';
+        final proceed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            key: Key('contextual_safety_dialog_${nudgeCard.topicId}'),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Row(
+              children: [
+                Icon(
+                  isDanger ? Icons.dangerous_rounded : Icons.warning_amber_rounded,
+                  color: isDanger ? AppTheme.dangerRed : const Color(0xFFD97706),
+                  size: 28,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    nudgeCard.title,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(nudgeCard.summary, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 10),
+                ...nudgeCard.instructions.take(2).map(
+                  (inst) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
+                    child: Text('• $inst', style: const TextStyle(fontSize: 12)),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                key: const Key('btn_view_full_safety_guide'),
+                onPressed: () {
+                  Navigator.pop(ctx, false);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SafetyCardDetailScreen(
+                        card: nudgeCard,
+                        locale: widget.locale,
+                      ),
+                    ),
+                  );
+                },
+                child: Text(widget.locale == 'hi' ? 'पूरा नियम पढ़ें' : (widget.locale == 'en' ? 'Read Full' : 'पूर्ण नियम वाचा')),
+              ),
+              ElevatedButton(
+                key: const Key('btn_acknowledge_nudge_proceed'),
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.greenGoEarn),
+                onPressed: () {
+                  SafetyRepository().acknowledgeCard(nudgeCard.topicId);
+                  Navigator.pop(ctx, true);
+                },
+                child: Text(widget.locale == 'hi' ? 'समझ गया, आगे बढ़ें' : (widget.locale == 'en' ? 'Understood' : 'समजले, पुढे चला')),
+              ),
+            ],
+          ),
+        );
+
+        if (proceed != true) {
+          return;
+        }
+      }
 
       final allPhotoHashes = <String>[];
       for (final item in _draftItems) {
         allPhotoHashes.addAll(item.photoHashes);
       }
+
 
       final lat = _currentLocation?.latitude ?? 19.6967;
       final lng = _currentLocation?.longitude ?? 72.7699;
@@ -445,6 +530,7 @@ class _AddLotScreenState extends State<AddLotScreen> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10.0),
                 child: BigTile(
+                  key: Key('category_tile_${pred.categoryId}'),
                   title: pred.categoryId,
                   subtitle: '${pred.confidencePercent}% खात्री (Confidence)',
                   icon: pred.icon,
@@ -477,6 +563,7 @@ class _AddLotScreenState extends State<AddLotScreen> {
                 final id = cat['id'] as String;
                 final isSelected = _selectedCategory == id;
                 return ChoiceChip(
+                  key: Key('category_tile_$id'),
                   label: Text(id, style: const TextStyle(fontWeight: FontWeight.bold)),
                   selected: isSelected,
                   onSelected: (val) {
@@ -544,10 +631,112 @@ class _AddLotScreenState extends State<AddLotScreen> {
               );
             }).toList(),
           ),
+
+          // Contextual Safety Guidance Nudge (CRT, Batteries, Burnt condition)
+          _buildContextualSafetyBanner(locale),
         ],
       ),
     );
   }
+
+  Widget _buildContextualSafetyBanner(String locale) {
+    final nudge = SafetyRepository().getContextualNudge(
+      category: _selectedCategory,
+      condition: _selectedCondition.dbValue,
+      locale: locale,
+    );
+
+    if (nudge == null) return const SizedBox.shrink();
+
+    String bannerKey = 'contextual_warning_banner';
+    if (_selectedCondition == ItemCondition.burnt) {
+      bannerKey = 'contextual_burnt_warning_banner';
+    } else if (_selectedCategory.toLowerCase().contains('crt')) {
+      bannerKey = 'contextual_crt_warning_banner';
+    } else if (_selectedCategory.toLowerCase().contains('batter')) {
+      bannerKey = 'contextual_battery_warning_banner';
+    }
+
+    final isDanger = nudge.hazardLevel == 'danger';
+
+    return Container(
+      key: Key(bannerKey),
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDanger ? AppTheme.dangerRedLight : AppTheme.yellowPendingLight,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDanger ? AppTheme.dangerRed : const Color(0xFFD97706),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isDanger ? Icons.dangerous_rounded : Icons.warning_amber_rounded,
+            color: isDanger ? AppTheme.dangerRed : const Color(0xFFD97706),
+            size: 26,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nudge.title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    color: isDanger ? AppTheme.dangerRed : const Color(0xFFB45309),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  nudge.summary,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textHighContrast,
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+          TextButton(
+            key: Key('btn_read_safety_${nudge.topicId}'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SafetyCardDetailScreen(
+                    card: nudge,
+                    locale: locale,
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              locale == 'hi' ? 'नियम पढ़ें' : (locale == 'en' ? 'Read' : 'नियम वाचा'),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDanger ? AppTheme.dangerRed : const Color(0xFFB45309),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   List<String> _getSubcategoriesForActiveCategory(String locale) {
     final isHi = locale == 'hi';

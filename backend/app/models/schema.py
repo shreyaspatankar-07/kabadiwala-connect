@@ -557,3 +557,20 @@ class User(Base):
         onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
+
+
+class SafetyAcknowledgement(Base):
+    """Tracking of Collector Safety Card Acknowledgements."""
+
+    __tablename__ = "safety_acknowledgements"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    collector_id: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    topic_id: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    acknowledged_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
+

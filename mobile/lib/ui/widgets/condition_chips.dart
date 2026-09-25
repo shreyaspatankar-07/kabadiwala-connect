@@ -67,6 +67,7 @@ class ConditionChips extends StatelessWidget {
               color: isSelected ? item.bg : AppTheme.surfaceLight,
               borderRadius: BorderRadius.circular(16),
               child: InkWell(
+                key: Key('condition_chip_${item.cond.name}'),
                 borderRadius: BorderRadius.circular(16),
                 onTap: () {
                   HapticService.selectionClick();

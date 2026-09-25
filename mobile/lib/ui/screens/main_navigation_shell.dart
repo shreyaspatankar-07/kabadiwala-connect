@@ -12,6 +12,8 @@ import '../widgets/sync_status_badge.dart';
 import 'add_lot_screen.dart';
 import 'earnings_screen.dart';
 import 'price_board_screen.dart';
+import 'safety_screen.dart';
+
 
 /// Bottom Navigation Shell with 4 tabs:
 /// 1. Add Lot (माल जोडा / माल जोड़ें)
@@ -382,88 +384,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   // Tab 4: Safety (सुरक्षा)
   // ---------------------------------------------------------------------------
   Widget _buildSafetyTab(BuildContext context, String locale) {
-    final rules = [
-      (
-        'बॅटरी कधीही कापू किंवा जाळू नका',
-        'बैटरी कभी न काटें और न जलाएं',
-        'स्फोट किंवा विषारी धूर निघू शकतो',
-        Icons.battery_alert_rounded,
-        AppTheme.dangerRed,
-        AppTheme.dangerRedLight,
-      ),
-      (
-        'सीआरटी ट्यूब फोडू नका',
-        'सीआरटी ट्यूब न तोड़ें',
-        'काचेमध्ये विषारी शिसे (Lead) असते',
-        Icons.tv_off_rounded,
-        AppTheme.dangerRed,
-        AppTheme.dangerRedLight,
-      ),
-      (
-        'वायर जाळू नका, प्लास्टिक सोलून काढा',
-        'तार न जलाएं, प्लास्टिक अलग करें',
-        'उघड्यावर वायर जाळणे कायद्याने गुन्हा आहे',
-        Icons.warning_amber_rounded,
-        const Color(0xFFD97706),
-        AppTheme.yellowPendingLight,
-      ),
-      (
-        'हातमोजे आणि मास्क वापरा',
-        'दस्ताने और मास्क का उपयोग करें',
-        'काच आणि धारदार पत्र्यापासून संरक्षण',
-        Icons.health_and_safety_rounded,
-        AppTheme.greenGoEarn,
-        AppTheme.greenGoEarnLight,
-      ),
-    ];
-
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      itemCount: rules.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final rule = rules[index];
-        final title = locale == 'hi' ? rule.$2 : rule.$1;
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: rule.$6,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: rule.$5, width: 2),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(rule.$4, color: rule.$5, size: 36),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        color: rule.$5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      rule.$3,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textHighContrast,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+    return SafetyScreen(locale: locale);
   }
+
 }

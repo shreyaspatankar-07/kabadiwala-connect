@@ -110,9 +110,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify hazard warnings
-      expect(find.text('बॅटरी कधीही कापू किंवा जाळू नका'), findsOneWidget);
-      expect(find.text('सीआरटी ट्यूब फोडू नका'), findsOneWidget);
-      expect(find.text('वायर जाळू नका, प्लास्टिक सोलून काढा'), findsOneWidget);
+      expect(find.text('तांब्यासाठी केबल कधीही जाळू नका'), findsOneWidget);
+      expect(find.text('CRT मॉनिटर किंवा टीव्ही कधीही फोडू नका'), findsOneWidget);
+      expect(find.text('लिथियम बॅटरी कधीही कापू किंवा चेपू नका'), findsOneWidget);
     });
   });
 }

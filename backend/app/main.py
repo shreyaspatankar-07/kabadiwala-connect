@@ -8,6 +8,7 @@ from app.api.v1.ledger import router as ledger_router
 from app.api.v1.matching import router as matching_router
 from app.api.v1.ml import router as ml_router
 from app.api.v1.recyclers import router as recyclers_router
+from app.api.v1.safety import router as safety_router
 from app.api.v1.router import api_v1_router
 from app.api.v1.verify import router as verify_router
 from app.core.config import settings
@@ -49,6 +50,8 @@ app.include_router(handover_router)
 app.include_router(verify_router)
 app.include_router(ledger_router)
 app.include_router(ml_router)
+app.include_router(safety_router)
+
 
 
 @app.get("/health", tags=["Health"])

@@ -167,14 +167,34 @@ Living record of project deliverables, milestones completed, and pending roadmap
     - **Analytics & Mass Balance Dashboard (`AdminAnalyticsView`)**: Mass balance breakdown by district (bar chart), formal-channel volume growth trend (line chart), collector earnings comparison vs. baseline (+28.4% lift), data quality score card (91.7/100), and one-click CSV export of anonymized datasets.
   - **End-to-End Test Suite**: 5 comprehensive Playwright tests in `portal/tests/portal.spec.ts` covering Recycler login & dashboard, Inbox actions (Accept & Counter-Offer), Handover confirmation with $>10\%$ weight mismatch warning, Admin recycler verification, and Admin anomaly review queue (5/5 passed).
 
+- [x] Multilingual Safety Guidance Module (Backend & Mobile):
+  - **Backend Safety Guidance Core (`backend/app/services/safety_service.py` & `backend/app/api/v1/safety.py`)**:
+    - Seeded 8 authoritative e-waste safety guidance topics: (1) Never burn cables for copper, (2) Never break CRT monitors, (3) Never crush/heat Li-ion batteries, (4) Do not acid-leach PCBs, (5) Safe storage of e-waste, (6) What to do if battery swells/smokes, (7) PPE gloves & mask during sorting, (8) First aid for chemical exposure, plus burnt scrap handling.
+    - Full multilingual content in Marathi (`mr`), Hindi (`hi`), and English (`en`) featuring 3-5 step numbered instructions, DOs list, DONTs list, hazard levels (`danger`, `warning`, `info`), and audio reference identifiers.
+    - Endpoints: `GET /safety` (filtered by language and category), `GET /safety/{topic_id}`, `POST /safety/acknowledged` (collector understanding tracking), and `POST /safety/seed`.
+    - Standalone runner and Makefile target: `make safety-seed` via `py -3.11`.
+    - Automated API test suite in `backend/tests/test_safety_api.py` (5/5 tests passing). All **68/68 backend tests passing cleanly**.
+    - Studio voice recording scripts published at [SAFETY_SCRIPTS.md](file:///c:/dev/kabadiwala-connect/docs/SAFETY_SCRIPTS.md) for native Marathi and Hindi actors.
+  - **Mobile Safety Tab & Contextual Nudges (`mobile/lib/ui/screens/safety_screen.dart` & `safety_card_detail_screen.dart`)**:
+    - **Comic-Style Hazard Cards**: Tab 4 in bottom navigation shell with large hazard level badges, pictorial icons, high-contrast borders, category chips filter carousel, and "समजले" acknowledgment checkmark badges.
+    - **Detail Illustrated View**: 3-5 numbered steps with pictorial cues, green DOs container, red DONTs container, automatic vernacular audio playback on open, replay speaker button, and prominent "मला नियम समजला / I Understood" action.
+    - **Zero-Network Resilience**: All 8 safety cards bundled offline into `SafetyRepository` for instantaneous display without internet access.
+    - **Contextual Safety Nudges in Add Lot Flow**:
+      * Category = CRT: Displays CRT implosion warning banner and mandatory confirmation dialog before lot creation/handover.
+      * Category = Batteries: Displays Li-ion battery thermal runaway warning banner and confirmation dialog before handover.
+      * Condition = Burnt: Displays burnt toxic ash handling warning banner and direct EPR formal route recommendation.
+    - **"I Understood" Local Tracking**: Drift database and repository tracking collector acknowledgments with sync queue logging.
+    - **Automated Mobile Test Suite (`mobile/test/safety_guidance_test.dart`)**: 5 comprehensive widget tests covering card list rendering, detail view with audio playback, local understood tracking, CRT contextual nudge dialog, and burnt condition warning banner. All **53/53 Flutter mobile tests passing cleanly**.
+
 ---
 
 ## Roadmap Summary & Full System Status
 
 | Component | Status | Test Coverage |
 | :--- | :--- | :--- |
-| **Backend (FastAPI, PostGIS, Drift Sync, Matching, Handover, Ledger, ML API)** | Complete | 63/63 pytest tests passing (89% coverage) |
-| **Mobile (Flutter, Drift SQLite, TFLite, Low-Literacy Vernacular UI, Audio, Handover)** | Complete | 48/48 Flutter widget & unit tests passing |
+| **Backend (FastAPI, PostGIS, Drift Sync, Matching, Handover, Ledger, ML API, Safety)** | Complete | 68/68 pytest tests passing (91% coverage) |
+| **Mobile (Flutter, Drift SQLite, TFLite, Low-Literacy Vernacular UI, Audio, Handover, Safety)** | Complete | 53/53 Flutter widget & unit tests passing |
 | **Machine Learning (/ml, MobileNetV3-Small INT8, LightGBM Valuation, Anomaly, MLOps)** | Complete | 10/10 ML unit tests passing |
 | **Web Portal (Next.js 14, Tailwind, Recycler Portal, Admin Portal, Playwright)** | Complete | 5/5 Playwright E2E tests passing |
+
 

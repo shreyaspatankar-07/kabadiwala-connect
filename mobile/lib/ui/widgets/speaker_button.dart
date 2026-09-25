@@ -9,16 +9,18 @@ import '../../core/theme/app_theme.dart';
 class SpeakerButton extends StatefulWidget {
   const SpeakerButton({
     super.key,
-    required this.promptKey,
-    required this.audioService,
+    this.promptKey,
+    this.audioService,
+    this.onPressed,
     this.size = AppTheme.minTouchTargetSize,
     this.iconSize = AppTheme.iconSizeMedium,
     this.color = AppTheme.greenGoEarn,
     this.tooltip = 'ऐका (Listen)',
   });
 
-  final String promptKey;
-  final AudioFeedbackService audioService;
+  final String? promptKey;
+  final AudioFeedbackService? audioService;
+  final VoidCallback? onPressed;
   final double size;
   final double iconSize;
   final Color color;
@@ -51,8 +53,13 @@ class _SpeakerButtonState extends State<SpeakerButton> with SingleTickerProvider
   Future<void> _handleTap() async {
     await HapticService.mediumImpact();
     unawaited(_animController.forward().then((_) => _animController.reverse()));
-    await widget.audioService.speakPrompt(widget.promptKey);
+    if (widget.onPressed != null) {
+      widget.onPressed!();
+    } else if (widget.promptKey != null && widget.audioService != null) {
+      await widget.audioService!.speakPrompt(widget.promptKey!);
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {

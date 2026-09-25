@@ -5,11 +5,27 @@ import 'audio_map.dart';
 /// AudioFeedbackService plays spoken prompts and feedback for low-literacy users.
 /// Designed for offline operation with asset playback and verbal audio prompts.
 class AudioFeedbackService {
-  AudioFeedbackService({
+  static final AudioFeedbackService _defaultInstance = AudioFeedbackService._internal();
+
+  factory AudioFeedbackService({AudioPlayer? player, bool? enableAudio}) {
+    if (player != null || enableAudio != null) {
+      return AudioFeedbackService._internal(player: player, enableAudio: enableAudio);
+    }
+    return _defaultInstance;
+  }
+
+  AudioFeedbackService._internal({
     AudioPlayer? player,
     bool? enableAudio,
   })  : _enableAudio = enableAudio ?? (!kIsWeb && defaultTargetPlatform == TargetPlatform.android),
         _player = player;
+
+  AudioFeedbackService.custom({
+    AudioPlayer? player,
+    bool? enableAudio,
+  })  : _enableAudio = enableAudio ?? (!kIsWeb && defaultTargetPlatform == TargetPlatform.android),
+        _player = player;
+
 
   AudioPlayer? _player;
   final bool _enableAudio;
@@ -87,6 +103,10 @@ class AudioFeedbackService {
     _lastSpokenText = text;
     debugPrint('[AudioFeedbackService] [$_currentLocale] Speaking: $text');
   }
+
+  /// Alias for speakCustomText
+  Future<void> speak(String text) => speakCustomText(text);
+
 
   /// Read aloud best buyer summary (Recycler name, distance km, rate per kg)
   Future<void> speakBestBuyer({
