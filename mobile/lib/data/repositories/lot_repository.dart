@@ -8,6 +8,7 @@ class LotRepository {
   LotRepository(this._db);
 
   final AppDatabase _db;
+  AppDatabase get db => _db;
   final Uuid _uuid = const Uuid();
 
   /// Create a new e-waste lot completely offline.

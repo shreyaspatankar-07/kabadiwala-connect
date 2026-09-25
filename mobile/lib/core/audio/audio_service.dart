@@ -88,6 +88,24 @@ class AudioFeedbackService {
     debugPrint('[AudioFeedbackService] [$_currentLocale] Speaking: $text');
   }
 
+  /// Read aloud best buyer summary (Recycler name, distance km, rate per kg)
+  Future<void> speakBestBuyer({
+    required String recyclerName,
+    required double distanceKm,
+    required double ratePerKg,
+    String? localeOverride,
+  }) async {
+    final locale = localeOverride ?? _currentLocale;
+    final text = AudioMap.getBestBuyerSpokenText(
+      recyclerName: recyclerName,
+      distanceKm: distanceKm,
+      ratePerKg: ratePerKg,
+      locale: locale,
+    );
+    _lastSpokenText = text;
+    debugPrint('[AudioFeedbackService] [$locale] Spoken Best Buyer: $text');
+  }
+
   /// Stop current audio
   Future<void> stop() async {
     try {

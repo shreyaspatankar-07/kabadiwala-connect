@@ -143,4 +143,23 @@ class AudioMap {
         return '$category: आजचा सरकारी भाव $pricePerKg रुपये प्रति किलो आहे. $trendText';
     }
   }
+
+  static String getBestBuyerSpokenText({
+    required String recyclerName,
+    required double distanceKm,
+    required double ratePerKg,
+    required String locale,
+  }) {
+    final distStr = distanceKm.toStringAsFixed(distanceKm.truncateToDouble() == distanceKm ? 0 : 1);
+    final rateStr = ratePerKg.toStringAsFixed(ratePerKg.truncateToDouble() == ratePerKg ? 0 : 1);
+    switch (locale) {
+      case 'hi':
+        return '$recyclerName, $distStr किलोमीटर दूर, $rateStr रुपये प्रति किलो';
+      case 'en':
+        return '$recyclerName, $distStr km away, $rateStr rupees per kg';
+      case 'mr':
+      default:
+        return '$recyclerName, $distStr किलोमीटर दूर, $rateStr रुपये प्रति किलो';
+    }
+  }
 }

@@ -3,6 +3,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.matching import router as matching_router
+from app.api.v1.recyclers import router as recyclers_router
 from app.api.v1.router import api_v1_router
 from app.core.config import settings
 from app.core.errors import AppError, app_error_handler, generic_http_error_handler
@@ -35,6 +37,10 @@ app.add_exception_handler(HTTPException, generic_http_error_handler)
 
 # Include v1 master router
 app.include_router(api_v1_router)
+
+# Mount direct root aliases matching user prompt (/matching/rank and /recyclers/nearby)
+app.include_router(matching_router)
+app.include_router(recyclers_router)
 
 
 @app.get("/health", tags=["Health"])

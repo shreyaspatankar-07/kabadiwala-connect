@@ -8,8 +8,14 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import NotFoundError
+from app.matching.scoring import haversine_distance_km
 from app.models.schema import AuthorizationBody, AuthorizationStatus, Recycler
-from app.schemas.recyclers import RecyclerCreate, RecyclerResponse, RecyclerUpdate
+from app.schemas.recyclers import (
+    RecyclerCreate,
+    RecyclerNearbyResponse,
+    RecyclerResponse,
+    RecyclerUpdate,
+)
 
 
 class RecyclersService:
@@ -153,3 +159,38 @@ class RecyclersService:
         result = await db.execute(stmt)
         await db.commit()
         return result.rowcount
+
+    @classmethod
+    async def get_nearby_recyclers(
+        cls,
+        lat: float,
+        lng: float,
+        radius_km: float,
+        category: str | None,
+        db: AsyncSession,
+    ) -> list[RecyclerNearbyResponse]:
+        """Finds authorized verified recyclers within radius_km, sorted by distance."""
+        query = select(Recycler).where(
+            Recycler.authorization_status == AuthorizationStatus.VERIFIED
+        )
+        result = await db.execute(query)
+        recyclers = result.scalars().all()
+
+        nearby: list[RecyclerNearbyResponse] = []
+        for r in recyclers:
+            if category:
+                accepted_lower = [m.lower() for m in (r.materials_accepted or [])]
+                if category.lower() not in accepted_lower:
+                    continue
+            resp = cls._to_response(r)
+            dist = haversine_distance_km(lat, lng, resp.latitude, resp.longitude)
+            if dist <= radius_km:
+                nearby.append(
+                    RecyclerNearbyResponse(
+                        **resp.model_dump(),
+                        distance_km=dist,
+                    )
+                )
+
+        nearby.sort(key=lambda x: x.distance_km)
+        return nearby

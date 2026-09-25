@@ -1,0 +1,18 @@
+# Recycler Ranking and Matching Engine Scoring Weights
+# Tunable weights for weighted-sum multi-criteria scoring
+# All weights should sum to 1.00
+
+weights:
+  offered_rate: 0.30       # Higher rate offered for the specific lot category
+  distance: 0.25           # Proximity to collector (inverse distance)
+  pickup_available: 0.15   # Bonus for on-site collection capability
+  completion_rate: 0.15    # Historical ratio of completed transactions
+  confirmation_speed: 0.10 # Faster confirmation of matches (hours to confirm)
+  rating: 0.05             # Verified recycler quality rating (0-5 stars)
+
+parameters:
+  distance_decay_km: 10.0          # Characteristic distance parameter (1 / (1 + d / decay))
+  speed_max_hours: 48.0            # Max window for speed normalization (faster = higher)
+  default_completion_rate: 0.85    # Default for recyclers with < 3 historical transactions
+  default_confirmation_hours: 4.0  # Default hours for new recyclers
+  min_records_for_learned_ranker: 50 # Minimum past matches to activate LightGBM

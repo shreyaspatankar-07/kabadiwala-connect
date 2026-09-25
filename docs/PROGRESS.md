@@ -72,6 +72,26 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - **Cache Staleness Detection**: Prominent amber alert banner when cached data is older than 3 days.
   - **Mobile Test Suite**: 4 new comprehensive widget tests in `mobile/test/price_board_test.dart` covering category grid, detail view with audio playback, staleness warning banner, and offline report submission; all 23 mobile widget tests passing cleanly (`flutter test`).
 
+- [x] Recycler Discovery & Matching Engine (Backend & Mobile):
+  - **Backend Matching Core (`backend/app/matching/`)**:
+    - `MatchingService.rank_recyclers(lot)` and functional `rank_recyclers(lot)` interface.
+    - **Hard Filters**: Verified authorization (`authorization_status = verified` & `valid_till > today`), accepted material category, and location constraints (within `pickup_radius_km` or inside `service_area` polygon/districts).
+    - **Multi-Criteria Scoring & Weights**: YAML-configurable weights (`weights.yaml`) covering normalized offered rate (0.30), inverse distance (0.25), pickup availability bonus (0.15), completion rate (0.15), confirmation speed (0.10), and recycler rating (0.05).
+    - **Deterministic Tie-Breaking**: Ordered on score $\rightarrow$ offered rate $\rightarrow$ distance $\rightarrow$ rating $\rightarrow$ recycler ID.
+    - **Learned Re-Ranker**: `LearnedReranker` powered by LightGBM with automated fallback to rule-based ranking when historical match interactions $< 50$ records.
+    - **API Endpoints**: `POST /matching/rank` (and `/api/v1/matching/rank`) returning top-3 ranked recyclers with score, factor breakdown, distance, rate, pickup, and estimated pickup time; `GET /recyclers/nearby` (and `/api/v1/recyclers/nearby`) for distance-sorted search.
+    - **Backend Test Suite**: 11 new tests in `test_matching_engine.py` and `test_matching_api.py` covering all hard filters, score ordering, tie-breaking, LightGBM fallback & training, and endpoint integration. All 47 backend tests pass (`py -3.11 -m pytest -q`).
+  - **Mobile Best Buyers Screen (`mobile/lib/ui/screens/best_buyers_screen.dart`)**:
+    - Accessible directly after offline lot creation or from lot details.
+    - Up to 3 recycler cards displaying name, distance with map pin icon, large rate per kg, pickup (truck) vs drop-off (walking) icon, and green verified badge.
+    - Ranked #1 card highlighted with a gold border and "सर्वोत्तम पर्याय / Best Choice" banner.
+    - Vernacular audio read-out: "[Recycler name], [distance] किलोमीटर दूर, [rate] रुपये प्रति किलो" with automatic playback and manual speaker buttons.
+    - "Select this buyer" action with haptic feedback and confirmation.
+    - "No buyers found" pictorial empty state with actionable suggestions to adjust category or distance.
+    - **Offline Matching Engine in Dart (`offline_matching_engine.dart`)**: Complete port of scoring rules and hard filters running against Drift `CachedRecyclers`.
+    - **Shared Test Fixture (`matching_fixture.json`)**: Proves backend and Flutter matching engines generate identical scores and breakdowns down to 4 decimal places!
+    - **Mobile Test Suite**: 8 new comprehensive widget and repository unit tests in `mobile/test/best_buyers_screen_test.dart`. All 31 mobile tests pass cleanly (`flutter test`) and `flutter analyze` reports 0 issues.
+
 ---
 
 ## Pending Next Phase Tasks

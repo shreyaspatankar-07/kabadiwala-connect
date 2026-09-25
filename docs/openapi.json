@@ -479,6 +479,100 @@
         }
       }
     },
+    "/api/v1/recyclers/nearby": {
+      "get": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Find authorized recyclers nearby",
+        "operationId": "get_nearby_recyclers_api_v1_recyclers_nearby_get",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 90.0,
+              "minimum": -90.0,
+              "description": "Collector latitude",
+              "title": "Lat"
+            },
+            "description": "Collector latitude"
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 180.0,
+              "minimum": -180.0,
+              "description": "Collector longitude",
+              "title": "Lng"
+            },
+            "description": "Collector longitude"
+          },
+          {
+            "name": "radius_km",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Search radius in kilometers",
+              "default": 25.0,
+              "title": "Radius Km"
+            },
+            "description": "Search radius in kilometers"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by accepted material category",
+              "title": "Category"
+            },
+            "description": "Filter by accepted material category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecyclerNearbyResponse"
+                  },
+                  "title": "Response Get Nearby Recyclers Api V1 Recyclers Nearby Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/recyclers": {
       "get": {
         "tags": [
@@ -1598,6 +1692,516 @@
         }
       }
     },
+    "/api/v1/matching/rank": {
+      "post": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Rank top recyclers for an e-waste lot",
+        "description": "Evaluates verified candidates against hard constraints (authorization, category, location)\n\nand applies multi-criteria scoring to return the top 3 ranked buyers.",
+        "operationId": "rank_lot_recyclers_api_v1_matching_rank_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotMatchInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchRankingResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/matching/rank": {
+      "post": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Rank top recyclers for an e-waste lot",
+        "description": "Evaluates verified candidates against hard constraints (authorization, category, location)\n\nand applies multi-criteria scoring to return the top 3 ranked buyers.",
+        "operationId": "rank_lot_recyclers_matching_rank_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotMatchInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchRankingResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recyclers/nearby": {
+      "get": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Find authorized recyclers nearby",
+        "operationId": "get_nearby_recyclers_recyclers_nearby_get",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 90.0,
+              "minimum": -90.0,
+              "description": "Collector latitude",
+              "title": "Lat"
+            },
+            "description": "Collector latitude"
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 180.0,
+              "minimum": -180.0,
+              "description": "Collector longitude",
+              "title": "Lng"
+            },
+            "description": "Collector longitude"
+          },
+          {
+            "name": "radius_km",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Search radius in kilometers",
+              "default": 25.0,
+              "title": "Radius Km"
+            },
+            "description": "Search radius in kilometers"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by accepted material category",
+              "title": "Category"
+            },
+            "description": "Filter by accepted material category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecyclerNearbyResponse"
+                  },
+                  "title": "Response Get Nearby Recyclers Recyclers Nearby Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recyclers": {
+      "get": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "List authorized recyclers",
+        "operationId": "list_recyclers_recyclers_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by authorization status",
+              "title": "Status"
+            },
+            "description": "Filter by authorization status"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by accepted category",
+              "title": "Category"
+            },
+            "description": "Filter by accepted category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecyclerResponse"
+                  },
+                  "title": "Response List Recyclers Recyclers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Register a new recycler facility",
+        "operationId": "create_recycler_recyclers_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecyclerCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recyclers/{recycler_id}": {
+      "get": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Get recycler by ID",
+        "operationId": "get_recycler_recyclers__recycler_id__get",
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Update recycler details",
+        "operationId": "update_recycler_recyclers__recycler_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecyclerUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recyclers/{recycler_id}/verify": {
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Admin approves & verifies recycler authorization",
+        "operationId": "verify_recycler_recyclers__recycler_id__verify_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recyclers/{recycler_id}/suspend": {
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Admin suspends recycler authorization",
+        "operationId": "suspend_recycler_recyclers__recycler_id__suspend_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "recycler_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Recycler Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recyclers/jobs/audit-expired": {
+      "post": {
+        "tags": [
+          "Recyclers"
+        ],
+        "summary": "Audit job: auto-flag recyclers with expired EPR authorization",
+        "operationId": "audit_expired_authorizations_recyclers_jobs_audit_expired_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -1924,6 +2528,67 @@
         ],
         "title": "LotCreate"
       },
+      "LotMatchInput": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category",
+            "description": "E-waste category (e.g. PCB, CRT, Batteries, Cables)"
+          },
+          "weight_kg": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight Kg",
+            "description": "Approximate weight in kg",
+            "default": 1.0
+          },
+          "collection_lat": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Collection Lat",
+            "description": "Collector latitude"
+          },
+          "collection_lng": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Collection Lng",
+            "description": "Collector longitude"
+          },
+          "district": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District",
+            "description": "Collector district/city"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id",
+            "description": "Optional local or server lot identifier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "collection_lat",
+          "collection_lng"
+        ],
+        "title": "LotMatchInput"
+      },
       "LotResponse": {
         "properties": {
           "lot_id": {
@@ -2146,6 +2811,54 @@
           "transaction_status"
         ],
         "title": "LotStatusUpdate"
+      },
+      "MatchRankingResponse": {
+        "properties": {
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "total_candidates_evaluated": {
+            "type": "integer",
+            "title": "Total Candidates Evaluated"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/RankedRecycler"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "algorithm": {
+            "type": "string",
+            "title": "Algorithm",
+            "default": "rule_based"
+          },
+          "matched_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Matched At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "total_candidates_evaluated",
+          "candidates",
+          "matched_at"
+        ],
+        "title": "MatchRankingResponse"
       },
       "MaterialCreate": {
         "properties": {
@@ -3160,6 +3873,79 @@
         ],
         "title": "PriceResponse"
       },
+      "RankedRecycler": {
+        "properties": {
+          "recycler_id": {
+            "type": "string",
+            "title": "Recycler Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "score_breakdown": {
+            "$ref": "#/components/schemas/ScoreBreakdown"
+          },
+          "distance_km": {
+            "type": "number",
+            "title": "Distance Km"
+          },
+          "offered_rate": {
+            "type": "number",
+            "title": "Offered Rate"
+          },
+          "pickup_available": {
+            "type": "boolean",
+            "title": "Pickup Available"
+          },
+          "estimated_pickup_time": {
+            "type": "string",
+            "title": "Estimated Pickup Time"
+          },
+          "authorization_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Authorization Number"
+          },
+          "rating": {
+            "type": "number",
+            "title": "Rating",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "recycler_id",
+          "name",
+          "phone",
+          "rank",
+          "score",
+          "score_breakdown",
+          "distance_km",
+          "offered_rate",
+          "pickup_available",
+          "estimated_pickup_time"
+        ],
+        "title": "RankedRecycler"
+      },
       "RecyclerCreate": {
         "properties": {
           "id": {
@@ -3247,6 +4033,112 @@
           "phone"
         ],
         "title": "RecyclerCreate"
+      },
+      "RecyclerNearbyResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "materials_accepted": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Materials Accepted"
+          },
+          "authorization_number": {
+            "type": "string",
+            "title": "Authorization Number"
+          },
+          "authorization_body": {
+            "type": "string",
+            "title": "Authorization Body"
+          },
+          "authorization_status": {
+            "type": "string",
+            "title": "Authorization Status"
+          },
+          "authorization_valid_till": {
+            "type": "string",
+            "format": "date",
+            "title": "Authorization Valid Till"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "offered_rates": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Offered Rates"
+          },
+          "pickup_available": {
+            "type": "boolean",
+            "title": "Pickup Available"
+          },
+          "pickup_radius_km": {
+            "type": "number",
+            "title": "Pickup Radius Km"
+          },
+          "service_area": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Service Area"
+          },
+          "rating": {
+            "type": "number",
+            "title": "Rating"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "distance_km": {
+            "type": "number",
+            "title": "Distance Km"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "latitude",
+          "longitude",
+          "materials_accepted",
+          "authorization_number",
+          "authorization_body",
+          "authorization_status",
+          "authorization_valid_till",
+          "phone",
+          "offered_rates",
+          "pickup_available",
+          "pickup_radius_km",
+          "service_area",
+          "rating",
+          "created_at",
+          "updated_at",
+          "distance_km"
+        ],
+        "title": "RecyclerNearbyResponse"
       },
       "RecyclerResponse": {
         "properties": {
@@ -3506,6 +4398,50 @@
           "donts"
         ],
         "title": "SafetyContentItem"
+      },
+      "ScoreBreakdown": {
+        "properties": {
+          "offered_rate": {
+            "type": "number",
+            "title": "Offered Rate",
+            "description": "Weighted score contribution from offered rate"
+          },
+          "distance": {
+            "type": "number",
+            "title": "Distance",
+            "description": "Weighted score contribution from proximity"
+          },
+          "pickup_available": {
+            "type": "number",
+            "title": "Pickup Available",
+            "description": "Weighted score contribution from pickup"
+          },
+          "completion_rate": {
+            "type": "number",
+            "title": "Completion Rate",
+            "description": "Weighted score contribution from completion rate"
+          },
+          "confirmation_speed": {
+            "type": "number",
+            "title": "Confirmation Speed",
+            "description": "Weighted score contribution from confirmation speed"
+          },
+          "rating": {
+            "type": "number",
+            "title": "Rating",
+            "description": "Weighted score contribution from rating"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offered_rate",
+          "distance",
+          "pickup_available",
+          "completion_rate",
+          "confirmation_speed",
+          "rating"
+        ],
+        "title": "ScoreBreakdown"
       },
       "SyncOperation": {
         "properties": {

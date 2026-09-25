@@ -8,6 +8,7 @@ import '../../core/haptics/haptic_service.dart';
 import '../../core/ml/material_classifier.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
+import '../../data/matching/offline_matching_engine.dart';
 import '../../data/models/lot_item_draft.dart';
 import '../../data/repositories/lot_repository.dart';
 import '../../data/repositories/price_repository.dart';
@@ -18,6 +19,7 @@ import '../widgets/condition_chips.dart';
 import '../widgets/reference_weight_helper.dart';
 import '../widgets/speaker_button.dart';
 import '../widgets/value_estimate_card.dart';
+import 'best_buyers_screen.dart';
 
 class AddLotScreen extends StatefulWidget {
   const AddLotScreen({
@@ -303,6 +305,24 @@ class _AddLotScreenState extends State<AddLotScreen> {
           _currentPhotos.clear();
           _weightInputString = '0';
         });
+
+        // Navigate to Best Buyers screen after lot creation
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => BestBuyersScreen(
+              lot: OfflineLotInput(
+                lotId: createdLot.lotId,
+                category: createdLot.category,
+                weightKg: createdLot.weightKg,
+                collectionLat: createdLot.collectionLat,
+                collectionLng: createdLot.collectionLng,
+              ),
+              audioService: widget.audioService,
+              db: widget.lotRepository.db,
+              locale: widget.locale,
+            ),
+          ),
+        );
       }
     } catch (e, st) {
       // ignore: avoid_print
