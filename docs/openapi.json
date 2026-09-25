@@ -942,11 +942,29 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "District name, e.g. Mumbai, Pune",
+              "description": "District name, e.g. Mumbai, Pune, Palghar",
               "default": "Mumbai Suburban",
               "title": "District"
             },
-            "description": "District name, e.g. Mumbai, Pune"
+            "description": "District name, e.g. Mumbai, Pune, Palghar"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by scrap material category",
+              "title": "Category"
+            },
+            "description": "Filter by scrap material category"
           }
         ],
         "responses": {
@@ -956,6 +974,118 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PriceBoardResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prices/history": {
+      "get": {
+        "tags": [
+          "Prices"
+        ],
+        "summary": "Get 30-day historical daily median prices for sparkline chart",
+        "operationId": "get_price_history_api_v1_prices_history_get",
+        "parameters": [
+          {
+            "name": "district",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "District name",
+              "default": "Mumbai Suburban",
+              "title": "District"
+            },
+            "description": "District name"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Material category",
+              "default": "PCB",
+              "title": "Category"
+            },
+            "description": "Material category"
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "description": "Number of history days",
+              "default": 30,
+              "title": "Days"
+            },
+            "description": "Number of history days"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prices/report": {
+      "post": {
+        "tags": [
+          "Prices"
+        ],
+        "summary": "Collector reports an offered scrap price from the field",
+        "operationId": "report_price_api_v1_prices_report_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceReportCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceReportResponse"
                 }
               }
             }
@@ -2345,7 +2475,8 @@
           },
           "unit": {
             "type": "string",
-            "title": "Unit"
+            "title": "Unit",
+            "default": "kg"
           },
           "min_rate_inr": {
             "type": "number",
@@ -2358,16 +2489,59 @@
           "avg_buying_price": {
             "type": "number",
             "title": "Avg Buying Price"
+          },
+          "current_buying_price": {
+            "type": "number",
+            "title": "Current Buying Price"
+          },
+          "market_min": {
+            "type": "number",
+            "title": "Market Min"
+          },
+          "market_max": {
+            "type": "number",
+            "title": "Market Max"
+          },
+          "recycler_offered_price": {
+            "type": "number",
+            "title": "Recycler Offered Price"
+          },
+          "trend_7d": {
+            "type": "string",
+            "title": "Trend 7D",
+            "default": "flat"
+          },
+          "pct_change_7d": {
+            "type": "number",
+            "title": "Pct Change 7D",
+            "default": 0.0
+          },
+          "confidence_level": {
+            "type": "string",
+            "title": "Confidence Level",
+            "default": "high"
+          },
+          "quality_score": {
+            "type": "number",
+            "title": "Quality Score",
+            "default": 85.0
+          },
+          "last_updated": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Updated"
           }
         },
         "type": "object",
         "required": [
           "category",
-          "sub_category",
-          "unit",
           "min_rate_inr",
           "max_rate_inr",
-          "avg_buying_price"
+          "avg_buying_price",
+          "current_buying_price",
+          "market_min",
+          "market_max",
+          "recycler_offered_price"
         ],
         "title": "PriceBoardCategory"
       },
@@ -2376,6 +2550,17 @@
           "district": {
             "type": "string",
             "title": "District"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
           },
           "valid_until": {
             "type": "string",
@@ -2388,6 +2573,95 @@
             },
             "type": "array",
             "title": "Rates"
+          },
+          "current_buying_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Buying Price"
+          },
+          "market_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Min"
+          },
+          "market_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Max"
+          },
+          "recycler_offered_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Offered Price"
+          },
+          "trend_7d": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trend 7D"
+          },
+          "pct_change_7d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct Change 7D"
+          },
+          "confidence_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Level"
+          },
+          "last_updated": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Updated"
           }
         },
         "type": "object",
@@ -2483,7 +2757,7 @@
           },
           "source": {
             "type": "string",
-            "pattern": "^(recycler_quote|field_survey|synthetic)$",
+            "pattern": "^(recycler_quote|field_survey|synthetic|collector_report)$",
             "title": "Source",
             "default": "synthetic"
           }
@@ -2500,6 +2774,263 @@
           "market_max"
         ],
         "title": "PriceCreate"
+      },
+      "PriceHistoryPoint": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "title": "Date"
+          },
+          "median_price": {
+            "type": "number",
+            "title": "Median Price"
+          },
+          "min_price": {
+            "type": "number",
+            "title": "Min Price"
+          },
+          "max_price": {
+            "type": "number",
+            "title": "Max Price"
+          },
+          "sample_count": {
+            "type": "integer",
+            "title": "Sample Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "median_price",
+          "min_price",
+          "max_price",
+          "sample_count"
+        ],
+        "title": "PriceHistoryPoint"
+      },
+      "PriceHistoryResponse": {
+        "properties": {
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/PriceHistoryPoint"
+            },
+            "type": "array",
+            "title": "History"
+          }
+        },
+        "type": "object",
+        "required": [
+          "district",
+          "category",
+          "days",
+          "history"
+        ],
+        "title": "PriceHistoryResponse"
+      },
+      "PriceReportCreate": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 2,
+            "title": "Category"
+          },
+          "sub_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Category"
+          },
+          "district": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "District"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "default": 19.076
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude",
+            "default": 72.8777
+          },
+          "offered_price": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Offered Price",
+            "description": "Price offered to collector"
+          },
+          "unit": {
+            "type": "string",
+            "pattern": "^(kg|piece)$",
+            "title": "Unit",
+            "default": "kg"
+          },
+          "recycler_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recycler Id"
+          },
+          "collector_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collector Id"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "district",
+          "offered_price"
+        ],
+        "title": "PriceReportCreate"
+      },
+      "PriceReportResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "sub_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Category"
+          },
+          "district": {
+            "type": "string",
+            "title": "District"
+          },
+          "offered_price": {
+            "type": "number",
+            "title": "Offered Price"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "default": "collector_report"
+          },
+          "validation_status": {
+            "type": "string",
+            "title": "Validation Status"
+          },
+          "is_flagged_for_review": {
+            "type": "boolean",
+            "title": "Is Flagged For Review"
+          },
+          "review_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "sub_category",
+          "district",
+          "offered_price",
+          "unit",
+          "validation_status",
+          "is_flagged_for_review",
+          "review_reason",
+          "created_at"
+        ],
+        "title": "PriceReportResponse"
       },
       "PriceResponse": {
         "properties": {
@@ -2585,6 +3116,22 @@
           "source": {
             "type": "string",
             "title": "Source"
+          },
+          "is_flagged_for_review": {
+            "type": "boolean",
+            "title": "Is Flagged For Review",
+            "default": false
+          },
+          "review_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Reason"
           },
           "created_at": {
             "type": "string",

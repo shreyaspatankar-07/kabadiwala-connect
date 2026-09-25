@@ -9,6 +9,7 @@ import '../widgets/big_tile.dart';
 import '../widgets/speaker_button.dart';
 import '../widgets/sync_status_badge.dart';
 import 'add_lot_screen.dart';
+import 'price_board_screen.dart';
 
 /// Bottom Navigation Shell with 4 tabs:
 /// 1. Add Lot (माल जोडा / माल जोड़ें)
@@ -328,68 +329,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   // Tab 2: Price Board (दर फलक)
   // ---------------------------------------------------------------------------
   Widget _buildPriceBoardTab(BuildContext context, String locale) {
-    final prices = [
-      ('तांब्याची वायर (Copper)', '₹ 680 / किलो', 'सरकारी प्रमाणित दर', AppTheme.greenGoEarn),
-      ('सर्किट बोर्ड (High-Grade PCB)', '₹ 420 / किलो', 'अधिकृत रीसायकलर', AppTheme.greenGoEarn),
-      ('लिथियम बॅटरी (Li-ion)', '₹ 140 / किलो', 'सुरक्षित विल्हेवाट दर', const Color(0xFFD97706)),
-      ('इलेक्ट्रिक मोटर (Motors)', '₹ 85 / किलो', 'प्रमाणित भाव', const Color(0xFF0284C7)),
-      ('स्क्रीन पॅनेल (LCD/LED)', '₹ 45 / किलो', 'न्यूनतम ₹३५ - कमाल ₹५५', const Color(0xFF475569)),
-      ('जुना टीव्ही (CRT Display)', '₹ 18 / किलो', 'काच न फोडता दर', AppTheme.dangerRed),
-    ];
-
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      itemCount: prices.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final item = prices[index];
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.borderColor, width: 2),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: item.$4.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(Icons.currency_rupee_rounded, color: item.$4, size: 28),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.$1,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      item.$3,
-                      style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                item.$2,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  color: item.$4,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    return PriceBoardScreen(
+      audioService: widget.audioService,
+      priceRepository: widget.priceRepository,
+      locale: locale,
     );
   }
 

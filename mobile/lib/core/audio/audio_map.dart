@@ -110,4 +110,37 @@ class AudioMap {
         return 'अंदाजे सरकारी भाव सुमारे $amount रुपये आहे.';
     }
   }
+
+  /// Generate dynamic spoken text for price board category, rate and trend
+  static String getPriceDetailSpokenText({
+    required String category,
+    required int pricePerKg,
+    required String trend,
+    required String locale,
+  }) {
+    switch (locale) {
+      case 'hi':
+        final trendText = trend == 'up'
+            ? 'भाव बढ़ गया है।'
+            : trend == 'down'
+                ? 'भाव गिर गया है।'
+                : 'भाव स्थिर है।';
+        return '$category: आज का सरकारी भाव $pricePerKg रुपये प्रति किलो है। $trendText';
+      case 'en':
+        final trendText = trend == 'up'
+            ? 'Price is rising.'
+            : trend == 'down'
+                ? 'Price is falling.'
+                : 'Price is stable.';
+        return '$category: Rate is $pricePerKg rupees per kilogram. $trendText';
+      case 'mr':
+      default:
+        final trendText = trend == 'up'
+            ? 'भाव वाढला आहे.'
+            : trend == 'down'
+                ? 'भाव कमी झाला आहे.'
+                : 'भाव स्थिर आहे.';
+        return '$category: आजचा सरकारी भाव $pricePerKg रुपये प्रति किलो आहे. $trendText';
+    }
+  }
 }

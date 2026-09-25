@@ -12,6 +12,7 @@ class ProvenanceSource(StrEnum):
     FIELD_SURVEY = "field_survey"
     RECYCLER_QUOTE = "recycler_quote"
     TRANSACTION = "transaction"
+    COLLECTOR_REPORT = "collector_report"
 
 
 class WeightSanityRule(BaseModel):

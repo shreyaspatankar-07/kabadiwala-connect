@@ -91,6 +91,7 @@ class PriceSource(enum.StrEnum):
     RECYCLER_QUOTE = "recycler_quote"
     FIELD_SURVEY = "field_survey"
     SYNTHETIC = "synthetic"
+    COLLECTOR_REPORT = "collector_report"
 
 
 class AuthorizationBody(enum.StrEnum):
@@ -298,6 +299,10 @@ class Price(Base):
     source: Mapped[PriceSource] = mapped_column(
         Enum(PriceSource), default=PriceSource.SYNTHETIC, nullable=False
     )
+    is_flagged_for_review: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false", nullable=False
+    )
+    review_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )

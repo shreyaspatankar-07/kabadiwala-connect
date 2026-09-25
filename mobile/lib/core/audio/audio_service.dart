@@ -64,6 +64,24 @@ class AudioFeedbackService {
     debugPrint('[AudioFeedbackService] [$locale] Spoken Estimate: $text');
   }
 
+  /// Read aloud price board item details (category, price per kg, trend direction)
+  Future<void> speakPriceDetail({
+    required String category,
+    required int pricePerKg,
+    required String trendDirection,
+    String? localeOverride,
+  }) async {
+    final locale = localeOverride ?? _currentLocale;
+    final text = AudioMap.getPriceDetailSpokenText(
+      category: category,
+      pricePerKg: pricePerKg,
+      trend: trendDirection,
+      locale: locale,
+    );
+    _lastSpokenText = text;
+    debugPrint('[AudioFeedbackService] [$locale] Spoken Price Detail: $text');
+  }
+
   /// Read aloud a custom vernacular text
   Future<void> speakCustomText(String text) async {
     _lastSpokenText = text;

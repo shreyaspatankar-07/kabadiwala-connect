@@ -62,6 +62,7 @@ class BigKeypad extends StatelessWidget {
       onTap: () => onDigitPressed(digit),
       child: Text(
         digit,
+        key: Key('keypad_digit_$digit'),
         style: const TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.w900,

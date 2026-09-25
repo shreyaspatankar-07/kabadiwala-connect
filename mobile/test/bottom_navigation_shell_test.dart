@@ -62,9 +62,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify price board items appear
-      expect(find.text('तांब्याची वायर (Copper)'), findsOneWidget);
-      expect(find.text('₹ 680 / किलो'), findsOneWidget);
-      expect(find.text('सर्किट बोर्ड (High-Grade PCB)'), findsOneWidget);
+      expect(find.text('तांब्याची वायर (Cables)'), findsOneWidget);
+      expect(find.text('₹ 680 / kg'), findsOneWidget);
+      expect(find.text('सर्किट बोर्ड (PCB)'), findsOneWidget);
     });
 
     testWidgets('Switching to Earnings tab displays cash balance',

@@ -60,6 +60,18 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - **GPS Fallback & Multi-Item Support**: Auto-capture GPS coordinates with fallback to last-known coordinates or manual district selector; full support for multiple items per lot and multiple lots per day.
   - **Automated Widget Tests**: 5 new end-to-end widget tests in `mobile/test/add_lot_flow_test.dart` covering photo capture, category selection, weight entry, value estimate display, and offline persistence with sync queue verification. All 19 mobile tests passing cleanly (`flutter test`).
 
+- [x] Regional Price Board Feature (Backend & Mobile):
+  - **Backend Price Board API (`/api/v1/prices/board`)**: District & category-aware endpoint using rolling 7d/30d median aggregation (`RollingBoardUpdater`), recency weighting, 7-day trend signal (`up`/`down`/`flat`), percentage change, confidence scoring (`high`/`medium`/`low`), and recycler-offered quote comparisons.
+  - **Backend Sparkline History API (`/api/v1/prices/history`)**: 30-day historical daily median price point aggregation for sparkline rendering.
+  - **Backend Price Reporting API (`/api/v1/prices/report`)**: Collector scrap price reporting endpoint with source `collector_report`, domain validation pipeline (`DataValidator`), and automated review flagging (`is_flagged_for_review`).
+  - **Backend Test Suite**: 4 dedicated tests in `backend/tests/test_prices_api.py`; all 36 backend tests passing cleanly with 89% coverage on services.
+  - **Mobile Price Board Screen (`/mobile/lib/ui/screens/price_board_screen.dart`)**: Tab 1 in main navigation shell featuring 7 material category cards (CRT, LCD, PCB, Cables, Batteries, Motors/Magnets, Mixed Plastics) with rates and trend chips.
+  - **Category Detail View**: Large digits rate display, 7-day trend arrow with % change, lightweight zero-dependency `SparklineChart` with gradient fill, and recycler quote vs. market min-max range bar.
+  - **Vernacular Audio Guidance**: Persistent speaker button reading aloud category name, price per kg, and trend direction in Marathi and Hindi ("सर्किट बोर्ड: आजचा सरकारी भाव 420 रुपये प्रति किलो आहे. भाव वाढला आहे.").
+  - **Field Price Reporting & Offline Sync**: "Report a Price" modal with `BigKeypad`, local Drift cache update, and enqueuing to `SyncQueueEntries` FIFO queue.
+  - **Cache Staleness Detection**: Prominent amber alert banner when cached data is older than 3 days.
+  - **Mobile Test Suite**: 4 new comprehensive widget tests in `mobile/test/price_board_test.dart` covering category grid, detail view with audio playback, staleness warning banner, and offline report submission; all 23 mobile widget tests passing cleanly (`flutter test`).
+
 ---
 
 ## Pending Next Phase Tasks

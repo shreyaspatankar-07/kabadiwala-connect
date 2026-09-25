@@ -18,7 +18,7 @@ def test_alembic_configuration_and_revisions():
     script = ScriptDirectory.from_config(config)
     head_rev = script.get_current_head()
 
-    assert head_rev == "0001_initial_schema"
+    assert head_rev == "0002_price_reporting_fields"
 
     rev = script.get_revision(head_rev)
     assert rev is not None

@@ -5,14 +5,15 @@ mobile/.flutter-plugins
 mobile/.flutter-plugins-dependencies
 
 # Python
-backend/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.coverage
+htmlcov/
 backend/.venv/
-backend/*.pyc
 backend/.pytest_cache/
 backend/.ruff_cache/
-ml/__pycache__/
 ml/.venv/
-ml/*.pyc
 ml/.pytest_cache/
 ml/.ruff_cache/
 
