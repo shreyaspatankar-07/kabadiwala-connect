@@ -54,7 +54,7 @@ class SyncStatusBadge extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: badgeColor.withOpacity(0.5), width: 1.5),
+              border: Border.all(color: badgeColor.withValues(alpha: 0.5), width: 1.5),
             ),
             child: Row(
               children: [
@@ -66,7 +66,7 @@ class SyncStatusBadge extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: badgeColor.withOpacity(0.95),
+                      color: badgeColor.withValues(alpha: 0.95),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

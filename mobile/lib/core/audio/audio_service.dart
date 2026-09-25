@@ -56,6 +56,20 @@ class AudioFeedbackService {
     }
   }
 
+  /// Read aloud a dynamic calculated rupee price estimate
+  Future<void> speakEstimate(int amount, {String? localeOverride}) async {
+    final locale = localeOverride ?? _currentLocale;
+    final text = AudioMap.getEstimateSpokenText(amount, locale);
+    _lastSpokenText = text;
+    debugPrint('[AudioFeedbackService] [$locale] Spoken Estimate: $text');
+  }
+
+  /// Read aloud a custom vernacular text
+  Future<void> speakCustomText(String text) async {
+    _lastSpokenText = text;
+    debugPrint('[AudioFeedbackService] [$_currentLocale] Speaking: $text');
+  }
+
   /// Stop current audio
   Future<void> stop() async {
     try {

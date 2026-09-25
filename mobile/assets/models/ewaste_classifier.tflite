@@ -1,0 +1,7 @@
+TFL3-MOCK-MOBILENETV3-SMALL-EWSTE-CLASSIFIER-V1.0.0
+Input: [1, 224, 224, 3] Float32/Int8
+Classes: [CRT, LCD, PCB, Cables, Batteries, Motors_Magnets, Mixed_Plastics]
+Quantization: INT8 post-training quantization
+Architecture: MobileNetV3-Small (width multiplier 0.75)
+Target: Edge inference on Android 8.0+ / 2GB RAM
+Author: Kabadiwala Connect ML Team / JNARDDC

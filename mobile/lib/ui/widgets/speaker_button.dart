@@ -70,8 +70,8 @@ class _SpeakerButtonState extends State<SpeakerButton> with SingleTickerProvider
             alignment: Alignment.center,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: widget.color.withOpacity(0.12),
-              border: Border.all(color: widget.color.withOpacity(0.4), width: 2),
+              color: widget.color.withValues(alpha: 0.12),
+              border: Border.all(color: widget.color.withValues(alpha: 0.4), width: 2),
             ),
             child: ScaleTransition(
               scale: _animController,

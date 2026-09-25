@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 import '../local_database.dart';
+import '../models/lot_item_draft.dart';
 
 class LotRepository {
   LotRepository(this._db);
@@ -19,6 +20,10 @@ class LotRepository {
     required double latitude,
     required double longitude,
     String? photoHash,
+    List<String>? photoHashes,
+    List<LotItemDraft>? items,
+    String? subCategory,
+    String? condition,
   }) async {
     final clientUuid = _uuid.v4();
     final now = DateTime.now();
@@ -43,17 +48,32 @@ class LotRepository {
 
     await _db.into(_db.localTransactions).insert(entry);
 
+    final resolvedPhotoHashes = photoHashes ?? (photoHash != null ? [photoHash] : <String>[]);
+    final itemsPayload = items?.map((i) => i.toJson()).toList() ?? [
+      {
+        'category': category,
+        'sub_category': subCategory,
+        'condition': condition ?? 'broken',
+        'weight_kg': weightKg,
+        'quoted_price': quotedPrice,
+        'photo_hashes': resolvedPhotoHashes,
+      }
+    ];
+
     // Queue operation in sync engine FIFO queue
     final queuePayload = jsonEncode({
       'client_tx_id': clientUuid,
       'lot_id': lotId,
       'collector_id': collectorId,
       'category': category,
+      'sub_category': subCategory,
+      'condition': condition,
       'weight_kg': weightKg,
       'quoted_price': quotedPrice,
       'latitude': latitude,
       'longitude': longitude,
-      'photo_hash': photoHash,
+      'photo_hashes': resolvedPhotoHashes,
+      'items': itemsPayload,
       'created_at': now.toIso8601String(),
     });
 

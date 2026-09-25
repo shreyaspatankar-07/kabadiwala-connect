@@ -103,7 +103,7 @@ class BigKeypad extends StatelessWidget {
             _buildKey(
               context,
               backgroundColor: AppTheme.dangerRedLight,
-              borderColor: AppTheme.dangerRed.withOpacity(0.4),
+              borderColor: AppTheme.dangerRed.withValues(alpha: 0.4),
               onTap: onBackspacePressed,
               child: const Icon(
                 Icons.backspace_rounded,
@@ -117,7 +117,7 @@ class BigKeypad extends StatelessWidget {
             _buildKey(
               context,
               backgroundColor: showSubmit ? AppTheme.greenGoEarnLight : Colors.grey.shade100,
-              borderColor: showSubmit ? AppTheme.greenGoEarn.withOpacity(0.5) : Colors.grey.shade300,
+              borderColor: showSubmit ? AppTheme.greenGoEarn.withValues(alpha: 0.5) : Colors.grey.shade300,
               onTap: onSubmitPressed,
               child: Icon(
                 Icons.check_circle_rounded,

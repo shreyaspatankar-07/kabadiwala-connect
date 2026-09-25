@@ -34,7 +34,7 @@ class BigTile extends StatelessWidget {
       selected: isSelected,
       label: subtitle != null ? '$title, $subtitle' : title,
       child: Material(
-        color: isSelected ? primaryColor.withOpacity(0.12) : AppTheme.surfaceLight,
+        color: isSelected ? primaryColor.withValues(alpha: 0.12) : AppTheme.surfaceLight,
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
@@ -53,7 +53,7 @@ class BigTile extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -66,7 +66,7 @@ class BigTile extends StatelessWidget {
                   height: 56,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: isSelected ? primaryColor : primaryColor.withOpacity(0.15),
+                    color: isSelected ? primaryColor : primaryColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(

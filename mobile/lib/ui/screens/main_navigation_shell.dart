@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/local_database.dart';
+import '../../data/repositories/lot_repository.dart';
+import '../../data/repositories/price_repository.dart';
 import '../widgets/big_tile.dart';
 import '../widgets/speaker_button.dart';
 import '../widgets/sync_status_badge.dart';
+import 'add_lot_screen.dart';
 
 /// Bottom Navigation Shell with 4 tabs:
 /// 1. Add Lot (माल जोडा / माल जोड़ें)
@@ -17,10 +21,14 @@ class MainNavigationShell extends StatefulWidget {
     super.key,
     required this.audioService,
     this.initialLocale = 'mr',
+    this.lotRepository,
+    this.priceRepository,
   });
 
   final AudioFeedbackService audioService;
   final String initialLocale;
+  final LotRepository? lotRepository;
+  final PriceRepository? priceRepository;
 
   @override
   State<MainNavigationShell> createState() => _MainNavigationShellState();
@@ -125,7 +133,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         ),
       ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(top: BorderSide(color: AppTheme.borderColor, width: 1.5)),
         ),
         child: BottomNavigationBar(
@@ -180,10 +188,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               onTap: () async {
                 await HapticService.mediumImpact();
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(locale == 'mr' ? 'फोटो घेतला गेला!' : 'फोटो खींच लिया गया!'),
-                    backgroundColor: AppTheme.greenGoEarn,
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AddLotScreen(
+                      audioService: widget.audioService,
+                      lotRepository: widget.lotRepository ?? LotRepository(AppDatabase.inMemory()),
+                      priceRepository: widget.priceRepository ?? PriceRepository(AppDatabase.inMemory()),
+                      locale: locale,
+                    ),
                   ),
                 );
               },
@@ -344,7 +356,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: item.$4.withOpacity(0.12),
+                  color: item.$4.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(Icons.currency_rupee_rounded, color: item.$4, size: 28),

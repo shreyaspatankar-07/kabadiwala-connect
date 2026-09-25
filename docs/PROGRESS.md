@@ -50,15 +50,25 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - **Small APK Target & Performance**: R8 shrinking, resource shrinking, split-per-ABI configured in `build.gradle.kts`, ProGuard rules in `proguard-rules.pro`, and comprehensive size budget documented in [PERF.md](file:///c:/dev/kabadiwala-connect/docs/PERF.md) (~14.9 MB per ABI vs < 25 MB budget).
   - **Mobile Test Suite**: 14/14 automated widget and repository unit tests passing cleanly in `mobile/test/`.
 
+- [x] Offline Add Lot Flow (`/mobile/lib/ui/screens/add_lot_screen.dart`):
+  - **Camera & Image Processing**: 1-4 photo capture, automatic compression to $\le 200$ KB, EXIF strip with GPS retention, and immutable SHA-256 hash calculation per photo ([image_processor.dart](file:///c:/dev/kabadiwala-connect/mobile/lib/core/hardware/image_processor.dart)).
+  - **Edge TFLite Inference**: Model card documentation for MobileNetV3-Small INT8 at [ML_DATASETS.md](file:///c:/dev/kabadiwala-connect/docs/ML_DATASETS.md), packaged placeholder model asset, and on-device classifier (`MaterialClassifier`) returning top-3 predicted categories with confidence bars. Manual override always available without ML.
+  - **Sub-Category & Condition Selection**: 4 condition icon chips (`ConditionChips`: working, broken, damaged, burnt) with semantic colors and high contrast, plus sub-category chips (e.g. PCB: Computer/Mobile/TV; Batteries: Li-ion/Lead-Acid; Cables: Copper/Mixed).
+  - **Weight Entry & References**: Big number pad with kg/gram toggle, reference pictorial weight helper (`ReferenceWeightHelper`) displaying "this size ~ 5 kg" visual cues, and Bluetooth scale stub interface (`BluetoothScaleService` & `StubBluetoothScaleService`).
+  - **Instant Value Estimate**: Instant calculation (`weight * cached_price`), min-max price range bar, large rupee display, and vernacular audio read-out ("अंदाजे सरकारी भाव सुमारे ... रुपये आहे") via persistent speaker button.
+  - **Traceable Offline Save**: Deterministic offline Lot ID (`KC-MH-YYMM-<HASH>`), local Drift SQLite persistence, enqueued into `SyncQueueEntries` FIFO queue (clock icon until synced, tick icon after sync).
+  - **GPS Fallback & Multi-Item Support**: Auto-capture GPS coordinates with fallback to last-known coordinates or manual district selector; full support for multiple items per lot and multiple lots per day.
+  - **Automated Widget Tests**: 5 new end-to-end widget tests in `mobile/test/add_lot_flow_test.dart` covering photo capture, category selection, weight entry, value estimate display, and offline persistence with sync queue verification. All 19 mobile tests passing cleanly (`flutter test`).
+
 ---
 
 ## Pending Next Phase Tasks
 
-### Phase 5: Hardware & ML Integration on Mobile
-- [ ] Implement camera photo compression ($\le 200$ KB) and SHA-256 hash calculation.
-- [ ] On-device TFLite classification model integration for e-waste category inference.
-- [ ] QR code generation for tamper-evident dual-handover audit trail.
+### Phase 6: Dual Handover & Recycler Verification Flow
+- [ ] QR code generation for tamper-evident offline dual-handover audit trail.
+- [ ] Bluetooth scale real driver integration (replacing stub).
+- [ ] Offline handover certificate signing.
 
-### Phase 6: Recycler & Admin Portal (Next.js)
+### Phase 7: Recycler & Admin Portal (Next.js)
 - [ ] Build Recycler dashboard (incoming lots, weight scale verification, EPR digital receipts).
 - [ ] Build Admin/JNARDDC compliance & mass balance overview.

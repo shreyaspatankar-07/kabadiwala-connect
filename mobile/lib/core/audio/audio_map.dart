@@ -62,6 +62,26 @@ class AudioMap {
       'hi': 'सारी जानकारी सरकारी सर्वर पर सुरक्षित जमा हो गई है।',
       'en': 'All pending transactions have synced with the server.',
     },
+    'photoCaptured': {
+      'mr': 'फोटो घेतला गेला. कॅमेरा मॉडेलने मालाचा प्रकार ओळखला आहे.',
+      'hi': 'फोटो ले लिया गया। कैमरा मॉडल ने माल का प्रकार पहचान लिया है।',
+      'en': 'Photo captured. AI model has suggested material categories.',
+    },
+    'selectCategory': {
+      'mr': 'स्क्रीनवरील योग्य प्रकारावर दाबा, किंवा खालील इतर प्रकार निवडा.',
+      'hi': 'स्क्रीन पर सही प्रकार पर दबाएं, या नीचे अन्य विकल्प चुनें।',
+      'en': 'Tap the matching material category or pick from the list.',
+    },
+    'weightPrompt': {
+      'mr': 'मोठ्या कीपॅडवर मालाचे वजन टाका. किलो किंवा ग्रॅम निवडा.',
+      'hi': 'बड़े कीपैड पर माल का वजन दर्ज करें। किलो या ग्राम चुनें।',
+      'en': 'Enter item weight on the keypad. Choose kg or grams.',
+    },
+    'lotSavedSuccess': {
+      'mr': 'माल सुरक्षित जतन झाला. इंटरनेट आल्यावर आपोआप सिंक होईल.',
+      'hi': 'माल सुरक्षित सहेज लिया गया। इंटरनेट आने पर अपने आप सिंक होगा।',
+      'en': 'Lot saved offline. It will synchronize once internet is restored.',
+    },
   };
 
   /// Returns asset audio path keyed by string ID and locale code
@@ -76,5 +96,18 @@ class AudioMap {
       return lang[locale]!;
     }
     return lang?['mr'] ?? '';
+  }
+
+  /// Generate dynamic spoken value estimate text
+  static String getEstimateSpokenText(int amount, String locale) {
+    switch (locale) {
+      case 'hi':
+        return 'अनुमानित सरकारी भाव लगभग $amount रुपये है।';
+      case 'en':
+        return 'Estimated government rate is approximately $amount Rupees.';
+      case 'mr':
+      default:
+        return 'अंदाजे सरकारी भाव सुमारे $amount रुपये आहे.';
+    }
   }
 }
