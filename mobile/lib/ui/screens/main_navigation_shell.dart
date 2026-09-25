@@ -7,6 +7,7 @@ import '../../data/repositories/lot_repository.dart';
 import '../../data/repositories/price_repository.dart';
 import '../../data/repositories/ledger_repository.dart';
 import '../widgets/big_tile.dart';
+import '../widgets/demo_banner.dart';
 import '../widgets/speaker_button.dart';
 import '../widgets/sync_status_badge.dart';
 import 'add_lot_screen.dart';
@@ -153,6 +154,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       body: SafeArea(
         child: Column(
           children: [
+            DemoBannerWidget(locale: locale),
             // Connectivity & sync queue badge
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

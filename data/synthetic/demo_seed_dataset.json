@@ -1,0 +1,264 @@
+{
+  "metadata": {
+    "title": "Kabadiwala Connect Demo Fixtures",
+    "source": "synthetic",
+    "generated_at": "2026-09-25T14:03:19.792244+00:00",
+    "districts": [
+      "Mumbai",
+      "Thane",
+      "Palghar",
+      "Pune",
+      "Nashik",
+      "Nagpur"
+    ]
+  },
+  "recyclers": [
+    {
+      "id": "REC-SYNTH-001",
+      "name": "Maharashtra Green E-Solutions (Synthetic)",
+      "district": "Mumbai",
+      "lat": 19.076,
+      "lng": 72.8777,
+      "cpcb_reg_no": "CPCB/SYNTH/EPR/2026/001",
+      "body": "CPCB",
+      "phone": "+91-98200-11111",
+      "pickup_available": true,
+      "pickup_radius_km": 35.0,
+      "rating": 4.8,
+      "rates": {
+        "CRT": 14.5,
+        "LCD panel": 48.0,
+        "PCB (low grade)": 52.0,
+        "PCB (mid grade)": 210.0,
+        "PCB (high grade)": 620.0,
+        "cables": 310.0,
+        "batteries": 95.0,
+        "motors/magnets": 85.0,
+        "mixed plastics": 24.0
+      }
+    },
+    {
+      "id": "REC-SYNTH-002",
+      "name": "Mumbai Eco-Refinery Hub (Synthetic)",
+      "district": "Mumbai",
+      "lat": 19.12,
+      "lng": 72.91,
+      "cpcb_reg_no": "MPCB/SYNTH/EPR/2026/002",
+      "body": "SPCB",
+      "phone": "+91-98200-22222",
+      "pickup_available": false,
+      "pickup_radius_km": 0.0,
+      "rating": 4.5,
+      "rates": {
+        "CRT": 12.0,
+        "LCD panel": 45.0,
+        "PCB (low grade)": 48.0,
+        "PCB (mid grade)": 195.0,
+        "PCB (high grade)": 590.0,
+        "cables": 295.0,
+        "batteries": 90.0,
+        "motors/magnets": 80.0,
+        "mixed plastics": 22.0
+      }
+    },
+    {
+      "id": "REC-SYNTH-003",
+      "name": "Thane Industrial E-Waste Aggregators (Synthetic)",
+      "district": "Thane",
+      "lat": 19.2183,
+      "lng": 72.9781,
+      "cpcb_reg_no": "MPCB/SYNTH/EPR/2026/003",
+      "body": "SPCB",
+      "phone": "+91-98200-33333",
+      "pickup_available": true,
+      "pickup_radius_km": 25.0,
+      "rating": 4.7,
+      "rates": {
+        "CRT": 13.5,
+        "LCD panel": 46.0,
+        "PCB (low grade)": 50.0,
+        "PCB (mid grade)": 205.0,
+        "PCB (high grade)": 610.0,
+        "cables": 305.0,
+        "batteries": 92.0,
+        "motors/magnets": 82.0,
+        "mixed plastics": 23.0
+      }
+    },
+    {
+      "id": "REC-SYNTH-004",
+      "name": "Palghar Coastal Metal Recovery (Synthetic)",
+      "district": "Palghar",
+      "lat": 19.6967,
+      "lng": 72.7699,
+      "cpcb_reg_no": "MPCB/SYNTH/EPR/2026/004",
+      "body": "SPCB",
+      "phone": "+91-98200-44444",
+      "pickup_available": true,
+      "pickup_radius_km": 40.0,
+      "rating": 4.6,
+      "rates": {
+        "CRT": 11.5,
+        "LCD panel": 40.0,
+        "PCB (low grade)": 45.0,
+        "PCB (mid grade)": 185.0,
+        "PCB (high grade)": 560.0,
+        "cables": 285.0,
+        "batteries": 88.0,
+        "motors/magnets": 78.0,
+        "mixed plastics": 20.0
+      }
+    },
+    {
+      "id": "REC-SYNTH-005",
+      "name": "Pune Circular Resources Pvt Ltd (Synthetic)",
+      "district": "Pune",
+      "lat": 18.5204,
+      "lng": 73.8567,
+      "cpcb_reg_no": "CPCB/SYNTH/EPR/2026/005",
+      "body": "CPCB",
+      "phone": "+91-98200-55555",
+      "pickup_available": true,
+      "pickup_radius_km": 30.0,
+      "rating": 4.9,
+      "rates": {
+        "CRT": 14.0,
+        "LCD panel": 47.0,
+        "PCB (low grade)": 51.0,
+        "PCB (mid grade)": 208.0,
+        "PCB (high grade)": 615.0,
+        "cables": 308.0,
+        "batteries": 94.0,
+        "motors/magnets": 84.0,
+        "mixed plastics": 23.5
+      }
+    },
+    {
+      "id": "REC-SYNTH-006",
+      "name": "Pimpri High-Tech Dismantlers (Synthetic)",
+      "district": "Pune",
+      "lat": 18.6279,
+      "lng": 73.8009,
+      "cpcb_reg_no": "MPCB/SYNTH/EPR/2026/006",
+      "body": "SPCB",
+      "phone": "+91-98200-66666",
+      "pickup_available": false,
+      "pickup_radius_km": 0.0,
+      "rating": 4.4,
+      "rates": {
+        "CRT": 12.5,
+        "LCD panel": 44.0,
+        "PCB (low grade)": 49.0,
+        "PCB (mid grade)": 198.0,
+        "PCB (high grade)": 585.0,
+        "cables": 298.0,
+        "batteries": 89.0,
+        "motors/magnets": 79.0,
+        "mixed plastics": 21.5
+      }
+    },
+    {
+      "id": "REC-SYNTH-007",
+      "name": "Nashik Valley Smelting Works (Synthetic)",
+      "district": "Nashik",
+      "lat": 19.9975,
+      "lng": 73.7898,
+      "cpcb_reg_no": "MPCB/SYNTH/EPR/2026/007",
+      "body": "SPCB",
+      "phone": "+91-98200-77777",
+      "pickup_available": true,
+      "pickup_radius_km": 30.0,
+      "rating": 4.6,
+      "rates": {
+        "CRT": 13.0,
+        "LCD panel": 43.0,
+        "PCB (low grade)": 47.0,
+        "PCB (mid grade)": 192.0,
+        "PCB (high grade)": 575.0,
+        "cables": 292.0,
+        "batteries": 87.0,
+        "motors/magnets": 77.0,
+        "mixed plastics": 21.0
+      }
+    },
+    {
+      "id": "REC-SYNTH-008",
+      "name": "Nagpur Central Vidarbha Recyclers (Synthetic)",
+      "district": "Nagpur",
+      "lat": 21.1458,
+      "lng": 79.0882,
+      "cpcb_reg_no": "CPCB/SYNTH/EPR/2026/008",
+      "body": "CPCB",
+      "phone": "+91-98200-88888",
+      "pickup_available": true,
+      "pickup_radius_km": 50.0,
+      "rating": 4.7,
+      "rates": {
+        "CRT": 13.2,
+        "LCD panel": 44.5,
+        "PCB (low grade)": 48.5,
+        "PCB (mid grade)": 196.0,
+        "PCB (high grade)": 590.0,
+        "cables": 300.0,
+        "batteries": 91.0,
+        "motors/magnets": 81.0,
+        "mixed plastics": 22.5
+      }
+    }
+  ],
+  "collectors": [
+    {
+      "id": "KC-C-7821",
+      "name": "Ramesh Scrap",
+      "phone": "+91-98000-78210",
+      "language": "mr",
+      "operating_area": "Thane",
+      "latitude": 19.2183,
+      "longitude": 72.9781
+    },
+    {
+      "id": "KC-C-4512",
+      "name": "Sunil E-Collect",
+      "phone": "+91-98000-45120",
+      "language": "hi",
+      "operating_area": "Mumbai",
+      "latitude": 19.076,
+      "longitude": 72.8777
+    },
+    {
+      "id": "KC-C-9034",
+      "name": "Prakash Metal",
+      "phone": "+91-98000-90340",
+      "language": "mr",
+      "operating_area": "Pune",
+      "latitude": 18.5204,
+      "longitude": 73.8567
+    }
+  ],
+  "anomalies": [
+    {
+      "lot_id": "KC-MH-2609-ANOM1",
+      "collector_id": "KC-C-7821",
+      "category": "PCB (mid grade)",
+      "weight_kg": 10.0,
+      "quoted_price": 1850.0,
+      "reason": "price_outlier: Quoted rate \u20b91850.0/kg exceeds 2.5x IQR upper threshold (\u20b9260.0/kg)"
+    },
+    {
+      "lot_id": "KC-MH-2609-ANOM2",
+      "collector_id": "KC-C-4512",
+      "category": "CRT",
+      "weight_kg": 4500.0,
+      "quoted_price": 12.0,
+      "reason": "weight_implausible: Single unit weight 4500.0 kg exceeds sanity limit (50.0 kg) for CRT"
+    },
+    {
+      "lot_id": "KC-MH-2609-ANOM3",
+      "collector_id": "KC-C-9034",
+      "category": "batteries",
+      "weight_kg": 15.0,
+      "quoted_price": 90.0,
+      "reason": "rapid_burst: 5 identical lots submitted within 180 seconds at same GPS coordinate"
+    }
+  ]
+}

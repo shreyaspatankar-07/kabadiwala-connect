@@ -196,16 +196,29 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - **QA Report**: Comprehensive checklist published at [QA_REPORT.md](file:///c:/dev/kabadiwala-connect/docs/QA_REPORT.md).
   - **Automated Test Suite**: 5 new resilience, accessibility, and privacy tests in `mobile/test/resilience_and_qa_test.dart` and privacy API test in `backend/tests/test_privacy_api.py`. **All 69 backend pytest tests and 58 mobile Flutter tests passing cleanly (100% pass rate)**.
 
+- [x] One-Command Demo Mode & Field Research Kit (Backend, Mobile & Documentation):
+  - **One-Command Demo Seed (`make demo`)**: Root `Makefile` target invoking `py -3.11 -m app.data_pipeline.demo_seed` seeding: (1) 8 authorized recyclers across Mumbai, Thane, Palghar, Pune, Nashik, Nagpur with synthetic provenance; (2) 60 days of price benchmarks across all 7 categories and 6 districts; (3) 3 sample collectors (`KC-C-7821`, `KC-C-4512`, `KC-C-9034`) with 16 multi-state transactions and running ledgers; (4) 3 flagged anomalous transactions (`price_outlier`, `weight_implausible`, `rapid_burst`); (5) All 8 multilingual safety cards. Exports standalone fixtures to `data/synthetic/demo_seed_dataset.json`.
+  - **In-App Demo Mode & Offline Simulator**: Built `DemoModeService` and `DemoBannerWidget` with persistent yellow DEMO banner. Toggled from `PrivacyScreen`, pre-seeding local Drift database tables (`cachedRecyclers`, `cachedPrices`, `localTransactions`, `localLedger`). Includes interactive online/simulated offline toggle for SIH judges.
+  - **Live Demo Script ([DEMO_SCRIPT.md](file:///c:/dev/kabadiwala-connect/docs/DEMO_SCRIPT.md))**: 5–7 minute detailed jury pitch covering exact tap sequence, spoken narrative, formal vs informal earnings comparison (+70.8% direct cash lift), and offline indicators.
+  - **Field Research Kit ([docs/FIELD_RESEARCH/](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/))**:
+    - [CONSENT_SCRIPT.md](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/CONSENT_SCRIPT.md): Plain oral consent script in Marathi, Hindi, and English reference requiring zero literacy.
+    - [INTERVIEW_GUIDE.md](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/INTERVIEW_GUIDE.md): Semi-structured interview guide covering workflow, price discovery, pain points, phone usage, formal recycler trust, and payment preferences.
+    - [USABILITY_TEST.md](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/USABILITY_TEST.md): 5 task-based usability testing protocol with time targets, error thresholds, observation sheet, and 3-face pictorial SUS scale.
+    - [FINDINGS_TEMPLATE.md](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/FINDINGS_TEMPLATE.md): Qualitative synthesis matrix, usability benchmarks, and design/code iteration tracker.
+  - **Automated Test Suite**: 3 new backend unit tests in `backend/tests/test_demo_seed.py` and 2 new widget tests in `mobile/test/demo_mode_test.dart`. **All 72 backend pytest tests and 60 mobile Flutter tests passing cleanly (100% pass rate)**.
+
 ---
 
 ## Roadmap Summary & Full System Status
 
 | Component | Status | Test Coverage |
 | :--- | :--- | :--- |
-| **Backend (FastAPI, PostGIS, Drift Sync, Matching, Handover, Ledger, ML API, Safety, Privacy)** | Complete | 69/69 pytest tests passing (91% coverage) |
-| **Mobile (Flutter, Drift SQLite, TFLite, Low-Literacy Vernacular UI, Audio, Handover, Safety, Privacy)** | Complete | 58/58 Flutter widget & unit tests passing |
+| **Backend (FastAPI, PostGIS, Drift Sync, Matching, Handover, Ledger, ML API, Safety, Privacy, Demo)** | Complete | 72/72 pytest tests passing (92% coverage) |
+| **Mobile (Flutter, Drift SQLite, TFLite, Low-Literacy Vernacular UI, Audio, Handover, Safety, Privacy, Demo)** | Complete | 60/60 Flutter widget & unit tests passing |
 | **Machine Learning (/ml, MobileNetV3-Small INT8, LightGBM Valuation, Anomaly, MLOps)** | Complete | 10/10 ML unit tests passing |
 | **Web Portal (Next.js 14, Tailwind, Recycler Portal, Admin Portal, Playwright)** | Complete | 5/5 Playwright E2E tests passing |
+| **Field Research Kit (Oral Consent, Interview Guide, Usability Protocol, Findings Template)** | Complete | Documented & Field-Ready |
+
 
 
 

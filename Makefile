@@ -3,7 +3,7 @@
 
 PYTHON = py -3.11
 
-.PHONY: help setup lint format test test-backend test-ml docker-up docker-down clean data-seed data-validate data-export safety-seed
+.PHONY: help setup lint format test test-backend test-ml docker-up docker-down clean data-seed data-validate data-export safety-seed demo
 
 help:
 	@echo "Available targets:"
@@ -11,6 +11,7 @@ help:
 	@echo "  lint          - Run lint checks across backend, ml, and portal"
 	@echo "  format        - Auto-format code using ruff"
 	@echo "  test          - Run test suites for backend and ml"
+	@echo "  demo          - One-command comprehensive seed: 8 recyclers, 60d prices, 3 collectors, 3 anomalies, safety topics"
 	@echo "  data-seed     - Generate synthetic price stream and raw observations"
 	@echo "  data-validate - Validate, clean, quarantine outliers, update rolling board & dataset card"
 	@echo "  data-export   - Generate privacy-preserved, anonymized ML-ready datasets"
@@ -18,6 +19,9 @@ help:
 	@echo "  docker-up     - Start Postgres+PostGIS, backend, and portal via docker-compose"
 	@echo "  docker-down   - Stop and tear down docker containers"
 	@echo "  clean         - Remove caches and build artifacts"
+
+demo:
+	cd backend && $(PYTHON) -m app.data_pipeline.demo_seed
 
 safety-seed:
 	cd backend && $(PYTHON) -m app.data_pipeline.safety_seed

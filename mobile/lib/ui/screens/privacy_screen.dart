@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
+import '../../core/demo/demo_mode_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
@@ -222,9 +223,111 @@ class PrivacyScreen extends StatelessWidget {
                 title: isMr ? '४. तुम्ही कधीही डेटा नष्ट करू शकता' : (isHi ? '४. कभी भी डेटा मिटाने का अधिकार' : '4. Complete Right to be Forgotten'),
                 subtitle: isMr ? 'एका दाबात फोन व सर्व्हरवरून सर्व नोंदी पुसल्या जातात.' : (isHi ? 'एक टैप में फोन और सर्वर से रिकॉर्ड हटा सकते हैं।' : 'One-tap total data purge anytime.'),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 20),
 
-              // 3. One-Tap Delete My Data Button
+              // 3. Demo Mode Settings for Judges
+              ListenableBuilder(
+                listenable: DemoModeService.instance,
+                builder: (context, _) {
+                  final isDemo = DemoModeService.instance.isDemoMode;
+                  final isSimOffline = DemoModeService.instance.isSimulatedOffline;
+
+                  return Container(
+                    key: const Key('demo_mode_settings_card'),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDemo ? Colors.amber.shade50 : Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isDemo ? Colors.amber.shade600 : AppTheme.borderColor,
+                        width: isDemo ? 2.0 : 1.5,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.science_rounded,
+                              color: isDemo ? Colors.amber.shade800 : AppTheme.textMuted,
+                              size: 26,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isMr ? 'परीक्षक डेमो मोड (Demo Mode)' : (isHi ? 'जज डेमो मोड (Demo Mode)' : 'Judges Demo Mode'),
+                                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
+                                  ),
+                                  Text(
+                                    isMr
+                                        ? 'ऑफलाइन चाचणी व नमुना डेटा चालू करा'
+                                        : (isHi ? 'ऑफलाइन टेस्टिंग और नमूना डेटा चालू करें' : 'Pre-seed offline database for testing'),
+                                    style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch.adaptive(
+                              key: const Key('switch_demo_mode'),
+                              value: isDemo,
+                              activeThumbColor: Colors.amber.shade800,
+                              onChanged: (val) {
+                                HapticService.mediumImpact();
+                                DemoModeService.instance.setDemoMode(val, db);
+                              },
+                            ),
+                          ],
+                        ),
+                        if (isDemo) ...[
+                          const Divider(height: 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  isMr
+                                      ? 'नेटवर्क खंडित सिम्युलेशन:'
+                                      : (isHi ? 'नेटवर्क कट सिमुलेशन:' : 'Simulate Offline Mode:'),
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                              ElevatedButton.icon(
+                                key: const Key('btn_simulate_offline_toggle'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isSimOffline ? AppTheme.dangerRed : AppTheme.greenGoEarn,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                onPressed: () {
+                                  HapticService.mediumImpact();
+                                  DemoModeService.instance.toggleSimulatedOffline();
+                                },
+                                icon: Icon(
+                                  isSimOffline ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
+                                  size: 16,
+                                ),
+                                label: Text(
+                                  isSimOffline
+                                      ? (isMr ? 'ऑफलाइन मोड' : (isHi ? 'ऑफलाइन' : 'Offline'))
+                                      : (isMr ? 'ऑनलाइन' : (isHi ? 'ऑनलाइन' : 'Online')),
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+
+              // 4. One-Tap Delete My Data Button
               ElevatedButton.icon(
                 key: const Key('btn_delete_my_data'),
                 style: ElevatedButton.styleFrom(
