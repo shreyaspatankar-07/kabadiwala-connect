@@ -9,7 +9,6 @@ from app.matching.reranker import LearnedReranker
 from app.matching.schemas import LotMatchInput, RecyclerCandidate
 from app.matching.scoring import (
     haversine_distance_km,
-    passes_hard_filters,
     rank_candidates_rule_based,
 )
 
@@ -74,7 +73,9 @@ def test_no_verified_recyclers():
 
 
 def test_category_mismatch_excluded():
-    lot = LotMatchInput(category="Lithium Batteries", collection_lat=19.0760, collection_lng=72.8777)
+    lot = LotMatchInput(
+        category="Lithium Batteries", collection_lat=19.0760, collection_lng=72.8777
+    )
     candidates = [
         _make_candidate(cid="rec-cables", materials=["Copper Cables", "Mixed Plastics"]),
         _make_candidate(cid="rec-crt", materials=["CRT Glass", "LCD Panels"]),
@@ -94,7 +95,7 @@ def test_distance_and_service_area_filter():
     c_distant = _make_candidate(
         cid="rec-distant",
         lat=18.5204,
-        lng=73.8567, # ~120 km
+        lng=73.8567,  # ~120 km
         pickup_radius_km=25.0,
         service_area={"districts": ["Pune"]},
     )
@@ -123,7 +124,9 @@ def test_distance_and_service_area_filter():
 
 
 def test_score_ordering():
-    lot = LotMatchInput(category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai")
+    lot = LotMatchInput(
+        category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai"
+    )
     # c_premium has higher rate, closer distance, pickup, higher rating, speed
     c_premium = _make_candidate(
         cid="rec-top",
@@ -154,7 +157,9 @@ def test_score_ordering():
 
 
 def test_deterministic_tie_breaking():
-    lot = LotMatchInput(category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai")
+    lot = LotMatchInput(
+        category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai"
+    )
     # Two candidates with identical scores and properties except ID
     c1 = _make_candidate(cid="rec-A", rate=400.0, lat=19.0800, lng=72.8800, rating=4.5)
     c2 = _make_candidate(cid="rec-B", rate=400.0, lat=19.0800, lng=72.8800, rating=4.5)
@@ -169,7 +174,7 @@ def test_deterministic_tie_breaking():
 
 def test_shared_fixture_reproducibility():
     assert FIXTURE_PATH.exists(), f"Shared test fixture not found at {FIXTURE_PATH}"
-    with open(FIXTURE_PATH, "r", encoding="utf-8") as f:
+    with open(FIXTURE_PATH, encoding="utf-8") as f:
         fixture_data = json.load(f)
 
     lot = LotMatchInput(**fixture_data["lot"])
@@ -195,7 +200,9 @@ def test_shared_fixture_reproducibility():
 
 
 def test_learned_reranker_fallback_under_50():
-    lot = LotMatchInput(category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai")
+    lot = LotMatchInput(
+        category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai"
+    )
     candidates = [_make_candidate(cid="rec-1"), _make_candidate(cid="rec-2")]
     reranker = LearnedReranker(min_training_records=50)
 
@@ -208,14 +215,17 @@ def test_learned_reranker_fallback_under_50():
 
 
 def test_learned_reranker_trains_at_50_records():
-    lot = LotMatchInput(category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai")
-    candidates = [_make_candidate(cid="rec-1", rate=450.0), _make_candidate(cid="rec-2", rate=480.0)]
+    lot = LotMatchInput(
+        category="PCB", collection_lat=19.0760, collection_lng=72.8777, district="Mumbai"
+    )
+    candidates = [
+        _make_candidate(cid="rec-1", rate=450.0),
+        _make_candidate(cid="rec-2", rate=480.0),
+    ]
     reranker = LearnedReranker(min_training_records=50)
 
     # 55 records >= 50 -> trains LightGBM
-    history_55 = [
-        {"features": [0.8, 0.9, 1.0, 0.95, 0.9, 0.9], "label": 1} for _ in range(35)
-    ] + [
+    history_55 = [{"features": [0.8, 0.9, 1.0, 0.95, 0.9, 0.9], "label": 1} for _ in range(35)] + [
         {"features": [0.2, 0.1, 0.0, 0.4, 0.2, 0.3], "label": 0} for _ in range(20)
     ]
 

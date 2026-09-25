@@ -38,13 +38,17 @@ class MatchingService:
             return [], []
 
         # 2. Performance stats from transactions table
-        tx_query = select(
-            Transaction.recycler_id,
-            func.count(Transaction.lot_id).label("total_tx"),
-            func.count(Transaction.lot_id)
-            .filter(Transaction.transaction_status == TransactionStatus.CONFIRMED)
-            .label("completed_tx"),
-        ).where(Transaction.recycler_id.isnot(None)).group_by(Transaction.recycler_id)
+        tx_query = (
+            select(
+                Transaction.recycler_id,
+                func.count(Transaction.lot_id).label("total_tx"),
+                func.count(Transaction.lot_id)
+                .filter(Transaction.transaction_status == TransactionStatus.CONFIRMED)
+                .label("completed_tx"),
+            )
+            .where(Transaction.recycler_id.isnot(None))
+            .group_by(Transaction.recycler_id)
+        )
 
         tx_res = await db.execute(tx_query)
         stats_map: dict[str, dict[str, float]] = {}
@@ -52,7 +56,7 @@ class MatchingService:
             comp_rate = float(completed) / float(total) if total and total > 0 else 0.85
             stats_map[r_id] = {
                 "completion_rate": comp_rate,
-                "confirmation_speed_hours": 3.5, # default fast response
+                "confirmation_speed_hours": 3.5,  # default fast response
             }
 
         candidates: list[RecyclerCandidate] = []
@@ -62,6 +66,7 @@ class MatchingService:
             if hasattr(r, "facility_location") and r.facility_location is not None:
                 try:
                     import shapely.wkb
+
                     geom = shapely.wkb.loads(bytes(r.facility_location.data))
                     lng, lat = geom.x, geom.y
                 except Exception:
@@ -75,7 +80,11 @@ class MatchingService:
                 longitude=lng,
                 materials_accepted=r.materials_accepted or [],
                 authorization_number=r.authorization_number,
-                authorization_status=str(r.authorization_status.value if hasattr(r.authorization_status, "value") else r.authorization_status),
+                authorization_status=str(
+                    r.authorization_status.value
+                    if hasattr(r.authorization_status, "value")
+                    else r.authorization_status
+                ),
                 authorization_valid_till=r.authorization_valid_till,
                 phone=r.phone,
                 offered_rates={k: float(v) for k, v in (r.offered_rates or {}).items()},
@@ -96,10 +105,12 @@ class MatchingService:
         for t in past_txs_res.scalars().all():
             is_completed = 1 if t.transaction_status == TransactionStatus.CONFIRMED else 0
             # Mock historical features matching vector dimensions
-            training_records.append({
-                "features": [0.8, 0.7, 1.0, 0.9, 0.85, 0.8],
-                "label": is_completed,
-            })
+            training_records.append(
+                {
+                    "features": [0.8, 0.7, 1.0, 0.9, 0.85, 0.8],
+                    "label": is_completed,
+                }
+            )
 
         return candidates, training_records
 

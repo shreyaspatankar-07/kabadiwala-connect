@@ -1,9 +1,8 @@
 """Deterministic Recycler Ranking and Multi-Criteria Scoring Engine."""
 
-from datetime import UTC, date, datetime
 import math
+from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -38,7 +37,7 @@ def load_scoring_config() -> tuple[dict[str, float], dict[str, float]]:
     """Loads weights and scoring parameters from YAML, with safe fallbacks."""
     if CONFIG_PATH.exists():
         try:
-            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            with open(CONFIG_PATH, encoding="utf-8") as f:
                 data = yaml.safe_load(f) or {}
                 weights = data.get("weights", DEFAULT_WEIGHTS)
                 parameters = data.get("parameters", DEFAULT_PARAMETERS)
@@ -55,9 +54,7 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     d_lon = math.radians(lon2 - lon1)
     a = (
         math.sin(d_lat / 2) ** 2
-        + math.cos(math.radians(lat1))
-        * math.cos(math.radians(lat2))
-        * math.sin(d_lon / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(d_lon / 2) ** 2
     )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return round(radius_earth_km * c, 2)
@@ -164,7 +161,9 @@ def rank_candidates_rule_based(
     min_rate = min(all_rates)
     max_rate = max(all_rates)
 
-    scored_records: list[tuple[float, float, float, float, str, RecyclerCandidate, ScoreBreakdown]] = []
+    scored_records: list[
+        tuple[float, float, float, float, str, RecyclerCandidate, ScoreBreakdown]
+    ] = []
 
     for c, dist_km, rate in passing:
         # 1. Normalized offered rate (0.0 to 1.0)
@@ -184,7 +183,9 @@ def rank_candidates_rule_based(
         norm_comp = max(0.0, min(1.0, float(comp_rate)))
 
         # 5. Confirmation speed (faster = higher)
-        speed_hours = c.confirmation_speed_hours if c.confirmation_speed_hours is not None else def_speed
+        speed_hours = (
+            c.confirmation_speed_hours if c.confirmation_speed_hours is not None else def_speed
+        )
         norm_speed = max(0.0, 1.0 - (float(speed_hours) / speed_max))
 
         # 6. Recycler rating (0.0 to 5.0 -> 0.0 to 1.0)
@@ -221,9 +222,7 @@ def rank_candidates_rule_based(
         scored_records.append((round(score, 4), rate, dist_km, float(c.rating), c.id, c, breakdown))
 
     # Deterministic sorting with tie-breaking
-    scored_records.sort(
-        key=lambda item: (-item[0], -item[1], item[2], -item[3], item[4])
-    )
+    scored_records.sort(key=lambda item: (-item[0], -item[1], item[2], -item[3], item[4]))
 
     ranked_results: list[RankedRecycler] = []
     for rank_idx, (final_score, rate, dist_km, _rating, _cid, candidate, breakdown) in enumerate(

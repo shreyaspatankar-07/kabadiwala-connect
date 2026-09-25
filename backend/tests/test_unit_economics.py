@@ -1,7 +1,7 @@
 """Unit tests for unit economics Excel model generation."""
 
-from pathlib import Path
 import openpyxl
+
 from app.data_pipeline.generate_unit_economics_excel import build_unit_economics_workbook
 
 

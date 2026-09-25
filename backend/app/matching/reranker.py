@@ -42,7 +42,11 @@ class LearnedReranker:
         def_speed: float,
     ) -> list[float]:
         """Extracts normalized feature vector for a candidate."""
-        norm_rate = (rate - min_rate) / (max_rate - min_rate) if max_rate > min_rate else (1.0 if rate > 0 else 0.0)
+        norm_rate = (
+            (rate - min_rate) / (max_rate - min_rate)
+            if max_rate > min_rate
+            else (1.0 if rate > 0 else 0.0)
+        )
         norm_dist = 1.0 / (1.0 + (dist_km / dist_decay))
         norm_pickup = 1.0 if candidate.pickup_available else 0.0
         comp_rate = candidate.completion_rate if candidate.completion_rate is not None else def_comp
@@ -140,9 +144,7 @@ class LearnedReranker:
                 ranked_items.append((predicted_score, r_val, d_km, c.rating, c.id, c, breakdown))
 
             # Deterministic sorting
-            ranked_items.sort(
-                key=lambda item: (-item[0], -item[1], item[2], -item[3], item[4])
-            )
+            ranked_items.sort(key=lambda item: (-item[0], -item[1], item[2], -item[3], item[4]))
 
             results: list[RankedRecycler] = []
             for r_idx, (p_score, r_val, d_km, _rating, _cid, candidate, breakdown) in enumerate(
@@ -169,7 +171,9 @@ class LearnedReranker:
                         distance_km=d_km,
                         offered_rate=r_val,
                         pickup_available=candidate.pickup_available,
-                        estimated_pickup_time=estimate_pickup_time(candidate.pickup_available, d_km),
+                        estimated_pickup_time=estimate_pickup_time(
+                            candidate.pickup_available, d_km
+                        ),
                         authorization_number=candidate.authorization_number,
                         rating=candidate.rating,
                     )

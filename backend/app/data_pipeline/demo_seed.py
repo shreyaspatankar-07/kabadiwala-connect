@@ -12,13 +12,12 @@ Usage:
 """
 
 import asyncio
-from datetime import UTC, date, datetime, timedelta
 import random
-from typing import Any
 import uuid
+from datetime import UTC, date, datetime, timedelta
+from typing import Any
 
 from geoalchemy2 import WKTElement
-from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionLocal
@@ -35,12 +34,9 @@ from app.models.schema import (
     PriceSource,
     PriceUnit,
     Recycler,
-    SafetyContent,
     Traceability,
     Transaction,
     TransactionStatus,
-    User,
-    UserRole,
 )
 from app.services.safety_service import SafetyService
 
@@ -676,7 +672,9 @@ async def seed_demo_data(db: AsyncSession) -> dict[str, int]:
     await db.commit()
     seeded_counts["collector_transactions"] = tx_count
     seeded_counts["ledger_entries"] = ledger_count
-    print(f"   -> Seeded {tx_count} transactions across 3 collectors ({ledger_count} ledger entries).")
+    print(
+        f"   -> Seeded {tx_count} transactions across 3 collectors ({ledger_count} ledger entries)."
+    )
 
     # 5. Seed 3 Flagged Anomalous Transactions (Price Outlier, Weight Implausible, Rapid Burst)
     print("5. Seeding 3 Flagged Anomalous Transactions...")
@@ -748,7 +746,11 @@ async def seed_demo_data(db: AsyncSession) -> dict[str, int]:
     print(f"   Ledger Entries: {seeded_counts['ledger_entries']}")
     print(f"   Anomalies: {seeded_counts['anomalies']}")
     print(f"   Safety Topics: {seeded_counts['safety_topics']}")
-def export_demo_fixtures(output_path: str = "data/synthetic/demo_seed_dataset.json") -> dict[str, Any]:
+
+
+def export_demo_fixtures(
+    output_path: str = "data/synthetic/demo_seed_dataset.json",
+) -> dict[str, Any]:
     """Export complete demo dataset to standalone JSON file for offline demo mode."""
     import json
     from pathlib import Path
@@ -831,4 +833,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

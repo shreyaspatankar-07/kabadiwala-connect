@@ -1,10 +1,10 @@
 """Verifiable Handover Record, QR Cryptographic Signing, and EPR Traceability Service."""
 
-from datetime import UTC, datetime
 import hashlib
 import hmac
 import json
 import secrets
+from datetime import UTC, datetime
 from typing import Any
 
 from geoalchemy2.elements import WKTElement
@@ -70,9 +70,7 @@ class HandoverService:
     ) -> HandoverInitiateResponse:
         """Initiates handover for a lot, generates unique 6-char code, and creates HMAC-signed QR payload."""
         # 1. Verify transaction exists
-        tx_res = await db.execute(
-            select(Transaction).where(Transaction.lot_id == data.lot_id)
-        )
+        tx_res = await db.execute(select(Transaction).where(Transaction.lot_id == data.lot_id))
         tx = tx_res.scalar_one_or_none()
         if not tx:
             raise NotFoundError("Transaction Lot", data.lot_id)
@@ -113,9 +111,7 @@ class HandoverService:
         last_rec = last_rec_res.scalar_one_or_none()
         prev_hash = last_rec.record_hash if last_rec else GENESIS_HASH
 
-        initial_record_hash = hashlib.sha256(
-            f"{qr_payload_str}:{prev_hash}".encode("utf-8")
-        ).hexdigest()
+        initial_record_hash = hashlib.sha256(f"{qr_payload_str}:{prev_hash}".encode()).hexdigest()
 
         # 5. Persist initial Traceability entry
         traceability_entry = Traceability(
@@ -239,7 +235,9 @@ class HandoverService:
 
         now_utc = datetime.now(UTC)
         final_price = float(data.final_price)
-        effective_recycler = str(recycler_id or data.recycler_id or tx.recycler_id or "REC-ANONYMOUS")
+        effective_recycler = str(
+            recycler_id or data.recycler_id or tx.recycler_id or "REC-ANONYMOUS"
+        )
 
         # Update transaction details
         tx.final_price = final_price

@@ -17,13 +17,19 @@ from app.services.recyclers_service import RecyclersService
 router = APIRouter(prefix="/recyclers", tags=["Recyclers"])
 
 
-@router.get("/nearby", response_model=list[RecyclerNearbyResponse], summary="Find authorized recyclers nearby")
+@router.get(
+    "/nearby",
+    response_model=list[RecyclerNearbyResponse],
+    summary="Find authorized recyclers nearby",
+)
 async def get_nearby_recyclers(
     lat: Annotated[float, Query(ge=-90.0, le=90.0, description="Collector latitude")],
     lng: Annotated[float, Query(ge=-180.0, le=180.0, description="Collector longitude")],
     db: Annotated[AsyncSession, Depends(get_db)],
     radius_km: Annotated[float, Query(gt=0, description="Search radius in kilometers")] = 25.0,
-    category: Annotated[str | None, Query(description="Filter by accepted material category")] = None,
+    category: Annotated[
+        str | None, Query(description="Filter by accepted material category")
+    ] = None,
 ):
     return await RecyclersService.get_nearby_recyclers(
         lat=lat, lng=lng, radius_km=radius_km, category=category, db=db

@@ -1,7 +1,7 @@
 """Pydantic schemas for Safety Guidance Cards and Collector Acknowledgements."""
 
 from datetime import datetime
-from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field
 
 

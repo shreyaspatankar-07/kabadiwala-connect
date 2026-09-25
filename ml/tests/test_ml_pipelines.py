@@ -1,27 +1,23 @@
 """Unit Tests for ML Pipelines: Classifier, Valuation, Anomaly Detector, Registry, and Drift Monitoring."""
 
-import json
-from pathlib import Path
 import numpy as np
-import pytest
-
+from ml.src.anomaly.anomaly_detector import (
+    AnomalyDetector,
+    haversine_distance_km,
+)
 from ml.src.material_classifier.train_classifier import (
+    CATEGORIES,
     MaterialAugmentationPipeline,
     generate_synthetic_image_features,
     train_and_evaluate_classifier,
-    CATEGORIES,
 )
+from ml.src.mlops.drift_monitor import calculate_psi, evaluate_drift_status
+from ml.src.mlops.registry import ModelRegistry, compute_file_sha256
 from ml.src.valuation.train_valuation import (
     generate_synthetic_valuation_dataset,
     train_valuation_model,
 )
 from ml.src.valuation.valuation_service import ValuationService
-from ml.src.anomaly.anomaly_detector import (
-    AnomalyDetector,
-    haversine_distance_km,
-)
-from ml.src.mlops.drift_monitor import calculate_psi, evaluate_drift_status
-from ml.src.mlops.registry import ModelRegistry, compute_file_sha256
 
 
 def test_material_augmentation_and_features():

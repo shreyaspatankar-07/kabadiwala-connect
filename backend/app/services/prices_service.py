@@ -159,7 +159,9 @@ class PricesService:
             )
 
         rolling_rates = RollingBoardUpdater.compute_rolling_board(cleaned_observations, now_dt=now)
-        rolling_map = {(r.category.lower(), (r.sub_category or "").lower()): r for r in rolling_rates}
+        rolling_map = {
+            (r.category.lower(), (r.sub_category or "").lower()): r for r in rolling_rates
+        }
 
         # 2. Also perform direct SQL aggregate fallback to guarantee all DB groups are represented
         stmt = (

@@ -38,8 +38,12 @@ class ScoreBreakdown(BaseModel):
     offered_rate: float = Field(..., description="Weighted score contribution from offered rate")
     distance: float = Field(..., description="Weighted score contribution from proximity")
     pickup_available: float = Field(..., description="Weighted score contribution from pickup")
-    completion_rate: float = Field(..., description="Weighted score contribution from completion rate")
-    confirmation_speed: float = Field(..., description="Weighted score contribution from confirmation speed")
+    completion_rate: float = Field(
+        ..., description="Weighted score contribution from completion rate"
+    )
+    confirmation_speed: float = Field(
+        ..., description="Weighted score contribution from confirmation speed"
+    )
     rating: float = Field(..., description="Weighted score contribution from rating")
 
 

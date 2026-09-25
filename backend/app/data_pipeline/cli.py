@@ -120,9 +120,7 @@ def cmd_validate(args: argparse.Namespace) -> None:
             indent=2,
             ensure_ascii=False,
         )
-    print(
-        f"Rolling price board computed ({len(rolling_rates)} combinations) -> {board_file}"
-    )
+    print(f"Rolling price board computed ({len(rolling_rates)} combinations) -> {board_file}")
 
     # 4. Data Quality Evaluation
     metrics = RollingBoardUpdater.evaluate_quality_metrics(

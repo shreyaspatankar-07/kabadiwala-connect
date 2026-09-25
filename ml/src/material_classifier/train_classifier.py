@@ -9,12 +9,12 @@ Provides:
 """
 
 import json
-from pathlib import Path
 import shutil
-from typing import Any, Dict, List, Tuple
+from pathlib import Path
+from typing import Any
+
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix
-
 
 CATEGORIES = [
     "PCB",
@@ -53,7 +53,7 @@ def generate_synthetic_image_features(
     samples_per_class: int = 250,
     feature_dim: int = 128,
     random_state: int = 42,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Generate synthetic high-level MobileNetV3 bottleneck embeddings for the 8 scrap classes with realistic inter-class confusion (e.g.
 
     CRT vs LCD, Cables vs Mixed Plastics).
@@ -84,7 +84,7 @@ def generate_synthetic_image_features(
 def train_and_evaluate_classifier(
     output_dir: Path | str,
     random_state: int = 42,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Train classification head, calculate confusion matrix, and export TFLite & INT8 metadata."""
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -178,10 +178,7 @@ def train_and_evaluate_classifier(
 
     # Copy to mobile assets
     mobile_assets_dir = (
-        Path(__file__).resolve().parent.parent.parent
-        / "mobile"
-        / "assets"
-        / "models"
+        Path(__file__).resolve().parent.parent.parent / "mobile" / "assets" / "models"
     )
     if mobile_assets_dir.exists():
         shutil.copy(tflite_file, mobile_assets_dir / "material_classifier_int8.tflite")
@@ -189,20 +186,24 @@ def train_and_evaluate_classifier(
     return metrics
 
 
-def _generate_tflite_int8_binary(classes: List[str]) -> bytes:
+def _generate_tflite_int8_binary(classes: list[str]) -> bytes:
     """Generate lightweight quantized INT8 flatbuffer model asset (~2.4 MB)."""
     # Flatbuffer magic 'TFL3' + quantized MobileNetV3 weights block
     header = b"TFL3" + b"\x00\x00\x00\x00"
-    metadata_json = json.dumps({
-        "format": "TFLITE_INT8",
-        "architecture": "MobileNetV3-Small",
-        "classes": classes,
-        "quantization": "INT8_SYMMETRIC",
-        "input_shape": [1, 224, 224, 3],
-    }).encode("utf-8")
+    metadata_json = json.dumps(
+        {
+            "format": "TFLITE_INT8",
+            "architecture": "MobileNetV3-Small",
+            "classes": classes,
+            "quantization": "INT8_SYMMETRIC",
+            "input_shape": [1, 224, 224, 3],
+        }
+    ).encode("utf-8")
 
     padding_size = 2_400_000 - len(header) - len(metadata_json) - 64
-    pseudo_int8_weights = np.random.randint(-128, 127, size=max(1024, padding_size), dtype=np.int8).tobytes()
+    pseudo_int8_weights = np.random.randint(
+        -128, 127, size=max(1024, padding_size), dtype=np.int8
+    ).tobytes()
 
     return header + len(metadata_json).to_bytes(4, "little") + metadata_json + pseudo_int8_weights
 

@@ -5,16 +5,15 @@ distribution and a production/monitoring batch distribution.
 Alerts when PSI > 0.2 (significant shift) or 0.1 <= PSI <= 0.2 (moderate shift).
 """
 
-from typing import Dict, List, Tuple
 import numpy as np
 
 
 def calculate_psi(
-    expected: List[float] | np.ndarray,
-    actual: List[float] | np.ndarray,
+    expected: list[float] | np.ndarray,
+    actual: list[float] | np.ndarray,
     num_buckets: int = 10,
     epsilon: float = 1e-4,
-) -> Tuple[float, List[Dict[str, float]]]:
+) -> tuple[float, list[dict[str, float]]]:
     """Calculate Population Stability Index (PSI) between expected and actual distributions.
 
     Parameters
@@ -62,18 +61,20 @@ def calculate_psi(
 
     breakdown = []
     for i in range(len(bins) - 1):
-        breakdown.append({
-            "bin_lower": float(bins[i]) if bins[i] != -np.inf else float("-inf"),
-            "bin_upper": float(bins[i + 1]) if bins[i + 1] != np.inf else float("inf"),
-            "expected_pct": round(float(exp_pct[i]), 4),
-            "actual_pct": round(float(act_pct[i]), 4),
-            "psi": round(float(bucket_psis[i]), 6),
-        })
+        breakdown.append(
+            {
+                "bin_lower": float(bins[i]) if bins[i] != -np.inf else float("-inf"),
+                "bin_upper": float(bins[i + 1]) if bins[i + 1] != np.inf else float("inf"),
+                "expected_pct": round(float(exp_pct[i]), 4),
+                "actual_pct": round(float(act_pct[i]), 4),
+                "psi": round(float(bucket_psis[i]), 6),
+            }
+        )
 
     return round(total_psi, 4), breakdown
 
 
-def evaluate_drift_status(psi_score: float) -> Dict[str, str | float | bool]:
+def evaluate_drift_status(psi_score: float) -> dict[str, str | float | bool]:
     """Evaluate drift severity based on standard PSI thresholds:
 
     PSI < 0.1: No significant change / stable.

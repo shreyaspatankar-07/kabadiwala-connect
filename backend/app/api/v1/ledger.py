@@ -1,8 +1,8 @@
 """Collector Ledger API router."""
 
+import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
-import uuid
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession

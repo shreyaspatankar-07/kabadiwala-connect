@@ -161,4 +161,7 @@ async def test_collector_price_reporting_flow(async_client: AsyncClient):
     inv_data = resp_invalid.json()
     assert inv_data["validation_status"] == "quarantined"
     assert inv_data["is_flagged_for_review"] is True
-    assert "boundaries" in inv_data["review_reason"].lower() or "india" in inv_data["review_reason"].lower()
+    assert (
+        "boundaries" in inv_data["review_reason"].lower()
+        or "india" in inv_data["review_reason"].lower()
+    )

@@ -1,8 +1,9 @@
 """Safety Guidance Service managing multilingual safety cards, seeding, and collector acknowledgements."""
 
+import uuid
 from datetime import UTC, datetime
 from typing import Any
-import uuid
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
@@ -792,7 +793,9 @@ class SafetyService:
                     id=card["id"],
                     topic_id=card["topic_id"],
                     category=card["category"],
-                    hazard_level=card["hazard_level"].value if isinstance(card["hazard_level"], HazardLevel) else card["hazard_level"],
+                    hazard_level=card["hazard_level"].value
+                    if isinstance(card["hazard_level"], HazardLevel)
+                    else card["hazard_level"],
                     pictogram=card["pictogram"],
                     title=card["title_vernacular"].get(lang, card["title_vernacular"]["mr"]),
                     summary=card["summary_vernacular"].get(lang, card["summary_vernacular"]["mr"]),
@@ -801,9 +804,7 @@ class SafetyService:
                     ),
                     dos=card["dos"].get(lang, card["dos"]["mr"]),
                     donts=card["donts"].get(lang, card["donts"]["mr"]),
-                    audio_ref=card["audio_prompt_urls"].get(
-                        lang, card["audio_prompt_urls"]["mr"]
-                    ),
+                    audio_ref=card["audio_prompt_urls"].get(lang, card["audio_prompt_urls"]["mr"]),
                     category_trigger=card.get("category_trigger"),
                     condition_trigger=card.get("condition_trigger"),
                 )
@@ -826,7 +827,9 @@ class SafetyService:
                     id=card["id"],
                     topic_id=card["topic_id"],
                     category=card["category"],
-                    hazard_level=card["hazard_level"].value if isinstance(card["hazard_level"], HazardLevel) else card["hazard_level"],
+                    hazard_level=card["hazard_level"].value
+                    if isinstance(card["hazard_level"], HazardLevel)
+                    else card["hazard_level"],
                     pictogram=card["pictogram"],
                     title=card["title_vernacular"].get(lang, card["title_vernacular"]["mr"]),
                     summary=card["summary_vernacular"].get(lang, card["summary_vernacular"]["mr"]),
@@ -835,9 +838,7 @@ class SafetyService:
                     ),
                     dos=card["dos"].get(lang, card["dos"]["mr"]),
                     donts=card["donts"].get(lang, card["donts"]["mr"]),
-                    audio_ref=card["audio_prompt_urls"].get(
-                        lang, card["audio_prompt_urls"]["mr"]
-                    ),
+                    audio_ref=card["audio_prompt_urls"].get(lang, card["audio_prompt_urls"]["mr"]),
                     category_trigger=card.get("category_trigger"),
                     condition_trigger=card.get("condition_trigger"),
                 )

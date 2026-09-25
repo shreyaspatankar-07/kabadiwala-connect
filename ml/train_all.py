@@ -7,14 +7,17 @@ Executes:
 4. MLOps Registry (models.json generation)
 """
 
-from pathlib import Path
 import json
-import joblib
+from pathlib import Path
 
-from ml.src.material_classifier.train_classifier import train_and_evaluate_classifier
-from ml.src.valuation.train_valuation import generate_synthetic_valuation_dataset, train_valuation_model
+import joblib
 from ml.src.anomaly.anomaly_detector import AnomalyDetector
+from ml.src.material_classifier.train_classifier import train_and_evaluate_classifier
 from ml.src.mlops.registry import ModelRegistry
+from ml.src.valuation.train_valuation import (
+    generate_synthetic_valuation_dataset,
+    train_valuation_model,
+)
 
 
 def run_pipeline() -> None:

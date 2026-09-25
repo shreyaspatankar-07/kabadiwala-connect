@@ -1,21 +1,23 @@
 """Valuation Inference Service."""
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
+
 import joblib
-import numpy as np
 
 
 class ValuationService:
     """Predicts estimated price_per_kg and 90% prediction intervals."""
 
-    def __init__(self, model_bundle_path: Optional[Path | str] = None):
+    def __init__(self, model_bundle_path: Path | str | None = None):
         if model_bundle_path:
             self.bundle_path = Path(model_bundle_path)
         else:
-            self.bundle_path = Path(__file__).resolve().parent.parent.parent / "models" / "valuation_bundle.joblib"
+            self.bundle_path = (
+                Path(__file__).resolve().parent.parent.parent / "models" / "valuation_bundle.joblib"
+            )
 
-        self._bundle: Optional[Dict[str, Any]] = None
+        self._bundle: dict[str, Any] | None = None
         self._load_bundle()
 
     def _load_bundle(self) -> None:
@@ -38,7 +40,7 @@ class ValuationService:
         month: int,
         rolling_7d_median: float,
         rolling_30d_median: float,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Predict price per kg and 90% prediction interval.
 
         Returns
@@ -48,7 +50,9 @@ class ValuationService:
         """
         # Fallback heuristic if bundle not loaded
         if self._bundle is None:
-            cond_factor = {"working": 1.15, "broken": 1.0, "damaged": 0.85, "burnt": 0.60}.get(condition, 1.0)
+            cond_factor = {"working": 1.15, "broken": 1.0, "damaged": 0.85, "burnt": 0.60}.get(
+                condition, 1.0
+            )
             median_rate = rolling_7d_median * 0.70 + rolling_30d_median * 0.30
             pred_rate = round(median_rate * cond_factor, 2)
             low_rate = round(pred_rate * 0.88, 2)
@@ -72,16 +76,21 @@ class ValuationService:
         dist_enc = encoders["districts"].get(location_district, 2)
 
         import pandas as pd
-        feat_df = pd.DataFrame([{
-            "category_enc": cat_enc,
-            "sub_category_enc": subcat_enc,
-            "weight_kg": float(weight_kg),
-            "condition_enc": cond_enc,
-            "district_enc": dist_enc,
-            "month": int(month),
-            "7d_median_price": float(rolling_7d_median),
-            "30d_median_price": float(rolling_30d_median),
-        }])
+
+        feat_df = pd.DataFrame(
+            [
+                {
+                    "category_enc": cat_enc,
+                    "sub_category_enc": subcat_enc,
+                    "weight_kg": float(weight_kg),
+                    "condition_enc": cond_enc,
+                    "district_enc": dist_enc,
+                    "month": int(month),
+                    "7d_median_price": float(rolling_7d_median),
+                    "30d_median_price": float(rolling_30d_median),
+                }
+            ]
+        )
 
         pred_median = float(models["median"].predict(feat_df)[0])
         pred_lower = float(models["lower"].predict(feat_df)[0])

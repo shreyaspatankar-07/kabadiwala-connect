@@ -1,6 +1,5 @@
 """Unit tests for demo seed dataset and generator."""
 
-import pytest
 from app.data_pipeline.demo_seed import (
     DEMO_COLLECTORS,
     DEMO_RECYCLERS,

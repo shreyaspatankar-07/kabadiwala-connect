@@ -12,11 +12,11 @@ Produces actionable, plain-language reason strings (English / translatable).
 
 import math
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 import joblib
 import numpy as np
 from sklearn.ensemble import IsolationForest
-
 
 # Weight bounds per category from data pipeline schemas
 CATEGORY_WEIGHT_BOUNDS = {
@@ -50,9 +50,7 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     dlon = math.radians(lon2 - lon1)
     a = (
         math.sin(dlat / 2) ** 2
-        + math.cos(math.radians(lat1))
-        * math.cos(math.radians(lat2))
-        * math.sin(dlon / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
     )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return radius_earth_km * c
@@ -61,13 +59,15 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
 class AnomalyDetector:
     """Combines Rule-Based heuristic filters and an Isolation Forest model."""
 
-    def __init__(self, model_path: Optional[Path | str] = None):
+    def __init__(self, model_path: Path | str | None = None):
         if model_path:
             self.model_path = Path(model_path)
         else:
-            self.model_path = Path(__file__).resolve().parent.parent.parent / "models" / "anomaly_detector.joblib"
+            self.model_path = (
+                Path(__file__).resolve().parent.parent.parent / "models" / "anomaly_detector.joblib"
+            )
 
-        self.iso_forest: Optional[IsolationForest] = None
+        self.iso_forest: IsolationForest | None = None
         self._load_model()
 
     def _load_model(self) -> None:
@@ -101,19 +101,19 @@ class AnomalyDetector:
         category: str,
         weight_kg: float,
         final_price: float,
-        collector_id: Optional[str] = None,
-        latitude: Optional[float] = None,
-        longitude: Optional[float] = None,
-        previous_lot: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        collector_id: str | None = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        previous_lot: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Perform comprehensive anomaly checks on a submitted lot.
 
         Returns
         -------
         Dict with is_anomalous, anomaly_score, reasons (List[str]), flags (List[str]).
         """
-        reasons: List[str] = []
-        flags: List[str] = []
+        reasons: list[str] = []
+        flags: list[str] = []
         is_anomalous = False
 
         price_per_kg = final_price / weight_kg if weight_kg > 0 else 0.0
@@ -199,7 +199,9 @@ class AnomalyDetector:
             "is_anomalous": is_anomalous,
             "anomaly_score": iso_score,
             "flags": flags,
-            "reasons": reasons if reasons else ["No anomalies detected. Lot passes all validation checks."],
+            "reasons": reasons
+            if reasons
+            else ["No anomalies detected. Lot passes all validation checks."],
             "category": category,
             "weight_kg": weight_kg,
             "final_price": final_price,

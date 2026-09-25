@@ -1,6 +1,5 @@
 """CLI tool and standalone runner to seed safety guidance content."""
 
-import sys
 from app.db.session import SessionLocal
 from app.services.safety_service import SafetyService
 

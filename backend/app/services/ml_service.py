@@ -1,20 +1,20 @@
 import datetime
-from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any
 
 repo_root = Path(__file__).resolve().parent.parent.parent.parent
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
 from ml.src.anomaly.anomaly_detector import AnomalyDetector
-from ml.src.valuation.valuation_service import ValuationService
-from ml.src.mlops.registry import ModelRegistry
 from ml.src.mlops.drift_monitor import calculate_psi, evaluate_drift_status
+from ml.src.mlops.registry import ModelRegistry
+from ml.src.valuation.valuation_service import ValuationService
 
 
 class MLService:
-    def __init__(self, models_dir: Optional[Path | str] = None):
+    def __init__(self, models_dir: Path | str | None = None):
         if models_dir:
             self.models_dir = Path(models_dir)
         else:
@@ -30,11 +30,11 @@ class MLService:
         category: str,
         weight_kg: float,
         final_price: float,
-        collector_id: Optional[str] = None,
-        latitude: Optional[float] = None,
-        longitude: Optional[float] = None,
-        previous_lot: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        collector_id: str | None = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        previous_lot: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         return self.anomaly_detector.check_lot(
             category=category,
             weight_kg=weight_kg,
@@ -48,14 +48,14 @@ class MLService:
     def predict_valuation(
         self,
         category: str,
-        sub_category: Optional[str],
+        sub_category: str | None,
         weight_kg: float,
         condition: str,
         location_district: str,
-        month: Optional[int] = None,
-        rolling_7d_median: Optional[float] = None,
-        rolling_30d_median: Optional[float] = None,
-    ) -> Dict[str, Any]:
+        month: int | None = None,
+        rolling_7d_median: float | None = None,
+        rolling_30d_median: float | None = None,
+    ) -> dict[str, Any]:
         cur_month = month or datetime.datetime.now().month
         r7d = rolling_7d_median or 250.0
         r30d = rolling_30d_median or 240.0
@@ -72,16 +72,16 @@ class MLService:
             rolling_30d_median=r30d,
         )
 
-    def get_manifest(self) -> Dict[str, Any]:
+    def get_manifest(self) -> dict[str, Any]:
         return self.registry.get_manifest()
 
     def check_distribution_drift(
         self,
         feature_name: str,
-        expected: List[float],
-        actual: List[float],
+        expected: list[float],
+        actual: list[float],
         num_buckets: int = 10,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         psi_score, breakdown = calculate_psi(expected, actual, num_buckets=num_buckets)
         eval_result = evaluate_drift_status(psi_score)
         return {

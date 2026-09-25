@@ -1,6 +1,7 @@
 """Tests for Collector Cash Ledger, Summary Totals, Cash Marking, Disputes, and Statements."""
 
 from datetime import UTC, datetime, timedelta
+
 import pytest
 from httpx import AsyncClient
 
@@ -62,9 +63,7 @@ async def test_ledger_entries_and_summary(async_client: AsyncClient, test_collec
 
 
 @pytest.mark.asyncio
-async def test_ledger_overview_and_pending_dues(
-    async_client: AsyncClient, test_collector
-):
+async def test_ledger_overview_and_pending_dues(async_client: AsyncClient, test_collector):
     _, collector_token = test_collector
     headers = {"Authorization": f"Bearer {collector_token}"}
 

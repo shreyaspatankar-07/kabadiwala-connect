@@ -1,8 +1,8 @@
 """Cash-first ledger service for informal collectors."""
 
-from datetime import UTC, datetime, timedelta
 import secrets
 import uuid
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +13,6 @@ from app.models.schema import (
     LedgerEntry,
     LedgerEntryType,
     PaymentStatus,
-    Recycler,
     Transaction,
 )
 from app.schemas.ledger import (
@@ -217,9 +216,7 @@ class LedgerService:
             category = tx.category if tx else "E-Waste"
             weight_kg = float(tx.weight_kg) if tx else 0.0
             final_price = float(e.amount)
-            recycler_name = (
-                tx.recycler.name if (tx and tx.recycler) else "Authorized Recycler Hub"
-            )
+            recycler_name = tx.recycler.name if (tx and tx.recycler) else "Authorized Recycler Hub"
             pay_status = (
                 "disputed"
                 if (tx and tx.anomaly_flag)

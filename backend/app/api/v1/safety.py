@@ -1,6 +1,7 @@
 """FastAPI endpoints for Safety Guidance Cards and Collector Acknowledgements."""
 
 from typing import Annotated, Any
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 

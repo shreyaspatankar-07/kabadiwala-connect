@@ -1,8 +1,8 @@
 """Export OpenAPI schema and Postman collection from FastAPI application."""
 
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 backend_dir = Path(__file__).resolve().parent.parent
 repo_root = backend_dir.parent

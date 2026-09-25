@@ -37,9 +37,7 @@ async def get_price_board(
     district: Annotated[
         str, Query(description="District name, e.g. Mumbai, Pune, Palghar")
     ] = "Mumbai Suburban",
-    category: Annotated[
-        str | None, Query(description="Filter by scrap material category")
-    ] = None,
+    category: Annotated[str | None, Query(description="Filter by scrap material category")] = None,
 ):
     return await PricesService.get_price_board(district, db, category=category)
 

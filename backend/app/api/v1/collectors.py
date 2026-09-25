@@ -2,12 +2,19 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
-from app.models.schema import Collector, LedgerEntry, SafetyAcknowledgement, SyncQueue, Transaction, User
+from app.models.schema import (
+    Collector,
+    LedgerEntry,
+    SafetyAcknowledgement,
+    SyncQueue,
+    Transaction,
+    User,
+)
 
 router = APIRouter(prefix="/collectors", tags=["Collectors & Privacy"])
 

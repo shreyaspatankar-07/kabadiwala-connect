@@ -12,7 +12,9 @@ from app.matching.service import rank_recyclers
 router = APIRouter(prefix="/matching", tags=["Matching"])
 
 
-@router.post("/rank", response_model=MatchRankingResponse, summary="Rank top recyclers for an e-waste lot")
+@router.post(
+    "/rank", response_model=MatchRankingResponse, summary="Rank top recyclers for an e-waste lot"
+)
 async def rank_lot_recyclers(
     lot: LotMatchInput,
     db: Annotated[AsyncSession, Depends(get_db)],

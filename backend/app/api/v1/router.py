@@ -3,18 +3,18 @@
 from fastapi import APIRouter
 
 from app.api.v1.auth import router as auth_router
+from app.api.v1.collectors import router as collectors_router
 from app.api.v1.handover import router as handover_router
 from app.api.v1.ledger import router as ledger_router
 from app.api.v1.lots import router as lots_router
 from app.api.v1.matching import router as matching_router
 from app.api.v1.materials import router as materials_router
+from app.api.v1.ml import router as ml_router
 from app.api.v1.prices import router as prices_router
 from app.api.v1.recyclers import router as recyclers_router
-from app.api.v1.ml import router as ml_router
 from app.api.v1.safety import router as safety_router
 from app.api.v1.sync import router as sync_router
 from app.api.v1.verify import router as verify_router
-from app.api.v1.collectors import router as collectors_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 
@@ -31,4 +31,3 @@ api_v1_router.include_router(verify_router)
 api_v1_router.include_router(ml_router)
 api_v1_router.include_router(safety_router)
 api_v1_router.include_router(collectors_router)
-

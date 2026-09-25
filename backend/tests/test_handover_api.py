@@ -5,7 +5,6 @@ import json
 import pytest
 from httpx import AsyncClient
 
-from app.core.config import settings
 from app.services.handover_service import HandoverService
 
 

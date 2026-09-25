@@ -17,13 +17,13 @@ Computes honest improvements (RMSE, MAE, MAPE) over simple median baseline.
 import json
 import math
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
+
 import joblib
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
 
 DISTRICTS = ["Palghar", "Thane", "Mumbai", "Pune", "Nashik", "Nagpur"]
 CATEGORIES = [
@@ -68,7 +68,9 @@ CONDITION_MULTIPLIERS = {
 }
 
 
-def generate_synthetic_valuation_dataset(n_samples: int = 5000, random_seed: int = 42) -> pd.DataFrame:
+def generate_synthetic_valuation_dataset(
+    n_samples: int = 5000, random_seed: int = 42
+) -> pd.DataFrame:
     """Generate realistic valuation training dataset with seasonal variations, condition adjustments, and realistic market noise."""
     rng = np.random.RandomState(random_seed)
     records = []
@@ -106,22 +108,27 @@ def generate_synthetic_valuation_dataset(n_samples: int = 5000, random_seed: int
         # True realized price per kg with slight scale discount for large bulk or condition impact
         bulk_bonus = 1.0 + min(0.08, weight_kg * 0.002)
         true_price = (
-            rolling_7d * 0.70 + rolling_30d * 0.30
-        ) * cond_mult * bulk_bonus * (1.0 + rng.normal(0, 0.05))
+            (rolling_7d * 0.70 + rolling_30d * 0.30)
+            * cond_mult
+            * bulk_bonus
+            * (1.0 + rng.normal(0, 0.05))
+        )
 
         true_price = max(5.0, round(float(true_price), 2))
 
-        records.append({
-            "category": cat,
-            "sub_category": sub_cat,
-            "weight_kg": weight_kg,
-            "condition": cond,
-            "location_district": dist,
-            "month": month,
-            "7d_median_price": rolling_7d,
-            "30d_median_price": rolling_30d,
-            "price_per_kg": true_price,
-        })
+        records.append(
+            {
+                "category": cat,
+                "sub_category": sub_cat,
+                "weight_kg": weight_kg,
+                "condition": cond,
+                "location_district": dist,
+                "month": month,
+                "7d_median_price": rolling_7d,
+                "30d_median_price": rolling_30d,
+                "price_per_kg": true_price,
+            }
+        )
 
     return pd.DataFrame(records)
 
@@ -130,7 +137,7 @@ def train_valuation_model(
     df: pd.DataFrame,
     output_dir: Path | str,
     random_seed: int = 42,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Train LightGBM Quantile Regressors for alpha=0.05 (lower), 0.50 (median), 0.95 (upper)."""
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -174,7 +181,7 @@ def train_valuation_model(
         X, y, test_size=0.15, random_state=random_seed
     )
 
-    models: Dict[str, lgb.LGBMRegressor] = {}
+    models: dict[str, lgb.LGBMRegressor] = {}
     quantiles = {"lower": 0.05, "median": 0.50, "upper": 0.95}
 
     for name, q in quantiles.items():
