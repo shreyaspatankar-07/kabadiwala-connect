@@ -39,6 +39,7 @@ dependencies:
   # Audio & Low-Literacy Support
   audioplayers: ^5.2.1
   qr_flutter: ^4.1.0
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:

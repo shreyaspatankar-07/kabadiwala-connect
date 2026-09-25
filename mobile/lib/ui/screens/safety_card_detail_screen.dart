@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -388,24 +389,24 @@ class _SafetyCardDetailScreenState extends State<SafetyCardDetailScreen> {
                     ),
                   ),
                   onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
                     await SafetyRepository().acknowledgeCard(widget.card.topicId);
+                    if (!mounted) return;
                     setState(() {
                       _isAcknowledged = true;
                     });
                     final msg = isMr
                         ? 'नियम समजला आहे'
                         : (isHi ? 'नियम स्वीकृत हो गया' : 'Safety rule understood');
-                    AudioFeedbackService().speak(msg);
+                    unawaited(AudioFeedbackService().speak(msg));
                     widget.onAcknowledged?.call();
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(msg),
-                          backgroundColor: AppTheme.greenGoEarn,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    }
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(msg),
+                        backgroundColor: AppTheme.greenGoEarn,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   },
                 ),
               ),

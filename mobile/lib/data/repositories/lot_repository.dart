@@ -103,6 +103,19 @@ class LotRepository {
         .watch();
   }
 
+  /// Get all offline lots
+  Future<List<LocalTransaction>> getOfflineLots([String? collectorId]) async {
+    if (collectorId != null) {
+      return (_db.select(_db.localTransactions)
+            ..where((t) => t.collectorId.equals(collectorId))
+            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+          .get();
+    }
+    return (_db.select(_db.localTransactions)
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
+  }
+
   /// Get pending unsynced lot count
   Future<int> getUnsyncedLotCount() async {
     final count = countAll();

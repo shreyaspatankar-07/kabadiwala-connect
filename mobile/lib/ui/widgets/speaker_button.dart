@@ -51,7 +51,7 @@ class _SpeakerButtonState extends State<SpeakerButton> with SingleTickerProvider
   }
 
   Future<void> _handleTap() async {
-    await HapticService.mediumImpact();
+    unawaited(HapticService.mediumImpact());
     unawaited(_animController.forward().then((_) => _animController.reverse()));
     if (widget.onPressed != null) {
       widget.onPressed!();

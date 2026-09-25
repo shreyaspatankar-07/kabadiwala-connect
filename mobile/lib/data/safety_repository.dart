@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 /// Domain model for a Safety Instruction Card.
@@ -859,9 +858,14 @@ class SafetyRepository {
     return Set<String>.from(_acknowledgedTopicIds);
   }
 
+  /// Clear acknowledgements (e.g. during privacy data purge)
+  void clearAcknowledgements() {
+    _acknowledgedTopicIds.clear();
+  }
+
   /// Clear acknowledgements (useful for test resets)
   @visibleForTesting
   void resetAcknowledgements() {
-    _acknowledgedTopicIds.clear();
+    clearAcknowledgements();
   }
 }

@@ -1,37 +1,43 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'audio_map.dart';
 
 /// AudioFeedbackService plays spoken prompts and feedback for low-literacy users.
-/// Designed for offline operation with asset playback and verbal audio prompts.
+/// Designed for offline operation with asset playback and live TTS fallback.
 class AudioFeedbackService {
   static final AudioFeedbackService _defaultInstance = AudioFeedbackService._internal();
 
-  factory AudioFeedbackService({AudioPlayer? player, bool? enableAudio}) {
-    if (player != null || enableAudio != null) {
-      return AudioFeedbackService._internal(player: player, enableAudio: enableAudio);
+  factory AudioFeedbackService({AudioPlayer? player, FlutterTts? tts, bool? enableAudio}) {
+    if (player != null || tts != null || enableAudio != null) {
+      return AudioFeedbackService._internal(player: player, tts: tts, enableAudio: enableAudio);
     }
     return _defaultInstance;
   }
 
   AudioFeedbackService._internal({
     AudioPlayer? player,
+    FlutterTts? tts,
     bool? enableAudio,
   })  : _enableAudio = enableAudio ?? (!kIsWeb && defaultTargetPlatform == TargetPlatform.android),
-        _player = player;
+        _player = player,
+        _tts = tts;
 
   AudioFeedbackService.custom({
     AudioPlayer? player,
+    FlutterTts? tts,
     bool? enableAudio,
   })  : _enableAudio = enableAudio ?? (!kIsWeb && defaultTargetPlatform == TargetPlatform.android),
-        _player = player;
-
+        _player = player,
+        _tts = tts;
 
   AudioPlayer? _player;
+  FlutterTts? _tts;
   final bool _enableAudio;
   String _currentLocale = 'mr'; // Marathi by default per AGENTS.md
   bool _isPlaying = false;
   String? _lastSpokenText;
+  bool _isTtsInitialized = false;
 
   bool get isPlaying => _isPlaying;
   String get currentLocale => _currentLocale;
@@ -42,9 +48,45 @@ class AudioFeedbackService {
     return _player!;
   }
 
+  FlutterTts get _getOrCreateTts {
+    _tts ??= FlutterTts();
+    return _tts!;
+  }
+
+  Future<void> _initTts(String locale) async {
+    if (!_enableAudio) return;
+    try {
+      final tts = _getOrCreateTts;
+      final ttsLang = locale == 'hi' ? 'hi-IN' : (locale == 'en' ? 'en-IN' : 'mr-IN');
+      await tts.setLanguage(ttsLang);
+      await tts.setSpeechRate(0.45); // Slower for low-literacy users
+      await tts.setPitch(1.0);
+      _isTtsInitialized = true;
+    } catch (e) {
+      debugPrint('[AudioFeedbackService] TTS init note: $e');
+    }
+  }
+
   void setLocale(String locale) {
     if (['mr', 'hi', 'en'].contains(locale)) {
       _currentLocale = locale;
+      _isTtsInitialized = false;
+    }
+  }
+
+  /// Speak text via live Android TTS fallback engine
+  Future<void> _speakViaTts(String text, String locale) async {
+    if (!_enableAudio) return;
+    try {
+      if (!_isTtsInitialized) {
+        await _initTts(locale);
+      }
+      final tts = _getOrCreateTts;
+      final ttsLang = locale == 'hi' ? 'hi-IN' : (locale == 'en' ? 'en-IN' : 'mr-IN');
+      await tts.setLanguage(ttsLang);
+      await tts.speak(text);
+    } catch (e) {
+      debugPrint('[AudioFeedbackService] TTS speech fallback: $e');
     }
   }
 
@@ -58,9 +100,14 @@ class AudioFeedbackService {
     try {
       _isPlaying = true;
       if (_enableAudio) {
-        final player = _getOrCreatePlayer;
-        await player.stop();
-        await player.play(AssetSource(audioPath));
+        try {
+          final player = _getOrCreatePlayer;
+          await player.stop();
+          await player.play(AssetSource(audioPath));
+        } catch (_) {
+          // Recorded clip missing -> Live Android TTS fallback
+          await _speakViaTts(spokenText, locale);
+        }
       } else {
         // Safe logging in test and non-Android environments
         debugPrint('[AudioFeedbackService] [$locale] Playing: $spokenText');
@@ -78,6 +125,7 @@ class AudioFeedbackService {
     final text = AudioMap.getEstimateSpokenText(amount, locale);
     _lastSpokenText = text;
     debugPrint('[AudioFeedbackService] [$locale] Spoken Estimate: $text');
+    await _speakViaTts(text, locale);
   }
 
   /// Read aloud price board item details (category, price per kg, trend direction)
@@ -96,17 +144,20 @@ class AudioFeedbackService {
     );
     _lastSpokenText = text;
     debugPrint('[AudioFeedbackService] [$locale] Spoken Price Detail: $text');
+    await _speakViaTts(text, locale);
   }
 
   /// Read aloud a custom vernacular text
-  Future<void> speakCustomText(String text) async {
+  Future<void> speakCustomText(String text, {String? localeOverride}) async {
+    final locale = localeOverride ?? _currentLocale;
     _lastSpokenText = text;
-    debugPrint('[AudioFeedbackService] [$_currentLocale] Speaking: $text');
+    debugPrint('[AudioFeedbackService] [$locale] Speaking: $text');
+    await _speakViaTts(text, locale);
   }
 
   /// Alias for speakCustomText
-  Future<void> speak(String text) => speakCustomText(text);
-
+  Future<void> speak(String text, {String? localeOverride}) =>
+      speakCustomText(text, localeOverride: localeOverride);
 
   /// Read aloud best buyer summary (Recycler name, distance km, rate per kg)
   Future<void> speakBestBuyer({
@@ -124,13 +175,15 @@ class AudioFeedbackService {
     );
     _lastSpokenText = text;
     debugPrint('[AudioFeedbackService] [$locale] Spoken Best Buyer: $text');
+    await _speakViaTts(text, locale);
   }
 
   /// Stop current audio
   Future<void> stop() async {
     try {
-      if (_enableAudio && _player != null) {
-        await _player!.stop();
+      if (_enableAudio) {
+        if (_player != null) await _player!.stop();
+        if (_tts != null) await _tts!.stop();
       }
     } catch (_) {}
     _isPlaying = false;
@@ -138,5 +191,7 @@ class AudioFeedbackService {
 
   void dispose() {
     _player?.dispose();
+    _tts?.stop();
   }
 }
+

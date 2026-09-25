@@ -65,5 +65,19 @@
   "statusOnline": "Online - Data recorded with server",
   "syncPending": "Sync pending (data safe)",
   "syncSuccess": "All data synchronized",
-  "syncNow": "Sync Now"
+  "syncNow": "Sync Now",
+
+  "privacyTitle": "Privacy & Data Security",
+  "privacyCardTitle": "Your Data is Completely Protected",
+  "privacyCardSummary": "We never ask for Aadhaar numbers, real names, or home addresses. Only scrap weights and received amounts are recorded.",
+  "privacyPoint1": "1. No Aadhaar or identity cards required",
+  "privacyPoint2": "2. Simple 4-digit PIN or phone OTP login",
+  "privacyPoint3": "3. All records stay offline on phone first",
+  "privacyPoint4": "4. Delete all your data anytime with one tap",
+  "deleteMyData": "Delete My Data Permanently",
+  "deleteConfirmTitle": "Confirm: Delete All Your Data?",
+  "deleteConfirmDesc": "All local and server records will be permanently removed. This action cannot be undone.",
+  "deleteConfirmAction": "Yes, Delete Everything",
+  "cancelAction": "Cancel",
+  "dataDeletedSuccess": "All personal data has been erased successfully"
 }

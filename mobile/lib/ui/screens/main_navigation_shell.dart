@@ -12,6 +12,7 @@ import '../widgets/sync_status_badge.dart';
 import 'add_lot_screen.dart';
 import 'earnings_screen.dart';
 import 'price_board_screen.dart';
+import 'privacy_screen.dart';
 import 'safety_screen.dart';
 
 
@@ -123,13 +124,30 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           style: const TextStyle(fontWeight: FontWeight.w900),
         ),
         actions: [
+          IconButton(
+            key: const Key('btn_open_privacy_screen'),
+            tooltip: locale == 'mr' ? 'गोपनीयता व सुरक्षा' : (locale == 'hi' ? 'गोपनीयता एवं सुरक्षा' : 'Privacy & Security'),
+            icon: const Icon(Icons.privacy_tip_outlined, color: AppTheme.greenGoEarn, size: 26),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PrivacyScreen(
+                    audioService: widget.audioService,
+                    db: _db,
+                    locale: locale,
+                  ),
+                ),
+              );
+            },
+          ),
           // Persistent speaker button on every screen
           SpeakerButton(
             promptKey: _tabPromptKeys[_currentIndex],
             audioService: widget.audioService,
             tooltip: 'या स्क्रीनबद्दल माहिती ऐका',
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
         ],
       ),
       body: SafeArea(

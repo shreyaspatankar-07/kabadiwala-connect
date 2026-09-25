@@ -82,6 +82,16 @@ class AudioMap {
       'hi': 'माल सुरक्षित सहेज लिया गया। इंटरनेट आने पर अपने आप सिंक होगा।',
       'en': 'Lot saved offline. It will synchronize once internet is restored.',
     },
+    'privacyNotice': {
+      'mr': 'तुमची गोपनीयता सुरक्षित आहे. आम्ही आधार क्रमांक किंवा नाव कधीही गोळा करत नाही. फक्त ई-कचऱ्याचे वजन व भाव नोंदवले जातात.',
+      'hi': 'आपकी गोपनीयता सुरक्षित है। हम आधार नंबर या नाम कभी नहीं मांगते। केवल वजन और भाव दर्ज होता है।',
+      'en': 'Your privacy is protected. We never collect Aadhaar or real names. Only scrap weights and rates are stored.',
+    },
+    'dataDeletedNotice': {
+      'mr': 'तुमचा सर्व डेटा यशस्वीरीत्या नष्ट करण्यात आला आहे.',
+      'hi': 'आपका सारा डेटा सफलतापूर्वक हटा दिया गया है।',
+      'en': 'All your personal data has been erased successfully.',
+    },
   };
 
   /// Returns asset audio path keyed by string ID and locale code

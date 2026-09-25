@@ -14,6 +14,7 @@ from app.api.v1.ml import router as ml_router
 from app.api.v1.safety import router as safety_router
 from app.api.v1.sync import router as sync_router
 from app.api.v1.verify import router as verify_router
+from app.api.v1.collectors import router as collectors_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 
@@ -29,4 +30,5 @@ api_v1_router.include_router(handover_router)
 api_v1_router.include_router(verify_router)
 api_v1_router.include_router(ml_router)
 api_v1_router.include_router(safety_router)
+api_v1_router.include_router(collectors_router)
 
