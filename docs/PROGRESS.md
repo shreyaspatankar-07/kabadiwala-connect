@@ -205,7 +205,10 @@ Living record of project deliverables, milestones completed, and pending roadmap
     - [INTERVIEW_GUIDE.md](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/INTERVIEW_GUIDE.md): Semi-structured interview guide covering workflow, price discovery, pain points, phone usage, formal recycler trust, and payment preferences.
     - [USABILITY_TEST.md](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/USABILITY_TEST.md): 5 task-based usability testing protocol with time targets, error thresholds, observation sheet, and 3-face pictorial SUS scale.
     - [FINDINGS_TEMPLATE.md](file:///c:/dev/kabadiwala-connect/docs/FIELD_RESEARCH/FINDINGS_TEMPLATE.md): Qualitative synthesis matrix, usability benchmarks, and design/code iteration tracker.
-  - **Automated Test Suite**: 3 new backend unit tests in `backend/tests/test_demo_seed.py` and 2 new widget tests in `mobile/test/demo_mode_test.dart`. **All 72 backend pytest tests and 60 mobile Flutter tests passing cleanly (100% pass rate)**.
+- [x] Unit Economics & Financial Sustainability Model (Documentation, Openpyxl Engine & Tests):
+  - **Unit Economics Document ([UNIT_ECONOMICS.md](file:///c:/dev/kabadiwala-connect/docs/UNIT_ECONOMICS.md))**: Complete micro- and macro-economic model comparing informal route vs. formal platform across 3 growth scenarios: Conservative (+10% price, +20% volume), Base (+25% price, +40% volume, yielding **+81.1% Net Take-Home Income Lift**), and Optimistic (+35% price, +60% volume). Includes health/fine risk reduction and explicit "Fill from Field" instructions for the 2 collector interviews.
+  - **Interactive Excel Model ([unit_economics.xlsx](file:///c:/dev/kabadiwala-connect/docs/unit_economics.xlsx))**: Programmatically generated using `openpyxl` with dynamic formulas across 3 interconnected sheets: (1) `Assumptions`, (2) `Collector Economics` (with embedded sensitivity Column BarChart), and (3) `Platform Sustainability` (4 revenue streams, monthly OPEX, break-even model, and 20 vs 100 recycler adoption sensitivity).
+  - **Automated Test Suite**: Added `backend/tests/test_unit_economics.py` verifying Excel generation, formulas, sheets, and chart integration. **All 73 backend pytest tests and 60 mobile Flutter tests passing cleanly (100% pass rate)**.
 
 ---
 
@@ -213,11 +216,13 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 | Component | Status | Test Coverage |
 | :--- | :--- | :--- |
-| **Backend (FastAPI, PostGIS, Drift Sync, Matching, Handover, Ledger, ML API, Safety, Privacy, Demo)** | Complete | 72/72 pytest tests passing (92% coverage) |
+| **Backend (FastAPI, PostGIS, Drift Sync, Matching, Handover, Ledger, ML API, Safety, Privacy, Demo, Economics)** | Complete | 73/73 pytest tests passing (92% coverage) |
 | **Mobile (Flutter, Drift SQLite, TFLite, Low-Literacy Vernacular UI, Audio, Handover, Safety, Privacy, Demo)** | Complete | 60/60 Flutter widget & unit tests passing |
 | **Machine Learning (/ml, MobileNetV3-Small INT8, LightGBM Valuation, Anomaly, MLOps)** | Complete | 10/10 ML unit tests passing |
 | **Web Portal (Next.js 14, Tailwind, Recycler Portal, Admin Portal, Playwright)** | Complete | 5/5 Playwright E2E tests passing |
 | **Field Research Kit (Oral Consent, Interview Guide, Usability Protocol, Findings Template)** | Complete | Documented & Field-Ready |
+| **Financial Sustainability (Unit Economics Doc, Interactive Excel Model & Sensitivity Chart)** | Complete | Modeled & Verified |
+
 
 
 
