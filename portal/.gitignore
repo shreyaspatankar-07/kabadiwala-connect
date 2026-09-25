@@ -1,0 +1,21 @@
+# Next.js
+/.next/
+/out/
+
+# Dependencies
+/node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Environment
+.env*.local
+
+# Typescript
+*.tsbuildinfo
+next-env.d.ts

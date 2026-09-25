@@ -4,7 +4,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 8 (Machine Learning Subsystem & MLOps-Lite) Complete
+## Current Status: Phase 9 (Next.js Recycler & Admin Portal) Complete
 
 ### Completed Items
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
@@ -149,11 +149,32 @@ Living record of project deliverables, milestones completed, and pending roadmap
     - Dataset provenance, synthetic data documentation, quality bounds, known limitations, and active learning plan for growing training data via collector confirmation and recycler ground truth.
   - **Automated Test Suite**: 10 dedicated ML unit tests in `ml/tests/test_ml_pipelines.py` (10/10 passed), 7 backend API tests in `backend/tests/test_ml_api.py` (7/7 passed), and 5 Flutter unit tests in `mobile/test/material_classifier_test.dart` (5/5 passed). **All 63 backend tests and 48 mobile tests passing cleanly**.
 
+- [x] Recycler & Admin Portal (`/portal`):
+  - **Next.js 14 App Router, TypeScript, Tailwind CSS**: Zero external runtime dependencies beyond Lucide React icons, mobile-responsive grid layout and touch-first controls.
+  - **Vernacular Localization (Marathi / Hindi / English)**: `LanguageContext` supporting Marathi (`mr`, default), Hindi (`hi`), and English (`en`) with unified dictionary in `lib/i18n.ts`.
+  - **Role-Based Access Control**: `AuthContext` supporting both `recycler` and `admin` roles, secure JWT storage simulation, instant demo login buttons, and header role switcher.
+  - **Recycler Portal Views**:
+    - **Dashboard (`RecyclerDashboardView`)**: Monthly collected volume (kg), total spend, pending payments count, and average rate cards per material category.
+    - **Matched Lots Inbox (`MatchedLotsInboxView`)**: Visual cards with photo thumbnail, material badge, estimated weight, distance (km), value, and one-click actions: **Accept**, **Counter-Offer** (with custom rate modal), and **Decline**.
+    - **Handover Confirmation (`HandoverConfirmationView`)**: 6-character code input or QR payload scanner, scale measured weight and final price inputs, live **$>10\%$ weight mismatch warning alert banner**, cash/UPI payment status toggle, and generated verifiable hash receipt card.
+    - **Downstream Tracking (`DownstreamTrackingView`)**: 4-stage lifecycle status updater (`received` $\rightarrow$ `dismantled` $\rightarrow$ `processed` $\rightarrow$ `certificate_issued`) with visual progression timeline.
+    - **Profile & Rate Card Management (`RecyclerProfileView`)**: Authorization PDF upload reference, materials accepted checklist (7 categories), service area district selector (Palghar, Thane, Mumbai, Pune, Nashik, Nagpur), pickup toggle with radius slider, and quick rate card updater.
+  - **Admin Portal Views (Ministry / JNARDDC / State Pollution Control Board)**:
+    - **Recycler Verification Queue (`AdminVerificationQueueView`)**: Review pending recyclers with authorization certificates, capacity, and one-click **Approve**, **Suspend**, or **Reject** actions calling `PATCH /recyclers/{id}/status`.
+    - **Authorization Expiry Alerts (`AdminExpiryAlertsView`)**: 30-day proactive expiry monitor with notice dispatch triggers and renewal status tracker.
+    - **Price Board Management (`AdminPriceBoardView`)**: Regional price board monitor across Maharashtra districts with manual price override modal.
+    - **Anomaly Review Queue (`AdminAnomalyReviewView`)**: Real-time review of transactions flagged by the ML Isolation Forest and rule engines with **Resolve** and **Escalate** workflows.
+    - **Analytics & Mass Balance Dashboard (`AdminAnalyticsView`)**: Mass balance breakdown by district (bar chart), formal-channel volume growth trend (line chart), collector earnings comparison vs. baseline (+28.4% lift), data quality score card (91.7/100), and one-click CSV export of anonymized datasets.
+  - **End-to-End Test Suite**: 5 comprehensive Playwright tests in `portal/tests/portal.spec.ts` covering Recycler login & dashboard, Inbox actions (Accept & Counter-Offer), Handover confirmation with $>10\%$ weight mismatch warning, Admin recycler verification, and Admin anomaly review queue (5/5 passed).
+
 ---
 
-## Pending Next Phase Tasks
+## Roadmap Summary & Full System Status
 
-### Phase 9: Recycler & Admin Portal (Next.js)
-- [ ] Build Recycler dashboard (incoming lots, weight scale verification, EPR digital receipts).
-- [ ] Build Admin/JNARDDC compliance & mass balance overview.
+| Component | Status | Test Coverage |
+| :--- | :--- | :--- |
+| **Backend (FastAPI, PostGIS, Drift Sync, Matching, Handover, Ledger, ML API)** | Complete | 63/63 pytest tests passing (89% coverage) |
+| **Mobile (Flutter, Drift SQLite, TFLite, Low-Literacy Vernacular UI, Audio, Handover)** | Complete | 48/48 Flutter widget & unit tests passing |
+| **Machine Learning (/ml, MobileNetV3-Small INT8, LightGBM Valuation, Anomaly, MLOps)** | Complete | 10/10 ML unit tests passing |
+| **Web Portal (Next.js 14, Tailwind, Recycler Portal, Admin Portal, Playwright)** | Complete | 5/5 Playwright E2E tests passing |
 
