@@ -4,7 +4,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 3 (Core Backend API) & Dataset Lifecycle Pipeline Complete
+## Current Status: Phase 4 (Mobile Collector App Shell) Complete
 
 ### Completed Items
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
@@ -40,19 +40,25 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - **Documentation:** Automated living [DATASET_CARD.md](file:///c:/dev/kabadiwala-connect/docs/DATASET_CARD.md) generator.
   - **CLI & Makefile Integration:** `make data-seed`, `make data-validate`, `make data-export` invoking `py -3.11`.
   - **Data Quality Profiling:** Jupyter notebook ([data_quality_profiling.ipynb](file:///c:/dev/kabadiwala-connect/data/notebooks/data_quality_profiling.ipynb)) and terminal runner script ([run_profiling.py](file:///c:/dev/kabadiwala-connect/data/notebooks/run_profiling.py)).
-- [x] Automated Test Suite: 33 unit and API integration tests in `backend/tests/` passing cleanly with **83% overall coverage** and **96% test coverage** on `app/services` (exceeding $\ge 80\%$ requirement).
-- [x] Code formatting & linting: Ruff checks and format clean across all backend modules using `py -3.11`.
+- [x] Backend Automated Test Suite: 33 unit and API integration tests in `backend/tests/` passing cleanly with **83% overall coverage** and **96% test coverage** on `app/services` (exceeding $\ge 80\%$ requirement).
+- [x] Mobile Collector App Shell (`/mobile`):
+  - **Offline-First Persistence**: Drift SQLite database (`local_database.dart`), repositories (`lot_repository.dart`, `price_repository.dart`, `ledger_repository.dart`), and background sync engine (`sync_engine.dart`) with `connectivity_plus` listener, exponential backoff, and FIFO queue.
+  - **Low-Literacy Design System**: `AppTheme` with min 56dp touch targets, semantic colors (Green = Go/Earn `#047857`, Red = Danger `#DC2626`, Yellow = Pending `#D97706`), tactile haptic feedback (`HapticService`), and persistent speaker button on every screen (`SpeakerButton`).
+  - **Vernacular i18n & Audio Feedback**: 100% complete Marathi (`app_mr.arb`), Hindi (`app_hi.arb`), and English (`app_en.arb`) with zero English fallback in vernacular files. Keyed audio transcript and asset mapping (`audio_map.dart`) with `AudioFeedbackService`.
+  - **First-Run Onboarding Flow**: `LanguageSelectionScreen` with auto-playing audio prompt and big selection tiles; single-field `PinSetupScreen` with 72dp keypad and audio verification.
+  - **Bottom Navigation Shell**: 4 icon tabs (`MainNavigationShell`): Add Lot, Price Board, Earnings, Safety, with top sync status badge (`SyncStatusBadge`).
+  - **Small APK Target & Performance**: R8 shrinking, resource shrinking, split-per-ABI configured in `build.gradle.kts`, ProGuard rules in `proguard-rules.pro`, and comprehensive size budget documented in [PERF.md](file:///c:/dev/kabadiwala-connect/docs/PERF.md) (~14.9 MB per ABI vs < 25 MB budget).
+  - **Mobile Test Suite**: 14/14 automated widget and repository unit tests passing cleanly in `mobile/test/`.
 
 ---
 
 ## Pending Next Phase Tasks
 
-### Phase 4: Low-Literacy Mobile Client (Flutter)
-- [ ] Implement Drift DAOs and local SQLite sync queue.
-- [ ] Build vernacular low-literacy UI components (56dp+ touch targets, speaker TTS button on every screen).
-- [ ] Implement offline camera photo compression ($\le 200$ KB) and hash verification.
-- [ ] Integrate on-device TFLite classification model for offline material identification.
+### Phase 5: Hardware & ML Integration on Mobile
+- [ ] Implement camera photo compression ($\le 200$ KB) and SHA-256 hash calculation.
+- [ ] On-device TFLite classification model integration for e-waste category inference.
+- [ ] QR code generation for tamper-evident dual-handover audit trail.
 
-### Phase 5: Recycler & Admin Portal (Next.js)
+### Phase 6: Recycler & Admin Portal (Next.js)
 - [ ] Build Recycler dashboard (incoming lots, weight scale verification, EPR digital receipts).
 - [ ] Build Admin/JNARDDC compliance & mass balance overview.

@@ -1,15 +1,33 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart';
+import 'package:kabadiwala_mobile/core/audio/audio_service.dart';
 import 'package:kabadiwala_mobile/main.dart';
+import 'package:kabadiwala_mobile/ui/widgets/speaker_button.dart';
 
 void main() {
-  testWidgets('App renders speaker button and big action buttons', (WidgetTester tester) async {
-    await tester.pumpWidget(const KabadiwalaApp());
+  testWidgets('App root initializes in Marathi with speaker button and language tiles',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          audioServiceProvider.overrideWithValue(
+            AudioFeedbackService(enableAudio: false),
+          ),
+        ],
+        child: const KabadiwalaCollectorApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    // Verify speaker read-aloud button is present
-    expect(find.byIcon(Icons.volume_up), findsOneWidget);
-
-    // Verify Marathi title
+    // Verify Marathi App Title
     expect(find.text('कबाडीवाला कनेक्ट'), findsOneWidget);
+
+    // Verify Speaker Button
+    expect(find.byType(SpeakerButton), findsOneWidget);
+
+    // Verify Language selection choices
+    expect(find.text('मराठी'), findsOneWidget);
+    expect(find.text('हिंदी'), findsOneWidget);
+    expect(find.text('English'), findsOneWidget);
   });
 }

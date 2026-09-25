@@ -1,0 +1,116 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kabadiwala_mobile/core/audio/audio_service.dart';
+import 'package:kabadiwala_mobile/core/theme/app_theme.dart';
+import 'package:kabadiwala_mobile/ui/screens/main_navigation_shell.dart';
+import 'package:kabadiwala_mobile/ui/widgets/speaker_button.dart';
+import 'package:kabadiwala_mobile/ui/widgets/sync_status_badge.dart';
+
+void main() {
+  group('Main Navigation Shell Widget Tests', () {
+    late AudioFeedbackService audioService;
+
+    setUp(() {
+      audioService = AudioFeedbackService(enableAudio: false);
+    });
+
+    testWidgets('Renders all 4 icon tabs, speaker button, and sync badge',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: MainNavigationShell(
+            audioService: audioService,
+            initialLocale: 'mr',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify persistent speaker button
+      expect(find.byType(SpeakerButton), findsOneWidget);
+
+      // Verify sync badge
+      expect(find.byType(SyncStatusBadge), findsOneWidget);
+
+      // Verify 4 tabs are present in bottom bar
+      expect(find.text('माल जोडा'), findsNWidgets(2)); // AppBar title + BottomNav item
+      expect(find.text('दर फलक'), findsOneWidget);
+      expect(find.text('कमाई'), findsOneWidget);
+      expect(find.text('सुरक्षा'), findsOneWidget);
+
+      // Verify Initial Tab (Add Lot) contents
+      expect(find.text('मालाचा फोटो काढा'), findsOneWidget);
+      expect(find.text('माल सुरक्षित जतन करा'), findsOneWidget);
+    });
+
+    testWidgets('Switching to Price Board tab displays market prices',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: MainNavigationShell(
+            audioService: audioService,
+            initialLocale: 'mr',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap 'दर फलक' tab
+      await tester.tap(find.text('दर फलक'));
+      await tester.pumpAndSettle();
+
+      // Verify price board items appear
+      expect(find.text('तांब्याची वायर (Copper)'), findsOneWidget);
+      expect(find.text('₹ 680 / किलो'), findsOneWidget);
+      expect(find.text('सर्किट बोर्ड (High-Grade PCB)'), findsOneWidget);
+    });
+
+    testWidgets('Switching to Earnings tab displays cash balance',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: MainNavigationShell(
+            audioService: audioService,
+            initialLocale: 'mr',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap 'कमाई' tab
+      await tester.tap(find.text('कमाई'));
+      await tester.pumpAndSettle();
+
+      // Verify earnings information
+      expect(find.text('एकूण रोख मिळाली'), findsOneWidget);
+      expect(find.text('₹ 14,250'), findsOneWidget);
+      expect(find.text('येणे बाकी रक्कम'), findsOneWidget);
+    });
+
+    testWidgets('Switching to Safety tab displays pictorial hazard cards',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: MainNavigationShell(
+            audioService: audioService,
+            initialLocale: 'mr',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap 'सुरक्षा' tab
+      await tester.tap(find.text('सुरक्षा'));
+      await tester.pumpAndSettle();
+
+      // Verify hazard warnings
+      expect(find.text('बॅटरी कधीही कापू किंवा जाळू नका'), findsOneWidget);
+      expect(find.text('सीआरटी ट्यूब फोडू नका'), findsOneWidget);
+      expect(find.text('वायर जाळू नका, प्लास्टिक सोलून काढा'), findsOneWidget);
+    });
+  });
+}
