@@ -4,7 +4,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 3 (FastAPI Core Backend API & Sync Engine) Complete
+## Current Status: Phase 3 (Core Backend API) & Dataset Lifecycle Pipeline Complete
 
 ### Completed Items
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
@@ -21,7 +21,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 - [x] PostgreSQL 16 + PostGIS Schema & SQLAlchemy ORM models ([schema.py](file:///c:/dev/kabadiwala-connect/backend/app/models/schema.py)) covering all 10 core entities with spatial GiST indexes, check constraints, and audit timestamps.
 - [x] Alembic Migrations ([0001_initial_schema.py](file:///c:/dev/kabadiwala-connect/backend/alembic/versions/0001_initial_schema.py)) with PostGIS extension activation and full upgrade/downgrade paths.
 - [x] Matching Drift (SQLite) Tables on Mobile ([tables.dart](file:///c:/dev/kabadiwala-connect/mobile/lib/data/tables.dart) & [local_database.dart](file:///c:/dev/kabadiwala-connect/mobile/lib/data/local_database.dart)) covering the offline-first subset.
-- [x] Collector Authentication: Pluggable phone+OTP (`MockOTPProvider`) and 4-digit PIN with bcrypt/argon2 hashing, zero PII collection (no Aadhaar, no names; only phone and operating area).
+- [x] Collector Authentication: Pluggable phone+OTP (`MockOTPProvider`) and 4-digit PIN with bcrypt hashing, zero PII collection.
 - [x] Portal Authentication: Recycler and admin registration/login with email + salted password hash and JWT tokens with RBAC claims (`collector`, `recycler`, `admin`).
 - [x] Core CRUD Endpoints: Full CRUD for lots/transactions, materials catalog, authorized recyclers directory, price boards, and financial cash-first ledger.
 - [x] Offline Idempotency: Deterministic lot generation (`KC-MH-YYMM-<HASH>`) and `client_lot_id` / `client_tx_id` indexing via `sync_queue` table preventing duplicate lot creation on client replay.
@@ -31,8 +31,17 @@ Living record of project deliverables, milestones completed, and pending roadmap
 - [x] Recycler Verification & Expiry Audit: Admin authorization approval/suspension endpoints and automated audit job (`/api/v1/recyclers/jobs/audit-expired`) flagging expired authorizations.
 - [x] System Non-Functionals: Structured JSON request logging with UUID tracing, sliding-window rate limiting, and unified error response envelope.
 - [x] OpenAPI & Postman Artifacts: Automated export of [openapi.json](file:///c:/dev/kabadiwala-connect/docs/openapi.json) and [postman_collection.json](file:///c:/dev/kabadiwala-connect/docs/postman_collection.json).
-- [x] Automated Test Suite: 26 unit and API integration tests in `backend/tests/` passing cleanly with **96% test coverage** on `app/services` (exceeding $\ge 80\%$ requirement).
-- [x] Code formatting & linting: Ruff checks and format clean across all modules using `py -3.11`.
+- [x] Living Dataset Lifecycle Pipeline (`/backend/app/data_pipeline` and `/data`):
+  - **Generation:** Realistic synthetic price stream generator for Maharashtra districts (Palghar, Thane, Mumbai, Pune, Nashik, Nagpur) for all 10 PS categories with seasonal noise, commodity trends, and injected outliers, plus real DB ingestion.
+  - **Validation:** Multi-rule validation engine (positivity, unit sanity, geo-fence, weight sanity bounds, duplicate check, future timestamp rejection) with date-partitioned quarantine routing (`/data/quarantine/`).
+  - **Cleaning:** IQR + MAD Robust Z-score outlier detection, unit normalization to per-kg INR rates, and missing value imputation policies.
+  - **Anonymization:** Salted HMAC-SHA256 collector ID hashing and ~500m GPS spatial coarsening (`0.005°` resolution).
+  - **Updating:** Rolling 7-day and 30-day median price board engine with recency-weighted recycler quotes, trend direction (`up`/`down`/`flat`), and data health scoring (91.7/100).
+  - **Documentation:** Automated living [DATASET_CARD.md](file:///c:/dev/kabadiwala-connect/docs/DATASET_CARD.md) generator.
+  - **CLI & Makefile Integration:** `make data-seed`, `make data-validate`, `make data-export` invoking `py -3.11`.
+  - **Data Quality Profiling:** Jupyter notebook ([data_quality_profiling.ipynb](file:///c:/dev/kabadiwala-connect/data/notebooks/data_quality_profiling.ipynb)) and terminal runner script ([run_profiling.py](file:///c:/dev/kabadiwala-connect/data/notebooks/run_profiling.py)).
+- [x] Automated Test Suite: 33 unit and API integration tests in `backend/tests/` passing cleanly with **83% overall coverage** and **96% test coverage** on `app/services` (exceeding $\ge 80\%$ requirement).
+- [x] Code formatting & linting: Ruff checks and format clean across all backend modules using `py -3.11`.
 
 ---
 

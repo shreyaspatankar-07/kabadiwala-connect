@@ -1,0 +1,12 @@
+{
+  "total_raw_ingested": 600,
+  "valid_count": 587,
+  "quarantined_validation_count": 13,
+  "quarantined_outlier_count": 0,
+  "clean_count": 587,
+  "completeness_score": 70.2,
+  "freshness_score": 100.0,
+  "validity_rate_pct": 97.8,
+  "overall_quality_score": 91.7,
+  "evaluation_time": "2026-09-25T07:01:06.921439Z"
+}
