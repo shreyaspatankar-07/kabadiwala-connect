@@ -84,10 +84,12 @@ void main() {
       await tester.tap(find.text('कमाई'));
       await tester.pumpAndSettle();
 
-      // Verify earnings information
-      expect(find.text('एकूण रोख मिळाली'), findsOneWidget);
-      expect(find.text('₹ 14,250'), findsOneWidget);
-      expect(find.text('येणे बाकी रक्कम'), findsOneWidget);
+      // Verify real earnings overview screen elements
+      expect(find.byKey(const Key('tile_today')), findsOneWidget);
+      expect(find.byKey(const Key('tile_week')), findsOneWidget);
+      expect(find.byKey(const Key('tile_month')), findsOneWidget);
+      expect(find.byKey(const Key('earnings_split_bar')), findsOneWidget);
+      expect(find.byKey(const Key('export_pdf_button')), findsOneWidget);
     });
 
     testWidgets('Switching to Safety tab displays pictorial hazard cards',

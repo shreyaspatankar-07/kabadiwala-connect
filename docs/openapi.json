@@ -1466,6 +1466,302 @@
         }
       }
     },
+    "/api/v1/ledger": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Get collector earnings overview with today, week, month, all-time totals and transaction list",
+        "operationId": "get_collector_ledger_api_v1_ledger_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "collector_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Collector ID to query",
+              "title": "Collector Id"
+            },
+            "description": "Collector ID to query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectorLedgerOverview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/{entry_id}/mark-cash-received": {
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Collector marks a pending entry as cash received",
+        "operationId": "mark_cash_received_api_v1_ledger__entry_id__mark_cash_received_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entry Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarkCashReceivedResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/{entry_id}/recycler-confirm-cash": {
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Recycler confirms cash payment. Flags transaction as disputed if amounts mismatch.",
+        "operationId": "recycler_confirm_cash_api_v1_ledger__entry_id__recycler_confirm_cash_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entry Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecyclerConfirmCashRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerConfirmCashResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/statement": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Get structured earnings statement for income proof export",
+        "operationId": "get_earnings_statement_api_v1_ledger_statement_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "collector_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Collector Id"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarningsStatementResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/{entry_id}/upi-intent": {
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Generate optional NPCI UPI payment deep link string when collector opts in",
+        "operationId": "get_upi_intent_api_v1_ledger__entry_id__upi_intent_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entry Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UPIIntentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ledger/entries": {
       "get": {
         "tags": [
@@ -2592,6 +2888,426 @@
         }
       }
     },
+    "/ledger": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Get collector earnings overview with today, week, month, all-time totals and transaction list",
+        "operationId": "get_collector_ledger_ledger_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "collector_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Collector ID to query",
+              "title": "Collector Id"
+            },
+            "description": "Collector ID to query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectorLedgerOverview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ledger/{entry_id}/mark-cash-received": {
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Collector marks a pending entry as cash received",
+        "operationId": "mark_cash_received_ledger__entry_id__mark_cash_received_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entry Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarkCashReceivedResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ledger/{entry_id}/recycler-confirm-cash": {
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Recycler confirms cash payment. Flags transaction as disputed if amounts mismatch.",
+        "operationId": "recycler_confirm_cash_ledger__entry_id__recycler_confirm_cash_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entry Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecyclerConfirmCashRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecyclerConfirmCashResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ledger/statement": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Get structured earnings statement for income proof export",
+        "operationId": "get_earnings_statement_ledger_statement_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "collector_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Collector Id"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarningsStatementResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ledger/{entry_id}/upi-intent": {
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Generate optional NPCI UPI payment deep link string when collector opts in",
+        "operationId": "get_upi_intent_ledger__entry_id__upi_intent_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entry Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UPIIntentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ledger/entries": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "List collector ledger entries",
+        "operationId": "list_ledger_entries_ledger_entries_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LedgerEntryResponse"
+                  },
+                  "title": "Response List Ledger Entries Ledger Entries Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Record a cash receipt or transaction entry in ledger",
+        "operationId": "create_ledger_entry_ledger_entries_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LedgerEntryCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerEntryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ledger/summary": {
+      "get": {
+        "tags": [
+          "Collector Ledger"
+        ],
+        "summary": "Get collector ledger balance summary",
+        "operationId": "get_ledger_summary_ledger_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerSummary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -2647,6 +3363,57 @@
   },
   "components": {
     "schemas": {
+      "CollectorLedgerOverview": {
+        "properties": {
+          "collector_id": {
+            "type": "string",
+            "title": "Collector Id"
+          },
+          "today_total": {
+            "type": "number",
+            "title": "Today Total"
+          },
+          "week_total": {
+            "type": "number",
+            "title": "Week Total"
+          },
+          "month_total": {
+            "type": "number",
+            "title": "Month Total"
+          },
+          "all_time_total": {
+            "type": "number",
+            "title": "All Time Total"
+          },
+          "pending_dues_count": {
+            "type": "integer",
+            "title": "Pending Dues Count"
+          },
+          "pending_dues_amount": {
+            "type": "number",
+            "title": "Pending Dues Amount"
+          },
+          "transactions": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerTransactionItem"
+            },
+            "type": "array",
+            "title": "Transactions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "collector_id",
+          "today_total",
+          "week_total",
+          "month_total",
+          "all_time_total",
+          "pending_dues_count",
+          "pending_dues_amount",
+          "transactions"
+        ],
+        "title": "CollectorLedgerOverview"
+      },
       "DownstreamStatusResponse": {
         "properties": {
           "lot_id": {
@@ -2685,6 +3452,126 @@
           "status"
         ],
         "title": "DownstreamStatusUpdate"
+      },
+      "EarningsStatementItem": {
+        "properties": {
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "weight_kg": {
+            "type": "number",
+            "title": "Weight Kg"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "payment_status": {
+            "type": "string",
+            "title": "Payment Status"
+          },
+          "recycler_name": {
+            "type": "string",
+            "title": "Recycler Name"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lot_id",
+          "category",
+          "weight_kg",
+          "amount",
+          "payment_status",
+          "recycler_name",
+          "date"
+        ],
+        "title": "EarningsStatementItem"
+      },
+      "EarningsStatementResponse": {
+        "properties": {
+          "statement_ref_no": {
+            "type": "string",
+            "title": "Statement Ref No"
+          },
+          "collector_id": {
+            "type": "string",
+            "title": "Collector Id"
+          },
+          "from_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "From Date"
+          },
+          "to_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "To Date"
+          },
+          "total_earned": {
+            "type": "number",
+            "title": "Total Earned"
+          },
+          "cash_received": {
+            "type": "number",
+            "title": "Cash Received"
+          },
+          "pending_amount": {
+            "type": "number",
+            "title": "Pending Amount"
+          },
+          "total_transactions": {
+            "type": "integer",
+            "title": "Total Transactions"
+          },
+          "total_weight_kg": {
+            "type": "number",
+            "title": "Total Weight Kg"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EarningsStatementItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "statement_ref_no",
+          "collector_id",
+          "from_date",
+          "to_date",
+          "total_earned",
+          "cash_received",
+          "pending_amount",
+          "total_transactions",
+          "total_weight_kg",
+          "items",
+          "generated_at"
+        ],
+        "title": "EarningsStatementResponse"
       },
       "EmailLoginRequest": {
         "properties": {
@@ -3211,6 +4098,62 @@
         ],
         "title": "LedgerSummary"
       },
+      "LedgerTransactionItem": {
+        "properties": {
+          "entry_id": {
+            "type": "string",
+            "title": "Entry Id"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "weight_kg": {
+            "type": "number",
+            "title": "Weight Kg"
+          },
+          "final_price": {
+            "type": "number",
+            "title": "Final Price"
+          },
+          "payment_status": {
+            "type": "string",
+            "title": "Payment Status"
+          },
+          "recycler_name": {
+            "type": "string",
+            "title": "Recycler Name"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry_id",
+          "lot_id",
+          "category",
+          "weight_kg",
+          "final_price",
+          "payment_status",
+          "recycler_name",
+          "date"
+        ],
+        "title": "LedgerTransactionItem"
+      },
       "LotCreate": {
         "properties": {
           "client_lot_id": {
@@ -3559,6 +4502,56 @@
           "transaction_status"
         ],
         "title": "LotStatusUpdate"
+      },
+      "MarkCashReceivedResponse": {
+        "properties": {
+          "entry_id": {
+            "type": "string",
+            "title": "Entry Id"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "payment_status": {
+            "type": "string",
+            "title": "Payment Status"
+          },
+          "collector_confirmed": {
+            "type": "boolean",
+            "title": "Collector Confirmed"
+          },
+          "recycler_confirmed": {
+            "type": "boolean",
+            "title": "Recycler Confirmed"
+          },
+          "is_disputed": {
+            "type": "boolean",
+            "title": "Is Disputed"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry_id",
+          "lot_id",
+          "payment_status",
+          "collector_confirmed",
+          "recycler_confirmed",
+          "is_disputed",
+          "message"
+        ],
+        "title": "MarkCashReceivedResponse"
       },
       "MatchRankingResponse": {
         "properties": {
@@ -4694,6 +5687,66 @@
         ],
         "title": "RankedRecycler"
       },
+      "RecyclerConfirmCashRequest": {
+        "properties": {
+          "recycler_confirmed_amount": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Recycler Confirmed Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recycler_confirmed_amount"
+        ],
+        "title": "RecyclerConfirmCashRequest"
+      },
+      "RecyclerConfirmCashResponse": {
+        "properties": {
+          "entry_id": {
+            "type": "string",
+            "title": "Entry Id"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "payment_status": {
+            "type": "string",
+            "title": "Payment Status"
+          },
+          "is_disputed": {
+            "type": "boolean",
+            "title": "Is Disputed"
+          },
+          "dispute_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dispute Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry_id",
+          "lot_id",
+          "payment_status",
+          "is_disputed"
+        ],
+        "title": "RecyclerConfirmCashResponse"
+      },
       "RecyclerCreate": {
         "properties": {
           "id": {
@@ -5376,6 +6429,39 @@
           "role"
         ],
         "title": "TokenResponse"
+      },
+      "UPIIntentResponse": {
+        "properties": {
+          "entry_id": {
+            "type": "string",
+            "title": "Entry Id"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "upi_uri": {
+            "type": "string",
+            "title": "Upi Uri"
+          },
+          "payee_name": {
+            "type": "string",
+            "title": "Payee Name"
+          },
+          "payee_vpa": {
+            "type": "string",
+            "title": "Payee Vpa"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry_id",
+          "amount",
+          "upi_uri",
+          "payee_name",
+          "payee_vpa"
+        ],
+        "title": "UPIIntentResponse"
       },
       "UserProfileResponse": {
         "properties": {

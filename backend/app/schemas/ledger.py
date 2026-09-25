@@ -38,3 +38,79 @@ class LedgerSummary(BaseModel):
     pending_inr: float
     current_balance_inr: float
     total_transactions: int
+
+
+class LedgerTransactionItem(BaseModel):
+    entry_id: str
+    lot_id: str | None
+    category: str
+    weight_kg: float
+    final_price: float
+    payment_status: str  # cash_received | pending | digital_paid | disputed
+    recycler_name: str
+    date: datetime
+
+
+class CollectorLedgerOverview(BaseModel):
+    collector_id: str
+    today_total: float
+    week_total: float
+    month_total: float
+    all_time_total: float
+    pending_dues_count: int
+    pending_dues_amount: float
+    transactions: list[LedgerTransactionItem]
+
+
+class MarkCashReceivedResponse(BaseModel):
+    entry_id: str
+    lot_id: str | None
+    payment_status: str
+    collector_confirmed: bool
+    recycler_confirmed: bool
+    is_disputed: bool
+    message: str
+
+
+class RecyclerConfirmCashRequest(BaseModel):
+    recycler_confirmed_amount: float = Field(..., ge=0)
+
+
+class RecyclerConfirmCashResponse(BaseModel):
+    entry_id: str
+    lot_id: str | None
+    payment_status: str
+    is_disputed: bool
+    dispute_reason: str | None = None
+
+
+class EarningsStatementItem(BaseModel):
+    lot_id: str | None
+    category: str
+    weight_kg: float
+    amount: float
+    payment_status: str
+    recycler_name: str
+    date: datetime
+
+
+class EarningsStatementResponse(BaseModel):
+    statement_ref_no: str
+    collector_id: str
+    from_date: datetime
+    to_date: datetime
+    total_earned: float
+    cash_received: float
+    pending_amount: float
+    total_transactions: int
+    total_weight_kg: float
+    items: list[EarningsStatementItem]
+    generated_at: datetime
+
+
+class UPIIntentResponse(BaseModel):
+    entry_id: str
+    amount: float
+    upi_uri: str
+    payee_name: str
+    payee_vpa: str

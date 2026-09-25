@@ -5,10 +5,12 @@ import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
 import '../../data/repositories/lot_repository.dart';
 import '../../data/repositories/price_repository.dart';
+import '../../data/repositories/ledger_repository.dart';
 import '../widgets/big_tile.dart';
 import '../widgets/speaker_button.dart';
 import '../widgets/sync_status_badge.dart';
 import 'add_lot_screen.dart';
+import 'earnings_screen.dart';
 import 'price_board_screen.dart';
 
 /// Bottom Navigation Shell with 4 tabs:
@@ -24,12 +26,16 @@ class MainNavigationShell extends StatefulWidget {
     this.initialLocale = 'mr',
     this.lotRepository,
     this.priceRepository,
+    this.db,
+    this.ledgerRepository,
   });
 
   final AudioFeedbackService audioService;
   final String initialLocale;
   final LotRepository? lotRepository;
   final PriceRepository? priceRepository;
+  final AppDatabase? db;
+  final LedgerRepository? ledgerRepository;
 
   @override
   State<MainNavigationShell> createState() => _MainNavigationShellState();
@@ -39,6 +45,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
   bool _isOnline = false; // offline-first default
   int _pendingCount = 2; // simulates offline queued items for demonstration
+
+  late final AppDatabase _db;
+  late final bool _ownsDb;
+  late final LedgerRepository _ledgerRepo;
 
   final List<String> _tabPromptKeys = [
     'tabAddLot',
@@ -50,9 +60,29 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   @override
   void initState() {
     super.initState();
+    if (widget.db != null) {
+      _db = widget.db!;
+      _ownsDb = false;
+    } else if (widget.lotRepository != null) {
+      _db = widget.lotRepository!.db;
+      _ownsDb = false;
+    } else {
+      _db = AppDatabase.inMemory();
+      _ownsDb = true;
+    }
+    _ledgerRepo = widget.ledgerRepository ?? LedgerRepository(_db);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.audioService.speakPrompt(_tabPromptKeys[_currentIndex]);
     });
+  }
+
+  @override
+  void dispose() {
+    if (_ownsDb) {
+      _db.close();
+    }
+    super.dispose();
   }
 
   void _onTabSelected(int index) {
@@ -340,119 +370,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   // Tab 3: Earnings (कमाई)
   // ---------------------------------------------------------------------------
   Widget _buildEarningsTab(BuildContext context, String locale) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Total Cash Received Card (Green = Go/Earn)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.greenGoEarnLight,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.greenGoEarn, width: 2),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      locale == 'mr' ? 'एकूण रोख मिळाली' : 'कुल नकद प्राप्त',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.greenGoEarn,
-                      ),
-                    ),
-                    const Icon(Icons.check_circle_rounded, color: AppTheme.greenGoEarn, size: 28),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  '₹ 14,250',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF064E3B),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Pending Dues Card (Yellow = Pending)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.yellowPendingLight,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.yellowPending, width: 2),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      locale == 'mr' ? 'येणे बाकी रक्कम' : 'बकाया राशि',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.yellowPending,
-                      ),
-                    ),
-                    const Icon(Icons.schedule_rounded, color: AppTheme.yellowPending, size: 28),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  '₹ 2,800',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF78350F),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Record Cash Received Button (Cash-first principle from AGENTS.md)
-          SizedBox(
-            height: 60,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.greenGoEarn,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              onPressed: () async {
-                await HapticService.mediumImpact();
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      locale == 'mr' ? 'रोख रक्कम नोंदवली गेली!' : 'नकद राशि दर्ज कर ली गई!',
-                    ),
-                    backgroundColor: AppTheme.greenGoEarn,
-                  ),
-                );
-              },
-              icon: const Icon(Icons.payments_rounded, size: 28),
-              label: Text(
-                locale == 'mr' ? 'रोख पावती नोंदवा' : 'नकद रसीद दर्ज करें',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return EarningsScreen(
+      db: _db,
+      audioService: widget.audioService,
+      ledgerRepository: _ledgerRepo,
+      locale: locale,
     );
   }
 

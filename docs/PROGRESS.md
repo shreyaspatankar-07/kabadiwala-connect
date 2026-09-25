@@ -4,7 +4,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 6 (Verifiable Handover Record & Signed QR Flow) Complete
+## Current Status: Phase 7 (Cash-First Earnings Ledger & Payments) Complete
 
 ### Completed Items
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
@@ -108,11 +108,30 @@ Living record of project deliverables, milestones completed, and pending roadmap
     - `VerifyHandoverScreen`: Public in-app verification screen allowing anyone to enter a 6-character reference code, displaying cryptographic integrity status badge, weight, recycler confirmation status, and embedded downstream timeline.
     - **Mobile Test Suite (`mobile/test/handover_flow_test.dart`)**: 6 comprehensive widget tests covering QR display, 6-char code rendering, offline cryptographic HMAC-SHA256 signature verification, live weight mismatch warning banner, receipt sharing callback, and downstream timeline progression. All 37 mobile tests pass cleanly (`flutter test`) and `flutter analyze` reports 0 issues.
 
+- [x] Cash-First Earnings Ledger & Payments (Backend & Mobile):
+  - **Backend Financial Ledger (`backend/app/services/ledger_service.py` & `backend/app/api/v1/ledger.py`)**:
+    - `GET /ledger?collector_id=`: Returns comprehensive collector financial overview (`today_total`, `week_total`, `month_total`, `all_time_total`), itemized transactions list (`category`, `weight_kg`, `final_price`, `payment_status`, `recycler_name`, `date`), and prominent `pending_dues_count` & `pending_dues_amount`.
+    - `POST /ledger/{entry_id}/mark-cash-received`: Collector marks pending entry and associated lot as `cash_received`.
+    - `POST /ledger/{entry_id}/recycler-confirm-cash`: Recycler confirms receipt via portal stub; amount discrepancy automatically flags entry and lot as `disputed`.
+    - `GET /ledger/statement?collector_id=&from=&to=`: Returns structured income proof earnings statement with summary metrics and line items for income verification.
+    - `POST /ledger/{entry_id}/upi-intent`: Optional UPI deep link string (`upi://pay?pa=...`) only generated upon explicit opt-in; full system operates without it.
+    - **Backend Test Suite (`backend/tests/test_ledger_api.py`)**: 5 comprehensive API tests covering summary totals, pending dues aggregation, collector cash marking, recycler confirmation and mismatch dispute triggering, statement export, and optional UPI intent generation. All 56 backend tests pass (`py -3.11 -m pytest -q`).
+  - **Mobile Earnings Screen & Offline Ledger (`mobile/lib/ui/screens/earnings_screen.dart`)**:
+    - **Three Big Summary Tiles**: `Today`, `This Week`, and `This Month` prominently styled in large green rupee numbers (`#047857`) and vernacular Marathi/Hindi labels.
+    - **Visual Split Bar**: Green/Red proportional bar (`Key('earnings_split_bar')`) displaying received cash vs. pending dues ratio with legend.
+    - **Transaction List**: Category icon, authorized recycler name, weight in kg, rupee amount, and semantic payment status chips (Green = Received, Amber = Pending, Red = Disputed) with tap-to-hear speaker button.
+    - **Pending Dues Section**: Amber alert card with `pendingDuesCount` and direct recycler contact action.
+    - **One-Tap "Mark as Cash Received"**: Single-touch confirmation button with heavy tactile haptic feedback and immediate spoken audio confirmation ("पैसे मिळाले" / "पैसे मिल गए").
+    - **Optional UPI Card**: Hidden by default; only displayed upon explicit user tap on "Pay via UPI" with QR code and UPI URI (`Key('upi_payment_card')`).
+    - **Pure-Dart PDF Statement Generator (`mobile/lib/core/pdf/pdf_statement_generator.dart`)**: Zero-dependency PDF 1.4 generator rendering official JNARDDC EPR collector income statement with vernacular header, metadata card, totals, and transaction table. Captures file and triggers Android share sheet.
+    - **Offline-First Drift Persistence & Sync**: Operates seamlessly with zero network connectivity via Drift SQLite (`LocalLedger`, `LocalTransactions`), queuing cash marking operations to `SyncQueueEntries` FIFO queue.
+    - **Mobile Test Suite (`mobile/test/earnings_screen_test.dart`)**: 6 comprehensive widget and unit tests covering summary tiles, proportional split bar, transaction list with audio playback, one-tap cash marking with Drift update and sync queue enqueuing, pending dues display, and PDF statement generation. All 43 mobile tests pass cleanly (`flutter test`) and `flutter analyze` reports 0 issues.
+
 ---
 
 ## Pending Next Phase Tasks
 
-### Phase 7: Recycler & Admin Portal (Next.js)
+### Phase 8: Recycler & Admin Portal (Next.js)
 - [ ] Build Recycler dashboard (incoming lots, weight scale verification, EPR digital receipts).
 - [ ] Build Admin/JNARDDC compliance & mass balance overview.
 
