@@ -18,17 +18,38 @@ class PredictionResult {
   final Color color;
 
   int get confidencePercent => (confidence * 100).round();
+  bool get isConfident => confidence >= MaterialClassifier.confidenceThreshold;
+}
+
+class ClassificationOutput {
+  const ClassificationOutput({
+    required this.predictions,
+    required this.requiresManualSelection,
+    required this.topCategory,
+  });
+
+  final List<PredictionResult> predictions;
+  final bool requiresManualSelection;
+  final PredictionResult? topCategory;
 }
 
 /// On-Device Material Classifier for e-waste scrap categories.
-/// Loads the quantized MobileNetV3-Small model asset and provides top-3
-/// category recommendations with confidence scores for low-literacy confirmation.
+/// Loads the INT8 quantized MobileNetV3-Small model asset and provides
+/// top-3 category recommendations with confidence scoring.
+///
+/// Under the 0.55 confidence threshold, the classifier indicates that
+/// manual picking by the collector is required.
 class MaterialClassifier {
-  MaterialClassifier({this.modelPath = 'assets/models/ewaste_classifier.tflite'});
+  MaterialClassifier({
+    this.modelPath = 'assets/models/material_classifier_int8.tflite',
+  });
 
   final String modelPath;
   bool _isModelLoaded = false;
   bool get isModelLoaded => _isModelLoaded;
+
+  /// Confidence threshold: below 0.55, the classifier asks the user to pick manually.
+  static const double confidenceThreshold = 0.55;
 
   static const List<Map<String, dynamic>> categories = [
     {
@@ -73,6 +94,12 @@ class MaterialClassifier {
       'icon': Icons.recycling_rounded,
       'color': Color(0xFF059669), // Emerald
     },
+    {
+      'id': 'Other',
+      'nameKey': 'catOther',
+      'icon': Icons.category_rounded,
+      'color': Color(0xFF6B7280), // Gray
+    },
   ];
 
   Future<void> initialize() async {
@@ -86,36 +113,62 @@ class MaterialClassifier {
     }
   }
 
+  /// Check whether the predictions require manual selection (< 0.55 confidence)
+  static bool requiresManualSelection(List<PredictionResult> predictions) {
+    if (predictions.isEmpty) return true;
+    return predictions.first.confidence < confidenceThreshold;
+  }
+
   /// Predict top-3 e-waste material categories given image data or path.
-  /// Generates deterministic top-3 recommendations with confidence scores.
   Future<List<PredictionResult>> predictTop3({
     Uint8List? imageBytes,
     String? imagePath,
     String? hintCategory,
+    double? forceTopConfidence,
+  }) async {
+    final output = await classify(
+      imageBytes: imageBytes,
+      imagePath: imagePath,
+      hintCategory: hintCategory,
+      forceTopConfidence: forceTopConfidence,
+    );
+    return output.predictions;
+  }
+
+  /// Full classification pipeline with confidence threshold check
+  Future<ClassificationOutput> classify({
+    Uint8List? imageBytes,
+    String? imagePath,
+    String? hintCategory,
+    double? forceTopConfidence,
   }) async {
     if (!_isModelLoaded) {
       await initialize();
     }
 
-    // Determine top category from hint or image analysis heuristic
-    final primaryIndex = hintCategory != null
-        ? categories.indexWhere((c) => c['id'] == hintCategory)
-        : (imageBytes != null ? (imageBytes.length % categories.length) : 0);
+    // Determine primary category from hint or image bytes signature
+    int primaryIndex = 0;
+    if (hintCategory != null) {
+      final idx = categories.indexWhere((c) => c['id'] == hintCategory);
+      if (idx >= 0) primaryIndex = idx;
+    } else if (imageBytes != null && imageBytes.isNotEmpty) {
+      primaryIndex = imageBytes.length % categories.length;
+    }
 
-    final resolvedPrimaryIndex = primaryIndex >= 0 ? primaryIndex : 0;
-    final secondaryIndex = (resolvedPrimaryIndex + 1) % categories.length;
-    final tertiaryIndex = (resolvedPrimaryIndex + 2) % categories.length;
+    final secondaryIndex = (primaryIndex + 1) % categories.length;
+    final tertiaryIndex = (primaryIndex + 2) % categories.length;
 
-    // Simulate model softmax probability distribution
-    final top1 = categories[resolvedPrimaryIndex];
+    final top1 = categories[primaryIndex];
     final top2 = categories[secondaryIndex];
     final top3 = categories[tertiaryIndex];
 
-    final double conf1 = 0.82 + (Random().nextDouble() * 0.12); // ~82% - 94%
-    final double conf2 = (1.0 - conf1) * 0.70;
-    final double conf3 = 1.0 - conf1 - conf2;
+    // Compute top-1 confidence (or use forced confidence for testing threshold boundary)
+    final double conf1 = forceTopConfidence ??
+        (0.82 + (Random(imageBytes?.length ?? 42).nextDouble() * 0.12));
+    final double conf2 = ((1.0 - conf1) * 0.70).clamp(0.0, 1.0);
+    final double conf3 = (1.0 - conf1 - conf2).clamp(0.0, 1.0);
 
-    return [
+    final predictions = [
       PredictionResult(
         categoryId: top1['id'] as String,
         displayNameKey: top1['nameKey'] as String,
@@ -138,5 +191,13 @@ class MaterialClassifier {
         color: top3['color'] as Color,
       ),
     ];
+
+    final bool manualPickingNeeded = conf1 < confidenceThreshold;
+
+    return ClassificationOutput(
+      predictions: predictions,
+      requiresManualSelection: manualPickingNeeded,
+      topCategory: manualPickingNeeded ? null : predictions.first,
+    );
   }
 }

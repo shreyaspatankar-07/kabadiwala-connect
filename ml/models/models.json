@@ -1,0 +1,80 @@
+{
+  "registry_version": "1.0.0",
+  "last_updated": "2026-09-25T12:13:57.298319+00:00",
+  "models": {
+    "ewaste-mobilenetv3-small-int8": {
+      "model_id": "ewaste-mobilenetv3-small-int8",
+      "version": "1.0.0",
+      "filename": "material_classifier_int8.tflite",
+      "framework": "TensorFlow Lite / INT8",
+      "task": "e-waste material classification",
+      "description": "MobileNetV3-Small INT8 quantized model for on-device e-waste scrap image classification (< 2.5 MB).",
+      "sha256": "d64fba07b01836d07cbf8cd75a5d88b73b300f91216536f677548f195839f8b7",
+      "size_bytes": 2399940,
+      "size_mb": 2.289,
+      "updated_at": "2026-09-25T12:13:56.585059+00:00",
+      "metrics": {
+        "top1_accuracy": 100.0,
+        "top3_accuracy": 100.0,
+        "categories_count": 8
+      },
+      "parameters": {},
+      "download_url": "/static/models/material_classifier_int8.tflite"
+    },
+    "ewaste-valuation-lgbm": {
+      "model_id": "ewaste-valuation-lgbm",
+      "version": "1.0.0",
+      "filename": "valuation_model.lgb",
+      "framework": "LightGBM",
+      "task": "e-waste scrap valuation with 90% prediction interval",
+      "description": "LightGBM quantile regressors predicting price per kg with lower (5%), median (50%), and upper (95%) bounds.",
+      "sha256": "5344cfa0dfe58d317049550c947aa72df35cad018f73e6e440157f0f1268f36b",
+      "size_bytes": 414707,
+      "size_mb": 0.395,
+      "updated_at": "2026-09-25T12:13:57.111017+00:00",
+      "metrics": {
+        "rmse": 15.888,
+        "mae": 9.029,
+        "mape_percent": 4.14,
+        "baseline_rmse": 52.224,
+        "baseline_mae": 29.457,
+        "baseline_mape_percent": 15.3,
+        "rmse_improvement_percent": 69.58,
+        "mae_improvement_percent": 69.35,
+        "prediction_interval_90_coverage_percent": 90.93,
+        "test_sample_count": 750
+      },
+      "parameters": {
+        "features": [
+          "category_enc",
+          "sub_category_enc",
+          "weight_kg",
+          "condition_enc",
+          "district_enc",
+          "month",
+          "7d_median_price",
+          "30d_median_price"
+        ]
+      },
+      "download_url": "/static/models/valuation_model.lgb"
+    },
+    "ewaste-anomaly-isolation-forest": {
+      "model_id": "ewaste-anomaly-isolation-forest",
+      "version": "1.0.0",
+      "filename": "anomaly_detector.joblib",
+      "framework": "scikit-learn",
+      "task": "e-waste transaction anomaly detection",
+      "description": "Isolation Forest + rule checks flagging price IQR outliers, weight sanity violations, and rapid GPS jumps.",
+      "sha256": "62eeb8cc09959c78aa516ad28f94ed82954b34ec26bc9282b8d7f58d7d454496",
+      "size_bytes": 1233305,
+      "size_mb": 1.176,
+      "updated_at": "2026-09-25T12:13:57.298319+00:00",
+      "metrics": {
+        "contamination": 0.03,
+        "n_estimators": 100
+      },
+      "parameters": {},
+      "download_url": "/static/models/anomaly_detector.joblib"
+    }
+  }
+}

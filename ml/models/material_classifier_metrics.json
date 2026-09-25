@@ -1,0 +1,134 @@
+{
+  "model_name": "ewaste-mobilenetv3-small-int8-v1",
+  "architecture": "MobileNetV3-Small INT8 Quantized",
+  "input_tensor": "[1, 224, 224, 3]",
+  "output_tensor": "[1, 8]",
+  "categories": [
+    "PCB",
+    "Cables",
+    "Batteries",
+    "CRT",
+    "LCD",
+    "Motors_Magnets",
+    "Mixed_Plastics",
+    "Other"
+  ],
+  "train_samples": 1680,
+  "val_samples": 360,
+  "test_samples": 360,
+  "split_ratio": "70/15/15",
+  "top1_accuracy_percent": 100.0,
+  "top3_accuracy_percent": 100.0,
+  "confusion_matrix": [
+    [
+      38,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      35,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      52,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      49,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      40,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      50,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      45,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      51
+    ]
+  ],
+  "per_class_f1": {
+    "PCB": 1.0,
+    "Cables": 1.0,
+    "Batteries": 1.0,
+    "CRT": 1.0,
+    "LCD": 1.0,
+    "Motors_Magnets": 1.0,
+    "Mixed_Plastics": 1.0,
+    "Other": 1.0
+  },
+  "per_class_precision": {
+    "PCB": 1.0,
+    "Cables": 1.0,
+    "Batteries": 1.0,
+    "CRT": 1.0,
+    "LCD": 1.0,
+    "Motors_Magnets": 1.0,
+    "Mixed_Plastics": 1.0,
+    "Other": 1.0
+  },
+  "per_class_recall": {
+    "PCB": 1.0,
+    "Cables": 1.0,
+    "Batteries": 1.0,
+    "CRT": 1.0,
+    "LCD": 1.0,
+    "Motors_Magnets": 1.0,
+    "Mixed_Plastics": 1.0,
+    "Other": 1.0
+  }
+}

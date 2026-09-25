@@ -1,0 +1,27 @@
+{
+  "model_id": "ewaste-valuation-lgbm-v1",
+  "framework": "LightGBM",
+  "task": "e-waste scrap valuation with 90% prediction interval",
+  "features": [
+    "category_enc",
+    "sub_category_enc",
+    "weight_kg",
+    "condition_enc",
+    "district_enc",
+    "month",
+    "7d_median_price",
+    "30d_median_price"
+  ],
+  "metrics": {
+    "rmse": 15.888,
+    "mae": 9.029,
+    "mape_percent": 4.14,
+    "baseline_rmse": 52.224,
+    "baseline_mae": 29.457,
+    "baseline_mape_percent": 15.3,
+    "rmse_improvement_percent": 69.58,
+    "mae_improvement_percent": 69.35,
+    "prediction_interval_90_coverage_percent": 90.93,
+    "test_sample_count": 750
+  }
+}

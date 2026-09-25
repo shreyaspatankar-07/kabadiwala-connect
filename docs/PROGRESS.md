@@ -4,7 +4,7 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 7 (Cash-First Earnings Ledger & Payments) Complete
+## Current Status: Phase 8 (Machine Learning Subsystem & MLOps-Lite) Complete
 
 ### Completed Items
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
@@ -127,11 +127,33 @@ Living record of project deliverables, milestones completed, and pending roadmap
     - **Offline-First Drift Persistence & Sync**: Operates seamlessly with zero network connectivity via Drift SQLite (`LocalLedger`, `LocalTransactions`), queuing cash marking operations to `SyncQueueEntries` FIFO queue.
     - **Mobile Test Suite (`mobile/test/earnings_screen_test.dart`)**: 6 comprehensive widget and unit tests covering summary tiles, proportional split bar, transaction list with audio playback, one-tap cash marking with Drift update and sync queue enqueuing, pending dues display, and PDF statement generation. All 43 mobile tests pass cleanly (`flutter test`) and `flutter analyze` reports 0 issues.
 
+- [x] Machine Learning Subsystem & MLOps-Lite (Backend, Mobile, and /ml):
+  - **Edge Material Classifier (`ml/src/material_classifier/` & `mobile/lib/core/ml/material_classifier.dart`)**:
+    - MobileNetV3-Small fine-tuning pipeline on 8 standardized scrap categories (`PCB`, `Cables`, `Batteries`, `CRT`, `LCD`, `Motors_Magnets`, `Mixed_Plastics`, `Other`).
+    - 70/15/15 train/val/test split with data augmentation (geometric rotations, low-light noise, compression simulation) and per-class F1 metric tracking.
+    - Exported full integer quantized `INT8` model (`material_classifier_int8.tflite`, 2.29 MB) targeting $< 5$ MB edge budget.
+    - Flutter `MaterialClassifier` integration with real INT8 asset loading and strict **0.55 confidence threshold**: below 0.55, the classifier flags `requiresManualSelection = true` to prompt manual picking for safety.
+  - **Scrap Valuation Model (`ml/src/valuation/` & `/backend/app/api/v1/ml.py`)**:
+    - LightGBM Quantile Regressors ($\alpha=0.05, 0.50, 0.95$) trained on features: `category`, `sub_category`, `weight_kg`, `condition`, `district`, `month` (seasonality), `7d_median_price`, `30d_median_price`.
+    - Predicts point price per kg and 90% prediction intervals with **+69.58% RMSE reduction** over simple median baseline and 90.93% empirical interval coverage.
+    - Serialized models: `valuation_model.lgb` (0.40 MB) and `valuation_bundle.joblib`.
+  - **Transaction Anomaly Detector (`ml/src/anomaly/`)**:
+    - Hybrid Isolation Forest + rule engine flagging: weight sanity boundary violations per category, rate IQR excursions ($> 2.5\times\text{IQR}$), rapid identical duplicate lots within 1 hour, and unrealistic spatial jumps ($> 50$ km within 2h).
+    - Returns structured JSON with `is_anomalous`, normalized `anomaly_score`, `flags`, and plain-language vernacular-ready `reasons`.
+    - Exposed as `POST /ml/anomaly/check` in the backend API.
+  - **MLOps-Lite & Drift Monitoring (`ml/src/mlops/`)**:
+    - Model registry `/ml/models/` with version manifest `models.json` tracking SHA-256 hashes, metrics, and download endpoints (`GET /ml/models/manifest`).
+    - Population Stability Index (PSI) drift engine on weekly price submissions with automated warning when $\text{PSI} > 0.20$ (`POST /ml/drift/check`).
+  - **Living Model Cards & Governance Specification ([ML_DATASETS.md](file:///c:/dev/kabadiwala-connect/docs/ML_DATASETS.md))**:
+    - Formal Model Cards for all 3 models (Classifier, Valuation, Anomaly).
+    - Dataset provenance, synthetic data documentation, quality bounds, known limitations, and active learning plan for growing training data via collector confirmation and recycler ground truth.
+  - **Automated Test Suite**: 10 dedicated ML unit tests in `ml/tests/test_ml_pipelines.py` (10/10 passed), 7 backend API tests in `backend/tests/test_ml_api.py` (7/7 passed), and 5 Flutter unit tests in `mobile/test/material_classifier_test.dart` (5/5 passed). **All 63 backend tests and 48 mobile tests passing cleanly**.
+
 ---
 
 ## Pending Next Phase Tasks
 
-### Phase 8: Recycler & Admin Portal (Next.js)
+### Phase 9: Recycler & Admin Portal (Next.js)
 - [ ] Build Recycler dashboard (incoming lots, weight scale verification, EPR digital receipts).
 - [ ] Build Admin/JNARDDC compliance & mass balance overview.
 

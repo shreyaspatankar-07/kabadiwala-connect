@@ -10,6 +10,7 @@ from app.api.v1.matching import router as matching_router
 from app.api.v1.materials import router as materials_router
 from app.api.v1.prices import router as prices_router
 from app.api.v1.recyclers import router as recyclers_router
+from app.api.v1.ml import router as ml_router
 from app.api.v1.sync import router as sync_router
 from app.api.v1.verify import router as verify_router
 
@@ -25,3 +26,4 @@ api_v1_router.include_router(sync_router)
 api_v1_router.include_router(matching_router)
 api_v1_router.include_router(handover_router)
 api_v1_router.include_router(verify_router)
+api_v1_router.include_router(ml_router)

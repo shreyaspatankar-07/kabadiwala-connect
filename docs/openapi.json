@@ -2225,6 +2225,154 @@
         }
       }
     },
+    "/api/v1/ml/anomaly/check": {
+      "post": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Check e-waste lot for price, weight, or spatial anomalies",
+        "description": "Evaluate a scrap e-waste lot against Isolation Forest and domain rules:\n\n- Weight sanity bounds per category\n- Rate IQR deviation\n- Repeated identical submissions within 1h\n- GPS spatial jumps > 50km",
+        "operationId": "check_anomaly_api_v1_ml_anomaly_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnomalyCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnomalyCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ml/models/manifest": {
+      "get": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Get MLOps Model Registry Version Manifest",
+        "description": "Returns current active model versions, SHA256 checksums, metrics, and download endpoints.",
+        "operationId": "get_model_manifest_api_v1_ml_models_manifest_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelManifestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ml/valuation/predict": {
+      "post": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Predict price per kg and 90% prediction interval",
+        "description": "Predict scrap valuation using LightGBM quantile regression models.",
+        "operationId": "predict_valuation_api_v1_ml_valuation_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValuationPredictRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValuationPredictResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ml/drift/check": {
+      "post": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Calculate Population Stability Index (PSI) drift monitoring",
+        "description": "Computes PSI between baseline and production feature distributions.",
+        "operationId": "check_drift_api_v1_ml_drift_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriftCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriftCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/matching/rank": {
       "post": {
         "tags": [
@@ -3308,6 +3456,154 @@
         ]
       }
     },
+    "/ml/anomaly/check": {
+      "post": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Check e-waste lot for price, weight, or spatial anomalies",
+        "description": "Evaluate a scrap e-waste lot against Isolation Forest and domain rules:\n\n- Weight sanity bounds per category\n- Rate IQR deviation\n- Repeated identical submissions within 1h\n- GPS spatial jumps > 50km",
+        "operationId": "check_anomaly_ml_anomaly_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnomalyCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnomalyCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ml/models/manifest": {
+      "get": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Get MLOps Model Registry Version Manifest",
+        "description": "Returns current active model versions, SHA256 checksums, metrics, and download endpoints.",
+        "operationId": "get_model_manifest_ml_models_manifest_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelManifestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ml/valuation/predict": {
+      "post": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Predict price per kg and 90% prediction interval",
+        "description": "Predict scrap valuation using LightGBM quantile regression models.",
+        "operationId": "predict_valuation_ml_valuation_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValuationPredictRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValuationPredictResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ml/drift/check": {
+      "post": {
+        "tags": [
+          "Machine Learning & MLOps"
+        ],
+        "summary": "Calculate Population Stability Index (PSI) drift monitoring",
+        "description": "Computes PSI between baseline and production feature distributions.",
+        "operationId": "check_drift_ml_drift_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DriftCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriftCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -3363,6 +3659,136 @@
   },
   "components": {
     "schemas": {
+      "AnomalyCheckRequest": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category",
+            "description": "E-waste category: PCB, Cables, Batteries, CRT, LCD, Motors_Magnets, Mixed_Plastics, Other"
+          },
+          "weight_kg": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight Kg",
+            "description": "Measured lot weight in kilograms"
+          },
+          "final_price": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Final Price",
+            "description": "Total price quoted or paid in INR"
+          },
+          "collector_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collector Id",
+            "description": "Collector reference ID"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "Current GPS latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude",
+            "description": "Current GPS longitude"
+          },
+          "previous_lot": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviousLotContext"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context of collector's previous lot for rapid sequence checks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "weight_kg",
+          "final_price"
+        ],
+        "title": "AnomalyCheckRequest"
+      },
+      "AnomalyCheckResponse": {
+        "properties": {
+          "is_anomalous": {
+            "type": "boolean",
+            "title": "Is Anomalous"
+          },
+          "anomaly_score": {
+            "type": "number",
+            "title": "Anomaly Score",
+            "description": "Normalized anomaly score from 0.0 (normal) to 1.0 (severe)"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Flags"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "weight_kg": {
+            "type": "number",
+            "title": "Weight Kg"
+          },
+          "final_price": {
+            "type": "number",
+            "title": "Final Price"
+          },
+          "price_per_kg": {
+            "type": "number",
+            "title": "Price Per Kg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_anomalous",
+          "anomaly_score",
+          "flags",
+          "reasons",
+          "category",
+          "weight_kg",
+          "final_price",
+          "price_per_kg"
+        ],
+        "title": "AnomalyCheckResponse"
+      },
       "CollectorLedgerOverview": {
         "properties": {
           "collector_id": {
@@ -3452,6 +3878,95 @@
           "status"
         ],
         "title": "DownstreamStatusUpdate"
+      },
+      "DriftCheckRequest": {
+        "properties": {
+          "feature_name": {
+            "type": "string",
+            "title": "Feature Name",
+            "default": "price_per_kg"
+          },
+          "expected_baseline": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "minItems": 5,
+            "title": "Expected Baseline",
+            "description": "Reference baseline feature distribution"
+          },
+          "actual_batch": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "minItems": 5,
+            "title": "Actual Batch",
+            "description": "Recent production monitoring distribution"
+          },
+          "num_buckets": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 2.0,
+            "title": "Num Buckets",
+            "default": 10
+          }
+        },
+        "type": "object",
+        "required": [
+          "expected_baseline",
+          "actual_batch"
+        ],
+        "title": "DriftCheckRequest"
+      },
+      "DriftCheckResponse": {
+        "properties": {
+          "feature_name": {
+            "type": "string",
+            "title": "Feature Name"
+          },
+          "psi": {
+            "type": "number",
+            "title": "Psi"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "is_drift_detected": {
+            "type": "boolean",
+            "title": "Is Drift Detected"
+          },
+          "action_required": {
+            "type": "string",
+            "title": "Action Required"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "bucket_breakdown": {
+            "items": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Bucket Breakdown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "feature_name",
+          "psi",
+          "status",
+          "is_drift_detected",
+          "action_required",
+          "message",
+          "bucket_breakdown"
+        ],
+        "title": "DriftCheckResponse"
       },
       "EarningsStatementItem": {
         "properties": {
@@ -4799,6 +5314,113 @@
         "type": "object",
         "title": "MaterialUpdate"
       },
+      "ModelEntrySchema": {
+        "properties": {
+          "model_id": {
+            "type": "string",
+            "title": "Model Id"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "framework": {
+            "type": "string",
+            "title": "Framework"
+          },
+          "task": {
+            "type": "string",
+            "title": "Task"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "size_mb": {
+            "type": "number",
+            "title": "Size Mb"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metrics"
+          },
+          "parameters": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parameters"
+          },
+          "download_url": {
+            "type": "string",
+            "title": "Download Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_id",
+          "version",
+          "filename",
+          "framework",
+          "task",
+          "description",
+          "sha256",
+          "size_bytes",
+          "size_mb",
+          "updated_at",
+          "metrics",
+          "download_url"
+        ],
+        "title": "ModelEntrySchema"
+      },
+      "ModelManifestResponse": {
+        "properties": {
+          "registry_version": {
+            "type": "string",
+            "title": "Registry Version"
+          },
+          "last_updated": {
+            "type": "string",
+            "title": "Last Updated"
+          },
+          "models": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ModelEntrySchema"
+            },
+            "type": "object",
+            "title": "Models"
+          }
+        },
+        "type": "object",
+        "required": [
+          "registry_version",
+          "last_updated",
+          "models"
+        ],
+        "title": "ModelManifestResponse"
+      },
       "OTPRequest": {
         "properties": {
           "phone": {
@@ -4909,6 +5531,66 @@
           "pin"
         ],
         "title": "PINSetupRequest"
+      },
+      "PreviousLotContext": {
+        "properties": {
+          "collector_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collector Id"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "weight_kg": {
+            "type": "number",
+            "title": "Weight Kg",
+            "default": 0.0
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "elapsed_seconds": {
+            "type": "integer",
+            "title": "Elapsed Seconds",
+            "default": 99999
+          }
+        },
+        "type": "object",
+        "title": "PreviousLotContext"
       },
       "PriceBoardCategory": {
         "properties": {
@@ -6612,6 +7294,135 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "ValuationPredictRequest": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "sub_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Category",
+            "default": "Standard"
+          },
+          "weight_kg": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight Kg"
+          },
+          "condition": {
+            "type": "string",
+            "title": "Condition",
+            "description": "working | broken | damaged | burnt",
+            "default": "broken"
+          },
+          "location_district": {
+            "type": "string",
+            "title": "Location District",
+            "description": "Maharashtra district",
+            "default": "Mumbai"
+          },
+          "month": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 12.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Month",
+            "description": "Month 1..12 (defaults to current month)"
+          },
+          "rolling_7d_median": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rolling 7D Median"
+          },
+          "rolling_30d_median": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rolling 30D Median"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "weight_kg"
+        ],
+        "title": "ValuationPredictRequest"
+      },
+      "ValuationPredictResponse": {
+        "properties": {
+          "predicted_price_per_kg": {
+            "type": "number",
+            "title": "Predicted Price Per Kg"
+          },
+          "low_price_per_kg": {
+            "type": "number",
+            "title": "Low Price Per Kg"
+          },
+          "high_price_per_kg": {
+            "type": "number",
+            "title": "High Price Per Kg"
+          },
+          "total_estimated_value": {
+            "type": "number",
+            "title": "Total Estimated Value"
+          },
+          "total_low_value": {
+            "type": "number",
+            "title": "Total Low Value"
+          },
+          "total_high_value": {
+            "type": "number",
+            "title": "Total High Value"
+          },
+          "prediction_interval": {
+            "type": "string",
+            "title": "Prediction Interval",
+            "default": "90%"
+          },
+          "confidence_level": {
+            "type": "string",
+            "title": "Confidence Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "predicted_price_per_kg",
+          "low_price_per_kg",
+          "high_price_per_kg",
+          "total_estimated_value",
+          "total_low_value",
+          "total_high_value",
+          "confidence_level"
+        ],
+        "title": "ValuationPredictResponse"
       }
     },
     "securitySchemes": {

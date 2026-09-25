@@ -2339,6 +2339,321 @@
       ]
     },
     {
+      "name": "Machine Learning & MLOps",
+      "item": [
+        {
+          "name": "Check e-waste lot for price, weight, or spatial anomalies",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ml/anomaly/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "ml",
+                "anomaly",
+                "check"
+              ]
+            },
+            "description": "Evaluate a scrap e-waste lot against Isolation Forest and domain rules:\n\n- Weight sanity bounds per category\n- Rate IQR deviation\n- Repeated identical submissions within 1h\n- GPS spatial jumps > 50km",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get MLOps Model Registry Version Manifest",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ml/models/manifest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "ml",
+                "models",
+                "manifest"
+              ]
+            },
+            "description": "Returns current active model versions, SHA256 checksums, metrics, and download endpoints."
+          },
+          "response": []
+        },
+        {
+          "name": "Predict price per kg and 90% prediction interval",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ml/valuation/predict",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "ml",
+                "valuation",
+                "predict"
+              ]
+            },
+            "description": "Predict scrap valuation using LightGBM quantile regression models.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Population Stability Index (PSI) drift monitoring",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ml/drift/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "ml",
+                "drift",
+                "check"
+              ]
+            },
+            "description": "Computes PSI between baseline and production feature distributions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check e-waste lot for price, weight, or spatial anomalies",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ml/anomaly/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ml",
+                "anomaly",
+                "check"
+              ]
+            },
+            "description": "Evaluate a scrap e-waste lot against Isolation Forest and domain rules:\n\n- Weight sanity bounds per category\n- Rate IQR deviation\n- Repeated identical submissions within 1h\n- GPS spatial jumps > 50km",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get MLOps Model Registry Version Manifest",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ml/models/manifest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ml",
+                "models",
+                "manifest"
+              ]
+            },
+            "description": "Returns current active model versions, SHA256 checksums, metrics, and download endpoints."
+          },
+          "response": []
+        },
+        {
+          "name": "Predict price per kg and 90% prediction interval",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ml/valuation/predict",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ml",
+                "valuation",
+                "predict"
+              ]
+            },
+            "description": "Predict scrap valuation using LightGBM quantile regression models.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Population Stability Index (PSI) drift monitoring",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{collectorToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ml/drift/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ml",
+                "drift",
+                "check"
+              ]
+            },
+            "description": "Computes PSI between baseline and production feature distributions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Health",
       "item": [
         {

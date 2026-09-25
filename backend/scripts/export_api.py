@@ -2,6 +2,12 @@
 
 import json
 from pathlib import Path
+import sys
+
+backend_dir = Path(__file__).resolve().parent.parent
+repo_root = backend_dir.parent
+sys.path.insert(0, str(backend_dir))
+sys.path.insert(0, str(repo_root))
 
 from app.main import app
 

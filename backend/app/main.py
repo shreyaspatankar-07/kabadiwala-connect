@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.handover import router as handover_router
 from app.api.v1.ledger import router as ledger_router
 from app.api.v1.matching import router as matching_router
+from app.api.v1.ml import router as ml_router
 from app.api.v1.recyclers import router as recyclers_router
 from app.api.v1.router import api_v1_router
 from app.api.v1.verify import router as verify_router
@@ -47,6 +48,7 @@ app.include_router(recyclers_router)
 app.include_router(handover_router)
 app.include_router(verify_router)
 app.include_router(ledger_router)
+app.include_router(ml_router)
 
 
 @app.get("/health", tags=["Health"])
