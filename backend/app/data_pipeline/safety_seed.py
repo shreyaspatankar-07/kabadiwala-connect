@@ -1,18 +1,23 @@
 """CLI tool and standalone runner to seed safety guidance content."""
 
-from app.db.session import SessionLocal
+import asyncio
+
+from app.core.database import AsyncSessionLocal
 from app.services.safety_service import SafetyService
 
 
-def main() -> None:
-    """Run safety content seeding."""
+async def _run() -> None:
+    """Run safety content seeding asynchronously."""
     print("Seeding safety guidance cards into database...")
-    db = SessionLocal()
-    try:
-        count = SafetyService.seed_safety_content(db)
+    async with AsyncSessionLocal() as session:
+        count = await SafetyService.seed_safety_content(session)
+        await session.commit()
         print(f"Successfully seeded {count} safety guidance cards.")
-    finally:
-        db.close()
+
+
+def main() -> None:
+    """Entry point for CLI and Makefile."""
+    asyncio.run(_run())
 
 
 if __name__ == "__main__":

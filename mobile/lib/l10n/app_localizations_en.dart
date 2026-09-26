@@ -181,4 +181,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncNow => 'Sync Now';
+
+  @override
+  String get privacyTitle => 'Privacy & Data Security';
+
+  @override
+  String get privacyCardTitle => 'Your Data is Completely Protected';
+
+  @override
+  String get privacyCardSummary =>
+      'We never ask for Aadhaar numbers, real names, or home addresses. Only scrap weights and received amounts are recorded.';
+
+  @override
+  String get privacyPoint1 => '1. No Aadhaar or identity cards required';
+
+  @override
+  String get privacyPoint2 => '2. Simple 4-digit PIN or phone OTP login';
+
+  @override
+  String get privacyPoint3 => '3. All records stay offline on phone first';
+
+  @override
+  String get privacyPoint4 => '4. Delete all your data anytime with one tap';
+
+  @override
+  String get deleteMyData => 'Delete My Data Permanently';
+
+  @override
+  String get deleteConfirmTitle => 'Confirm: Delete All Your Data?';
+
+  @override
+  String get deleteConfirmDesc =>
+      'All local and server records will be permanently removed. This action cannot be undone.';
+
+  @override
+  String get deleteConfirmAction => 'Yes, Delete Everything';
+
+  @override
+  String get cancelAction => 'Cancel';
+
+  @override
+  String get dataDeletedSuccess =>
+      'All personal data has been erased successfully';
 }

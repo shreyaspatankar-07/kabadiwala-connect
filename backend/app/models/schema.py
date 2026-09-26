@@ -182,7 +182,9 @@ class Collector(Base):
     phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
     pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     preferred_language: Mapped[PreferredLanguage] = mapped_column(
-        Enum(PreferredLanguage), default=PreferredLanguage.MR, nullable=False
+        Enum(PreferredLanguage, values_callable=lambda x: [e.value for e in x], name="preferredlanguage"),
+        default=PreferredLanguage.MR,
+        nullable=False,
     )
     operating_area: Mapped[str] = mapped_column(
         String(100), nullable=False, comment="District only"
@@ -210,8 +212,14 @@ class Material(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     image_ref: Mapped[str | None] = mapped_column(String(255), nullable=True)
     approx_weight_kg: Mapped[float] = mapped_column(Float, nullable=False)
-    condition: Mapped[MaterialCondition] = mapped_column(Enum(MaterialCondition), nullable=False)
-    source_type: Mapped[SourceType] = mapped_column(Enum(SourceType), nullable=False)
+    condition: Mapped[MaterialCondition] = mapped_column(
+        Enum(MaterialCondition, values_callable=lambda x: [e.value for e in x], name="materialcondition"),
+        nullable=False,
+    )
+    source_type: Mapped[SourceType] = mapped_column(
+        Enum(SourceType, values_callable=lambda x: [e.value for e in x], name="sourcetype"),
+        nullable=False,
+    )
     estimated_value: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
@@ -237,10 +245,13 @@ class Recycler(Base):
         String(100), unique=True, nullable=False, index=True
     )
     authorization_body: Mapped[AuthorizationBody] = mapped_column(
-        Enum(AuthorizationBody), nullable=False
+        Enum(AuthorizationBody, values_callable=lambda x: [e.value for e in x], name="authorizationbody"),
+        nullable=False,
     )
     authorization_status: Mapped[AuthorizationStatus] = mapped_column(
-        Enum(AuthorizationStatus), default=AuthorizationStatus.PENDING, nullable=False
+        Enum(AuthorizationStatus, values_callable=lambda x: [e.value for e in x], name="authorizationstatus"),
+        default=AuthorizationStatus.PENDING,
+        nullable=False,
     )
     authorization_valid_till: Mapped[date] = mapped_column(Date, nullable=False)
     phone: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -290,14 +301,20 @@ class Price(Base):
     )
     buying_price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     selling_quoted_price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
-    unit: Mapped[PriceUnit] = mapped_column(Enum(PriceUnit), default=PriceUnit.KG, nullable=False)
+    unit: Mapped[PriceUnit] = mapped_column(
+        Enum(PriceUnit, values_callable=lambda x: [e.value for e in x], name="priceunit"),
+        default=PriceUnit.KG,
+        nullable=False,
+    )
     market_min: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     market_max: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
     recycler_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("recyclers.id"), nullable=True
     )
     source: Mapped[PriceSource] = mapped_column(
-        Enum(PriceSource), default=PriceSource.SYNTHETIC, nullable=False
+        Enum(PriceSource, values_callable=lambda x: [e.value for e in x], name="pricesource"),
+        default=PriceSource.SYNTHETIC,
+        nullable=False,
     )
     is_flagged_for_review: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default="false", nullable=False
@@ -341,10 +358,16 @@ class Transaction(Base):
     )
     handover_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     payment_status: Mapped[PaymentStatus] = mapped_column(
-        Enum(PaymentStatus), default=PaymentStatus.PENDING, nullable=False, index=True
+        Enum(PaymentStatus, values_callable=lambda x: [e.value for e in x], name="paymentstatus"),
+        default=PaymentStatus.PENDING,
+        nullable=False,
+        index=True,
     )
     transaction_status: Mapped[TransactionStatus] = mapped_column(
-        Enum(TransactionStatus), default=TransactionStatus.DRAFT, nullable=False, index=True
+        Enum(TransactionStatus, values_callable=lambda x: [e.value for e in x], name="transactionstatus"),
+        default=TransactionStatus.DRAFT,
+        nullable=False,
+        index=True,
     )
     anomaly_flag: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     anomaly_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -397,7 +420,9 @@ class Traceability(Base):
     confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     confirmed_by: Mapped[str | None] = mapped_column(String(100), nullable=True)
     downstream_status: Mapped[DownstreamStatus] = mapped_column(
-        Enum(DownstreamStatus), default=DownstreamStatus.RECEIVED, nullable=False
+        Enum(DownstreamStatus, values_callable=lambda x: [e.value for e in x], name="downstreamstatus"),
+        default=DownstreamStatus.RECEIVED,
+        nullable=False,
     )
     record_hash: Mapped[str] = mapped_column(
         String(64), nullable=False, index=True, comment="SHA-256"
@@ -428,10 +453,15 @@ class LedgerEntry(Base):
     lot_id: Mapped[str | None] = mapped_column(
         String(40), ForeignKey("transactions.lot_id"), nullable=True, index=True
     )
-    entry_type: Mapped[LedgerEntryType] = mapped_column(Enum(LedgerEntryType), nullable=False)
+    entry_type: Mapped[LedgerEntryType] = mapped_column(
+        Enum(LedgerEntryType, values_callable=lambda x: [e.value for e in x], name="ledgerentrytype"),
+        nullable=False,
+    )
     amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     payment_mode: Mapped[PaymentStatus] = mapped_column(
-        Enum(PaymentStatus), default=PaymentStatus.CASH_RECEIVED, nullable=False
+        Enum(PaymentStatus, values_callable=lambda x: [e.value for e in x], name="paymentstatus"),
+        default=PaymentStatus.CASH_RECEIVED,
+        nullable=False,
     )
     description: Mapped[str] = mapped_column(String(255), nullable=False)
     balance_after: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
@@ -458,7 +488,9 @@ class SafetyContent(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, comment="e.g. SAFE-BATT-01")
     category: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     hazard_level: Mapped[HazardLevel] = mapped_column(
-        Enum(HazardLevel), default=HazardLevel.INFO, nullable=False
+        Enum(HazardLevel, values_callable=lambda x: [e.value for e in x], name="hazardlevel"),
+        default=HazardLevel.INFO,
+        nullable=False,
     )
     pictogram_url: Mapped[str] = mapped_column(String(255), nullable=False)
     audio_prompt_urls: Mapped[dict[str, str]] = mapped_column(
@@ -490,7 +522,10 @@ class SyncQueue(Base):
     action: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     payload: Mapped[dict[str, Any]] = mapped_column(JSONCompatible, nullable=False)
     status: Mapped[SyncActionStatus] = mapped_column(
-        Enum(SyncActionStatus), default=SyncActionStatus.PENDING, nullable=False, index=True
+        Enum(SyncActionStatus, values_callable=lambda x: [e.value for e in x], name="syncactionstatus"),
+        default=SyncActionStatus.PENDING,
+        nullable=False,
+        index=True,
     )
     attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -513,7 +548,7 @@ class MLTrainingSample(Base):
     price: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
     location = mapped_column(Geometry(geometry_type="POINT", srid=4326), nullable=True)
     source: Mapped[DataProvenanceSource] = mapped_column(
-        Enum(DataProvenanceSource),
+        Enum(DataProvenanceSource, values_callable=lambda x: [e.value for e in x], name="dataprovenancesource"),
         default=DataProvenanceSource.SYNTHETIC,
         nullable=False,
         index=True,
@@ -539,7 +574,10 @@ class User(Base):
     hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
     pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole), nullable=False, default=UserRole.COLLECTOR, index=True
+        Enum(UserRole, values_callable=lambda x: [e.value for e in x], name="userrole"),
+        nullable=False,
+        default=UserRole.COLLECTOR,
+        index=True,
     )
     collector_id: Mapped[str | None] = mapped_column(
         String(32), ForeignKey("collectors.collector_id"), nullable=True

@@ -61,7 +61,7 @@ async def confirm_handover(
     return await HandoverService.confirm_handover(
         data=data,
         db=db,
-        recycler_id=current_user.id,
+        recycler_id=current_user.recycler_id or data.recycler_id,
     )
 
 

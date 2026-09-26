@@ -447,6 +447,84 @@ abstract class AppLocalizations {
   /// In mr, this message translates to:
   /// **'आता सिंक करा'**
   String get syncNow;
+
+  /// No description provided for @privacyTitle.
+  ///
+  /// In mr, this message translates to:
+  /// **'गोपनीयता व डेटा सुरक्षा'**
+  String get privacyTitle;
+
+  /// No description provided for @privacyCardTitle.
+  ///
+  /// In mr, this message translates to:
+  /// **'तुमची माहिती पूर्णपणे सुरक्षित आहे'**
+  String get privacyCardTitle;
+
+  /// No description provided for @privacyCardSummary.
+  ///
+  /// In mr, this message translates to:
+  /// **'आम्ही आधार कार्ड, पूर्ण नाव किंवा घरचा पत्ता कधीही गोळा करत नाही. फक्त ई-कचऱ्याचे वजन आणि मिळालेले पैसे नोंदवले जातात.'**
+  String get privacyCardSummary;
+
+  /// No description provided for @privacyPoint1.
+  ///
+  /// In mr, this message translates to:
+  /// **'१. आधार किंवा ओळखपत्राची गरज नाही'**
+  String get privacyPoint1;
+
+  /// No description provided for @privacyPoint2.
+  ///
+  /// In mr, this message translates to:
+  /// **'२. गुप्त पिन किंवा मोबाईल ओटीपीवर चालते'**
+  String get privacyPoint2;
+
+  /// No description provided for @privacyPoint3.
+  ///
+  /// In mr, this message translates to:
+  /// **'३. सर्व माहिती आधी फोनमध्ये ऑफलाइन राहते'**
+  String get privacyPoint3;
+
+  /// No description provided for @privacyPoint4.
+  ///
+  /// In mr, this message translates to:
+  /// **'४. तुम्ही कधीही तुमची माहिती नष्ट करू शकता'**
+  String get privacyPoint4;
+
+  /// No description provided for @deleteMyData.
+  ///
+  /// In mr, this message translates to:
+  /// **'माझा सर्व डेटा नष्ट करा (Delete)'**
+  String get deleteMyData;
+
+  /// No description provided for @deleteConfirmTitle.
+  ///
+  /// In mr, this message translates to:
+  /// **'खात्री करा: सर्व डेटा नष्ट करायचा?'**
+  String get deleteConfirmTitle;
+
+  /// No description provided for @deleteConfirmDesc.
+  ///
+  /// In mr, this message translates to:
+  /// **'फोनमधील व सर्व्हरवरील सर्व जुन्या नोंदी कायमच्या पुसल्या जातील. ही क्रिया मागे घेता येणार नाही.'**
+  String get deleteConfirmDesc;
+
+  /// No description provided for @deleteConfirmAction.
+  ///
+  /// In mr, this message translates to:
+  /// **'हो, डेटा नष्ट करा'**
+  String get deleteConfirmAction;
+
+  /// No description provided for @cancelAction.
+  ///
+  /// In mr, this message translates to:
+  /// **'रद्द करा'**
+  String get cancelAction;
+
+  /// No description provided for @dataDeletedSuccess.
+  ///
+  /// In mr, this message translates to:
+  /// **'सर्व डेटा यशस्वीरीत्या नष्ट करण्यात आला'**
+  String get dataDeletedSuccess;
 }
 
 class _AppLocalizationsDelegate

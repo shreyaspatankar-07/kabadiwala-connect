@@ -249,6 +249,24 @@ Living record of project deliverables, milestones completed, and pending roadmap
 | **Prompt 16**| Unit economics model & interactive openpyxl Excel spreadsheet | Complete | 73 backend / 60 mobile passed |
 | **Prompt 17**| Compliance check, traceability matrix, pitch outline, video script, README | Complete | 100% tests & quality verified |
 
+---
+
+## Live Prototype Demo Status: Ready & Verified
+- [x] **Backend & Database Seed**:
+  - `demo_seed.py` fixed and executed: 8 authorized recyclers, 1,860 price points, 16 transactions across 3 collectors, 10 ledger entries, 3 anomalies, and 9 safety topics seeded.
+  - `safety_seed.py` fixed and executed: all 9 safety guidance cards seeded.
+  - PostgreSQL enum case handling fixed with lowercase values (`danger`, `warning`, `info`).
+  - Spatial GiST indexes created with `IF NOT EXISTS` idempotency.
+- [x] **Service Health**:
+  - FastAPI Swagger UI active: `http://localhost:8000/docs` (HTTP 200).
+  - Next.js Portal active: `http://localhost:3000` (HTTP 200).
+- [x] **Android Mobile App (Emulator `emulator-5554`)**:
+  - Resolved Android SDK prerequisites: AGP 8.11.1, Kotlin 2.2.20, NDK 28.2.13676358, Platform SDKs 33/34/35/36, CMake 3.22.1, and Build-Tools 35.0.0.
+  - Successfully compiled and launched `kabadiwala_mobile` debug APK.
+  - First-run onboarding completed in Marathi (मराठी), 4-digit PIN configured, phone skip handled.
+  - Safety (सुरक्षा) tab cards verified in Marathi with TTS audio feedback.
+  - Demo Mode enabled with yellow `DEMO` banner displayed across the top of all dashboard screens.
+
 
 
 

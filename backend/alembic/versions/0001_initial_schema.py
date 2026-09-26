@@ -1,3 +1,5 @@
+
+
 """Initial PostgreSQL and PostGIS schema migration for Kabadiwala Connect.
 
 Revision ID: 0001_initial_schema
@@ -28,6 +30,8 @@ def upgrade() -> None:
     op.create_table(
         "collectors",
         sa.Column("collector_id", sa.String(length=32), nullable=False),
+        sa.Column("phone", sa.String(length=20), nullable=True),
+        sa.Column("pin_hash", sa.String(length=255), nullable=True),
         sa.Column(
             "preferred_language",
             sa.Enum("mr", "hi", "en", name="preferredlanguage"),
@@ -37,9 +41,13 @@ def upgrade() -> None:
         sa.Column("operating_area", sa.String(length=100), nullable=False, comment="District only"),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.PrimaryKeyConstraint("collector_id"),
+        sa.UniqueConstraint("phone"),
     )
     op.create_index(
         op.f("ix_collectors_collector_id"), "collectors", ["collector_id"], unique=False
+    )
+    op.create_index(
+        op.f("ix_collectors_phone"), "collectors", ["phone"], unique=True
     )
 
     # 2. materials table
@@ -110,13 +118,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("authorization_number"),
     )
     op.create_index(op.f("ix_recyclers_id"), "recyclers", ["id"], unique=False)
-    op.create_index(
-        "idx_recyclers_facility_location",
-        "recyclers",
-        ["facility_location"],
-        unique=False,
-        postgresql_using="gist",
-    )
+    op.execute("CREATE INDEX IF NOT EXISTS idx_recyclers_facility_location ON recyclers USING gist (facility_location);")
 
     # 4. prices table
     op.create_table(
@@ -158,9 +160,7 @@ def upgrade() -> None:
     op.create_index(op.f("ix_prices_sub_category"), "prices", ["sub_category"], unique=False)
     op.create_index(op.f("ix_prices_district"), "prices", ["district"], unique=False)
     op.create_index(op.f("ix_prices_recorded_at"), "prices", ["recorded_at"], unique=False)
-    op.create_index(
-        "idx_prices_location", "prices", ["location"], unique=False, postgresql_using="gist"
-    )
+    op.execute("CREATE INDEX IF NOT EXISTS idx_prices_location ON prices USING gist (location);")
 
     # 5. transactions table
     op.create_table(
@@ -242,20 +242,8 @@ def upgrade() -> None:
     op.create_index(
         op.f("ix_transactions_anomaly_flag"), "transactions", ["anomaly_flag"], unique=False
     )
-    op.create_index(
-        "idx_transactions_collection_location",
-        "transactions",
-        ["collection_location"],
-        unique=False,
-        postgresql_using="gist",
-    )
-    op.create_index(
-        "idx_transactions_handover_location",
-        "transactions",
-        ["handover_location"],
-        unique=False,
-        postgresql_using="gist",
-    )
+    op.execute("CREATE INDEX IF NOT EXISTS idx_transactions_collection_location ON transactions USING gist (collection_location);")
+    op.execute("CREATE INDEX IF NOT EXISTS idx_transactions_handover_location ON transactions USING gist (handover_location);")
 
     # 6. traceability table
     op.create_table(
@@ -303,13 +291,7 @@ def upgrade() -> None:
     op.create_index(
         op.f("ix_traceability_record_hash"), "traceability", ["record_hash"], unique=False
     )
-    op.create_index(
-        "idx_traceability_location",
-        "traceability",
-        ["location"],
-        unique=False,
-        postgresql_using="gist",
-    )
+    op.execute("CREATE INDEX IF NOT EXISTS idx_traceability_location ON traceability USING gist (location);")
 
     # 7. ledger_entries table
     op.create_table(
@@ -442,16 +424,49 @@ def upgrade() -> None:
     op.create_index(
         op.f("ix_ml_training_samples_verified"), "ml_training_samples", ["verified"], unique=False
     )
-    op.create_index(
-        "idx_ml_samples_location",
-        "ml_training_samples",
-        ["location"],
-        unique=False,
-        postgresql_using="gist",
+    op.execute("CREATE INDEX IF NOT EXISTS idx_ml_samples_location ON ml_training_samples USING gist (location);")
+
+    # 11. users table
+    op.create_table(
+        "users",
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("email", sa.String(length=255), nullable=True),
+        sa.Column("phone", sa.String(length=20), nullable=True),
+        sa.Column("hashed_password", sa.String(length=255), nullable=True),
+        sa.Column("pin_hash", sa.String(length=255), nullable=True),
+        sa.Column("role", sa.Enum("collector", "recycler", "admin", name="userrole"), nullable=False, server_default="collector"),
+        sa.Column("collector_id", sa.String(length=32), nullable=True),
+        sa.Column("recycler_id", sa.String(length=36), nullable=True),
+        sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text("true")),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+        sa.ForeignKeyConstraint(["collector_id"], ["collectors.collector_id"]),
+        sa.ForeignKeyConstraint(["recycler_id"], ["recyclers.id"]),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("email"),
+        sa.UniqueConstraint("phone"),
     )
+    op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
+    op.create_index(op.f("ix_users_phone"), "users", ["phone"], unique=True)
+    op.create_index(op.f("ix_users_role"), "users", ["role"], unique=False)
+
+    # 12. safety_acknowledgements table
+    op.create_table(
+        "safety_acknowledgements",
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("collector_id", sa.String(length=32), nullable=False),
+        sa.Column("topic_id", sa.String(length=32), nullable=False),
+        sa.Column("acknowledged_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_safety_acknowledgements_collector_id"), "safety_acknowledgements", ["collector_id"], unique=False)
+    op.create_index(op.f("ix_safety_acknowledgements_topic_id"), "safety_acknowledgements", ["topic_id"], unique=False)
 
 
 def downgrade() -> None:
+    op.drop_table("safety_acknowledgements")
+    op.drop_table("users")
     op.drop_table("ml_training_samples")
     op.drop_table("sync_queue")
     op.drop_table("safety_content")

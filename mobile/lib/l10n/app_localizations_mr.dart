@@ -181,4 +181,45 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get syncNow => 'आता सिंक करा';
+
+  @override
+  String get privacyTitle => 'गोपनीयता व डेटा सुरक्षा';
+
+  @override
+  String get privacyCardTitle => 'तुमची माहिती पूर्णपणे सुरक्षित आहे';
+
+  @override
+  String get privacyCardSummary =>
+      'आम्ही आधार कार्ड, पूर्ण नाव किंवा घरचा पत्ता कधीही गोळा करत नाही. फक्त ई-कचऱ्याचे वजन आणि मिळालेले पैसे नोंदवले जातात.';
+
+  @override
+  String get privacyPoint1 => '१. आधार किंवा ओळखपत्राची गरज नाही';
+
+  @override
+  String get privacyPoint2 => '२. गुप्त पिन किंवा मोबाईल ओटीपीवर चालते';
+
+  @override
+  String get privacyPoint3 => '३. सर्व माहिती आधी फोनमध्ये ऑफलाइन राहते';
+
+  @override
+  String get privacyPoint4 => '४. तुम्ही कधीही तुमची माहिती नष्ट करू शकता';
+
+  @override
+  String get deleteMyData => 'माझा सर्व डेटा नष्ट करा (Delete)';
+
+  @override
+  String get deleteConfirmTitle => 'खात्री करा: सर्व डेटा नष्ट करायचा?';
+
+  @override
+  String get deleteConfirmDesc =>
+      'फोनमधील व सर्व्हरवरील सर्व जुन्या नोंदी कायमच्या पुसल्या जातील. ही क्रिया मागे घेता येणार नाही.';
+
+  @override
+  String get deleteConfirmAction => 'हो, डेटा नष्ट करा';
+
+  @override
+  String get cancelAction => 'रद्द करा';
+
+  @override
+  String get dataDeletedSuccess => 'सर्व डेटा यशस्वीरीत्या नष्ट करण्यात आला';
 }
