@@ -14,19 +14,19 @@ class DemoModeService extends ChangeNotifier {
   bool get isDemoMode => _isDemoMode;
   bool get isSimulatedOffline => _isSimulatedOffline;
 
-  void toggleDemoMode([AppDatabase? db]) {
+  Future<void> toggleDemoMode([AppDatabase? db]) async {
     _isDemoMode = !_isDemoMode;
     if (_isDemoMode && db != null) {
-      seedDemoDriftData(db);
+      await seedDemoDriftData(db);
     }
     notifyListeners();
   }
 
-  void setDemoMode(bool value, [AppDatabase? db]) {
+  Future<void> setDemoMode(bool value, [AppDatabase? db]) async {
     if (_isDemoMode != value) {
       _isDemoMode = value;
       if (_isDemoMode && db != null) {
-        seedDemoDriftData(db);
+        await seedDemoDriftData(db);
       }
       notifyListeners();
     }

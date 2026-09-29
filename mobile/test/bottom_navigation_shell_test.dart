@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kabadiwala_mobile/core/audio/audio_service.dart';
 import 'package:kabadiwala_mobile/core/theme/app_theme.dart';
+import 'package:kabadiwala_mobile/data/local_database.dart';
 import 'package:kabadiwala_mobile/ui/screens/main_navigation_shell.dart';
 import 'package:kabadiwala_mobile/ui/widgets/speaker_button.dart';
 import 'package:kabadiwala_mobile/ui/widgets/sync_status_badge.dart';
@@ -9,9 +10,15 @@ import 'package:kabadiwala_mobile/ui/widgets/sync_status_badge.dart';
 void main() {
   group('Main Navigation Shell Widget Tests', () {
     late AudioFeedbackService audioService;
+    late AppDatabase db;
 
     setUp(() {
       audioService = AudioFeedbackService(enableAudio: false);
+      db = AppDatabase.inMemory();
+    });
+
+    tearDown(() async {
+      await db.close();
     });
 
     testWidgets('Renders all 4 icon tabs, speaker button, and sync badge',
@@ -20,6 +27,7 @@ void main() {
         MaterialApp(
           theme: AppTheme.lightTheme,
           home: MainNavigationShell(
+            db: db,
             audioService: audioService,
             initialLocale: 'mr',
           ),
@@ -28,7 +36,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify persistent speaker button
-      expect(find.byType(SpeakerButton), findsOneWidget);
+      expect(find.byType(SpeakerButton), findsWidgets);
 
       // Verify sync badge
       expect(find.byType(SyncStatusBadge), findsOneWidget);
@@ -40,7 +48,7 @@ void main() {
       expect(find.text('सुरक्षा'), findsOneWidget);
 
       // Verify Initial Tab (Add Lot) contents
-      expect(find.text('मालाचा फोटो काढा'), findsOneWidget);
+      expect(find.text('कॅमेरा सुरू करा (फोटो काढा)'), findsOneWidget);
       expect(find.text('माल सुरक्षित जतन करा'), findsOneWidget);
     });
 
@@ -50,6 +58,7 @@ void main() {
         MaterialApp(
           theme: AppTheme.lightTheme,
           home: MainNavigationShell(
+            db: db,
             audioService: audioService,
             initialLocale: 'mr',
           ),
@@ -73,6 +82,7 @@ void main() {
         MaterialApp(
           theme: AppTheme.lightTheme,
           home: MainNavigationShell(
+            db: db,
             audioService: audioService,
             initialLocale: 'mr',
           ),
@@ -98,6 +108,7 @@ void main() {
         MaterialApp(
           theme: AppTheme.lightTheme,
           home: MainNavigationShell(
+            db: db,
             audioService: audioService,
             initialLocale: 'mr',
           ),

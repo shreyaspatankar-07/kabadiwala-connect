@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { mockMatchedLots } from "../../lib/api";
+import { mockMatchedLots, updateLotStatusApi } from "../../lib/api";
+import { useLotFeed } from "../../lib/useLotFeed";
 import { MatchedLot } from "../../lib/types";
 import {
   CheckCircle2,
@@ -14,27 +15,51 @@ import {
   IndianRupee,
   Truck,
   ShieldCheck,
+  RefreshCw,
+  Radio,
 } from "lucide-react";
 
 export function MatchedLotsInboxView() {
   const { t } = useLanguage();
-  const [lots, setLots] = useState<MatchedLot[]>(mockMatchedLots);
   const [counterModalLot, setCounterModalLot] = useState<MatchedLot | null>(null);
   const [counterRate, setCounterRate] = useState<string>("");
   const [actionSuccessMessage, setActionSuccessMessage] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdatedTime, setLastUpdatedTime] = useState<string>("Just now");
 
-  const handleAccept = (lotId: string) => {
-    setLots((prev) =>
-      prev.map((l) => (l.id === lotId ? { ...l, status: "accepted" } : l))
-    );
+  // Real-time lot feed: WebSocket primary, REST polling fallback on disconnect.
+  // Falls back to mockMatchedLots as initialLots so the UI is never empty.
+  const {
+    lots,
+    connectionStatus,
+    isConnected,
+    refresh: feedRefresh,
+  } = useLotFeed({
+    recycler_id: "REC-ECO-01", // TODO: replace with auth context recycler_id
+    initialLots: mockMatchedLots,
+  });
+
+  const refreshLots = useCallback(async () => {
+    setIsRefreshing(true);
+    await feedRefresh();
+    setLastUpdatedTime(new Date().toLocaleTimeString());
+    setIsRefreshing(false);
+  }, [feedRefresh]);
+
+  // Optimistic local overrides for accept / decline / counter — merged at render
+  const [localOverrides, setLocalOverrides] = useState<Record<string, Partial<MatchedLot>>>({});
+  const displayLots = lots.map((l) => ({ ...l, ...(localOverrides[l.lotId] ?? {}) }));
+
+  const handleAccept = async (lotId: string) => {
+    setLocalOverrides((prev) => ({ ...prev, [lotId]: { status: "accepted" } }));
+    await updateLotStatusApi(lotId, "accepted");
     setActionSuccessMessage(`Lot ${lotId} accepted! Handover code generated for collector.`);
     setTimeout(() => setActionSuccessMessage(null), 4000);
   };
 
-  const handleDecline = (lotId: string) => {
-    setLots((prev) =>
-      prev.map((l) => (l.id === lotId ? { ...l, status: "declined" } : l))
-    );
+  const handleDecline = async (lotId: string) => {
+    setLocalOverrides((prev) => ({ ...prev, [lotId]: { status: "declined" } }));
+    await updateLotStatusApi(lotId, "cancelled");
     setActionSuccessMessage(`Lot ${lotId} declined.`);
     setTimeout(() => setActionSuccessMessage(null), 4000);
   };
@@ -44,21 +69,15 @@ export function MatchedLotsInboxView() {
     setCounterRate(Math.round(lot.quotedPrice / lot.weightKg).toString());
   };
 
-  const submitCounterOffer = () => {
+  const submitCounterOffer = async () => {
     if (!counterModalLot) return;
     const rate = parseFloat(counterRate) || 0;
-    setLots((prev) =>
-      prev.map((l) =>
-        l.id === counterModalLot.id
-          ? {
-              ...l,
-              status: "counter_offered",
-              counterOfferRate: rate,
-              quotedPrice: rate * l.weightKg,
-            }
-          : l
-      )
-    );
+    const newPrice = rate * counterModalLot.weightKg;
+    setLocalOverrides((prev) => ({
+      ...prev,
+      [counterModalLot.lotId]: { status: "counter_offered" as any, quotedPrice: newPrice },
+    }));
+    await updateLotStatusApi(counterModalLot.lotId, "matched", newPrice);
     setActionSuccessMessage(
       `Counter-offer of ₹${rate}/kg sent to collector for Lot ${counterModalLot.lotId}`
     );
@@ -71,13 +90,39 @@ export function MatchedLotsInboxView() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white">{t.navInbox}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-extrabold text-white">{t.navInbox}</h1>
+            {isConnected ? (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full text-xs font-semibold animate-pulse">
+                <Radio className="w-3.5 h-3.5 text-emerald-400" />
+                Live · WebSocket
+              </span>
+            ) : connectionStatus === "polling" ? (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-xs font-semibold">
+                <Radio className="w-3.5 h-3.5 text-amber-400" />
+                Polling (reconnecting…)
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-700/40 border border-slate-600/30 text-slate-400 rounded-full text-xs font-semibold">
+                <Radio className="w-3.5 h-3.5" />
+                Connecting…
+              </span>
+            )}
+          </div>
           <p className="text-xs text-slate-400 mt-1">
-            Incoming matched e-waste lots from nearby informal collectors
+            Incoming matched e-waste lots from nearby informal collectors • Updated {lastUpdatedTime}
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-800 rounded-lg text-xs font-bold">
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={refreshLots}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold transition shadow-sm"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-emerald-400" : ""}`} />
+            Refresh Feed
+          </button>
+          <span className="px-3 py-1.5 bg-emerald-950 text-emerald-300 border border-emerald-800 rounded-lg text-xs font-bold">
             {lots.filter((l) => l.status === "matched").length} Pending Actions
           </span>
         </div>
@@ -93,7 +138,7 @@ export function MatchedLotsInboxView() {
 
       {/* Matched Lots Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {lots.map((lot) => {
+        {displayLots.map((lot) => {
           const ratePerKg = (lot.quotedPrice / lot.weightKg).toFixed(0);
           const isPending = lot.status === "matched";
 

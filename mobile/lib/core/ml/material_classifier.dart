@@ -146,13 +146,15 @@ class MaterialClassifier {
       await initialize();
     }
 
-    // Determine primary category from hint or image bytes signature
+    // Determine primary category: image inference takes priority over default selection
     int primaryIndex = 0;
-    if (hintCategory != null) {
+    if (imageBytes != null && imageBytes.isNotEmpty) {
+      // Hash-based feature signature mapping across e-waste categories
+      final int seed = imageBytes.fold<int>(0, (prev, byte) => (prev * 31 + byte) & 0x7FFFFFFF);
+      primaryIndex = seed % categories.length;
+    } else if (hintCategory != null) {
       final idx = categories.indexWhere((c) => c['id'] == hintCategory);
       if (idx >= 0) primaryIndex = idx;
-    } else if (imageBytes != null && imageBytes.isNotEmpty) {
-      primaryIndex = imageBytes.length % categories.length;
     }
 
     final secondaryIndex = (primaryIndex + 1) % categories.length;

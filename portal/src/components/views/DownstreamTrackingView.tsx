@@ -17,6 +17,7 @@ export function DownstreamTrackingView() {
   const { t } = useLanguage();
   const [records, setRecords] = useState<HandoverRecord[]>(mockHandoverRecords);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [pendingStages, setPendingStages] = useState<Record<string, string>>({});
 
   const stages = [
     { id: "received", label: t.stageReceived, icon: Truck },
@@ -25,13 +26,14 @@ export function DownstreamTrackingView() {
     { id: "certificate_issued", label: t.stageCertified, icon: FileCheck },
   ];
 
-  const handleUpdateStage = (refNo: string, newStage: any) => {
+  const handleUpdateStage = (refNo: string, newStage?: string) => {
+    const stageToApply = newStage || pendingStages[refNo] || "dismantled";
     setRecords((prev) =>
       prev.map((r) =>
-        r.handoverRefNo === refNo ? { ...r, downstreamStatus: newStage } : r
+        r.handoverRefNo === refNo ? { ...r, downstreamStatus: stageToApply as any } : r
       )
     );
-    setSuccessMsg(`Lot ${refNo} advanced to stage: ${newStage}`);
+    setSuccessMsg(`Lot ${refNo} advanced to stage: ${stageToApply.toUpperCase()}`);
     setTimeout(() => setSuccessMsg(null), 4000);
   };
 
@@ -78,12 +80,15 @@ export function DownstreamTrackingView() {
                   </p>
                 </div>
 
-                {/* Stage Select Dropdown */}
+                {/* Stage Select Dropdown & Update Status Button */}
                 <div className="flex items-center space-x-2 w-full sm:w-auto">
                   <select
-                    value={rec.downstreamStatus}
+                    value={pendingStages[rec.handoverRefNo] ?? rec.downstreamStatus}
                     onChange={(e) =>
-                      handleUpdateStage(rec.handoverRefNo, e.target.value)
+                      setPendingStages((prev) => ({
+                        ...prev,
+                        [rec.handoverRefNo]: e.target.value,
+                      }))
                     }
                     data-testid={`select-stage-${rec.handoverRefNo}`}
                     className="bg-slate-800 border border-slate-700 text-white text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:border-emerald-500"
@@ -94,6 +99,15 @@ export function DownstreamTrackingView() {
                       </option>
                     ))}
                   </select>
+
+                  <button
+                    type="button"
+                    data-testid={`btn-update-status-${rec.handoverRefNo}`}
+                    onClick={() => handleUpdateStage(rec.handoverRefNo)}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2.5 rounded-xl transition shadow flex items-center space-x-1"
+                  >
+                    <span>Update Status</span>
+                  </button>
                 </div>
               </div>
 

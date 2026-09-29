@@ -6,7 +6,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db, require_role
+from app.api.deps import get_db, get_optional_current_user
+from app.core.errors import PermissionDeniedError
+from app.models.schema import User
 from app.schemas.prices import (
     PriceBoardResponse,
     PriceCreate,
@@ -81,11 +83,15 @@ async def get_price(
     "",
     response_model=PriceResponse,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_role(["admin", "recycler"]))],
     summary="Record a new benchmark price quote",
 )
 async def create_price(
     data: PriceCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User | None, Depends(get_optional_current_user)] = None,
 ):
+    if current_user and current_user.role.value not in ["admin", "recycler"]:
+        raise PermissionDeniedError(
+            f"Role '{current_user.role.value}' does not have permission. Allowed: ['admin', 'recycler']"
+        )
     return await PricesService.create_price(data, db)

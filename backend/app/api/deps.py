@@ -47,6 +47,38 @@ async def get_current_user(
     return user
 
 
+async def get_optional_current_user(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security_scheme)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> User | None:
+    """Validate JWT bearer token if present, or return None for public/demo access."""
+    if not credentials:
+        return None
+
+    payload = decode_access_token(credentials.credentials)
+    if not payload:
+        return None
+
+    user_id = payload.get("sub")
+    if not user_id:
+        return None
+
+    import uuid
+
+    try:
+        user_uuid = uuid.UUID(str(user_id))
+    except ValueError:
+        return None
+
+    result = await db.execute(select(User).where(User.id == user_uuid))
+    user = result.scalar_one_or_none()
+
+    if not user or not user.is_active:
+        return None
+
+    return user
+
+
 def require_role(allowed_roles: list[str]):
     """Factory creating dependency that restricts access to specified roles."""
 
@@ -66,3 +98,4 @@ async def get_optional_idempotency_key(
     x_idempotency_key: Annotated[str | None, Header(alias="X-Idempotency-Key")] = None,
 ) -> str | None:
     return x_idempotency_key
+

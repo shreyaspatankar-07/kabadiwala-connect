@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
+import '../../core/auth/session_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/local_database.dart';
 import '../widgets/big_keypad.dart';
 import '../widgets/speaker_button.dart';
 import 'main_navigation_shell.dart';
@@ -18,11 +23,13 @@ class PinSetupScreen extends StatefulWidget {
     super.key,
     required this.audioService,
     required this.locale,
+    this.db,
     this.onPinCompleted,
   });
 
   final AudioFeedbackService audioService;
   final String locale;
+  final AppDatabase? db;
   final VoidCallback? onPinCompleted;
 
   @override
@@ -99,9 +106,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     if (_firstPin == _confirmPin) {
       HapticService.heavyImpact();
       widget.audioService.speakPrompt('pinSuccess', localeOverride: widget.locale);
-      setState(() {
-        _currentStep = PinStep.phoneOptional;
-      });
+      _finishSetup();
     } else {
       HapticService.errorAlert();
       widget.audioService.speakPrompt('pinMismatch', localeOverride: widget.locale);
@@ -116,17 +121,50 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     }
   }
 
-  void _finishSetup() {
+  void _finishSetup() async {
+    final pinHash = sha256.convert(utf8.encode(_firstPin)).toString();
+
+    // 1. Save fast session in SharedPreferences for instant cold-start restore
+    try {
+      await SessionService.saveSession(
+        collectorId: 'KC-C-7821',
+        pinHash: pinHash,
+        locale: widget.locale,
+      );
+    } catch (e) {
+      debugPrint('[PinSetup] Error saving session to SharedPreferences: $e');
+    }
+
+    // 2. Save heavy relational record to SQLite
+    if (widget.db != null && _firstPin.isNotEmpty) {
+      try {
+        await widget.db!.into(widget.db!.collectorProfile).insertOnConflictUpdate(
+              CollectorProfileCompanion.insert(
+                collectorId: 'KC-C-7821',
+                preferredLanguage: drift.Value(widget.locale),
+                operatingArea: 'Palghar',
+                quickPinHash: drift.Value(pinHash),
+                createdAt: DateTime.now(),
+              ),
+            );
+      } catch (e) {
+        debugPrint('[PinSetup] Error saving collector profile: $e');
+      }
+    }
+
     widget.onPinCompleted?.call();
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => MainNavigationShell(
-          audioService: widget.audioService,
-          initialLocale: widget.locale,
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => MainNavigationShell(
+            db: widget.db,
+            audioService: widget.audioService,
+            initialLocale: widget.locale,
+          ),
         ),
-      ),
-      (route) => false,
-    );
+        (route) => false,
+      );
+    }
   }
 
   Widget _buildPinDots(String pin) {
@@ -153,47 +191,50 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMr = widget.locale == 'mr';
+    final isHi = widget.locale == 'hi';
+
     final String titleText;
     final String subtitleText;
     final String promptKey;
 
     if (_currentStep == PinStep.enterInitial) {
       promptKey = 'enterPinPrompt';
-      titleText = widget.locale == 'mr'
+      titleText = isMr
           ? '४ अंकी पिन टाका'
-          : (widget.locale == 'hi' ? '४ अंकों का पिन दर्ज करें' : 'Enter 4-digit PIN');
-      subtitleText = widget.locale == 'mr'
+          : (isHi ? '४ अंकों का पिन दर्ज करें' : 'Enter 4-Digit PIN');
+      subtitleText = isMr
           ? 'अ‍ॅप सुरक्षित ठेवण्यासाठी'
-          : (widget.locale == 'hi' ? 'ऐप सुरक्षित रखने के लिए' : 'To keep your account secure');
+          : (isHi ? 'ऐप सुरक्षित रखने के लिए' : 'To keep your account secure');
     } else if (_currentStep == PinStep.confirmPin) {
       promptKey = 'confirmPinPrompt';
-      titleText = widget.locale == 'mr'
+      titleText = isMr
           ? 'तोच पिन पुन्हा टाका'
-          : (widget.locale == 'hi' ? 'वही पिन दोबारा दर्ज करें' : 'Confirm your PIN');
-      subtitleText = widget.locale == 'mr'
+          : (isHi ? 'वही पिन दोबारा दर्ज करें' : 'Confirm your PIN');
+      subtitleText = isMr
           ? 'खात्री करा'
-          : (widget.locale == 'hi' ? 'पुष्टि करें' : 'Verify matching PIN');
+          : (isHi ? 'पुष्टि करें' : 'Verify matching PIN');
     } else {
       promptKey = 'pinSuccess';
-      titleText = widget.locale == 'mr'
+      titleText = isMr
           ? 'मोबाईल नंबर (ऐच्छिक)'
-          : (widget.locale == 'hi' ? 'मोबाइल नंबर (वैकल्पिक)' : 'Mobile Number (Optional)');
-      subtitleText = widget.locale == 'mr'
+          : (isHi ? 'मोबाइल नंबर (वैकल्पिक)' : 'Mobile Number (Optional)');
+      subtitleText = isMr
           ? 'नाही टाकला तरी चालेल'
-          : (widget.locale == 'hi' ? 'छोड़ भी सकते हैं' : 'Can skip this step');
+          : (isHi ? 'छोड़ भी सकते हैं' : 'Can skip this step');
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.locale == 'mr' ? 'पिन सेटअप' : (widget.locale == 'hi' ? 'पिन सेटअप' : 'PIN Setup'),
+          isMr ? 'पिन सेटअप' : (isHi ? 'पिन सेटअप' : 'PIN Setup'),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         actions: [
           SpeakerButton(
             promptKey: promptKey,
             audioService: widget.audioService,
-            tooltip: 'सूचना ऐका',
+            tooltip: isMr ? 'सूचना ऐका' : (isHi ? 'सूचना सुनें' : 'Listen Instructions'),
           ),
           const SizedBox(width: 12),
         ],
@@ -241,7 +282,9 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                     border: Border.all(color: AppTheme.borderColor, width: 2),
                   ),
                   child: Text(
-                    _phoneNumber.isEmpty ? '१० अंकी मोबाईल नंबर' : _phoneNumber,
+                    _phoneNumber.isEmpty
+                        ? (isMr ? '१० अंकी मोबाईल नंबर' : (isHi ? '१० अंकों का मोबाइल नंबर' : '10-Digit Mobile Number'))
+                        : _phoneNumber,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 26,
@@ -282,7 +325,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                       child: OutlinedButton(
                         onPressed: _finishSetup,
                         child: Text(
-                          widget.locale == 'mr' ? 'सोडून द्या (Skip)' : 'छोड़ें (Skip)',
+                          isMr ? 'सोडून द्या (Skip)' : (isHi ? 'छोड़ें (Skip)' : 'Skip Step'),
                         ),
                       ),
                     ),
@@ -295,7 +338,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                         ),
                         onPressed: _finishSetup,
                         child: Text(
-                          widget.locale == 'mr' ? 'सुरू करा' : (widget.locale == 'hi' ? 'शुरू करें' : 'Start'),
+                          isMr ? 'सुरू करा' : (isHi ? 'शुरू करें' : 'Start'),
                         ),
                       ),
                     ),

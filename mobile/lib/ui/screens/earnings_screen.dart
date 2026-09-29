@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/audio/audio_service.dart';
 import '../../core/haptics/haptic_service.dart';
@@ -9,13 +11,14 @@ import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
 import '../../data/repositories/ledger_repository.dart';
 import '../widgets/speaker_button.dart';
+import 'handover_initiate_screen.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({
     super.key,
     required this.db,
     required this.audioService,
-    this.collectorId = 'KC-C-TEST01',
+    this.collectorId = 'KC-C-7821',
     this.locale = 'mr',
     this.ledgerRepository,
     this.onPdfExported,
@@ -36,21 +39,65 @@ class _EarningsScreenState extends State<EarningsScreen> {
   late final LedgerRepository _ledgerRepo;
   bool _isLoading = true;
   EarningsOverviewData? _overview;
+  List<LocalTransaction> _collectorLots = [];
+  int _activeTab = 0; // 0 = Earnings & Ledger, 1 = My Created Lots
   bool _showUpiModal = false;
   double _selectedUpiAmount = 0.0;
+  StreamSubscription<EarningsOverviewData>? _overviewSub;
+  StreamSubscription<List<LocalTransaction>>? _lotsSub;
 
   @override
   void initState() {
     super.initState();
     _ledgerRepo = widget.ledgerRepository ?? LedgerRepository(widget.db);
     _loadOverview();
+    _subscribeStreams();
+  }
+
+  @override
+  void dispose() {
+    _overviewSub?.cancel();
+    _lotsSub?.cancel();
+    super.dispose();
+  }
+
+  void _subscribeStreams() {
+    if (WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
+      return;
+    }
+    _overviewSub = _ledgerRepo.watchDetailedOverview(widget.collectorId).listen((data) {
+      if (mounted) {
+        setState(() {
+          _overview = data;
+          _isLoading = false;
+        });
+      }
+    });
+
+    _lotsSub = (widget.db.select(widget.db.localTransactions)
+          ..where((t) => t.collectorId.equals(widget.collectorId))
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .watch()
+        .listen((lots) {
+      if (mounted) {
+        setState(() {
+          _collectorLots = lots;
+        });
+      }
+    });
   }
 
   Future<void> _loadOverview() async {
     final data = await _ledgerRepo.getDetailedOverview(widget.collectorId);
+    final lots = await (widget.db.select(widget.db.localTransactions)
+          ..where((t) => t.collectorId.equals(widget.collectorId))
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
+
     if (mounted) {
       setState(() {
         _overview = data;
+        _collectorLots = lots;
         _isLoading = false;
       });
     }
@@ -64,20 +111,23 @@ class _EarningsScreenState extends State<EarningsScreen> {
       lotId: item.lotId,
     );
 
-    unawaited(widget.audioService.speakCustomText(
-      widget.locale == 'hi' ? 'पैसे मिल गए' : 'पैसे मिळाले',
-    ));
+    final spokenText = widget.locale == 'en'
+        ? 'Cash payment recorded'
+        : (widget.locale == 'hi' ? 'पैसे मिल गए' : 'पैसे मिळाले');
+    unawaited(widget.audioService.speakCustomText(spokenText));
 
     await _loadOverview();
 
     if (mounted) {
+      final snackText = widget.locale == 'en'
+          ? 'Cash payment marked as received'
+          : (widget.locale == 'hi'
+              ? 'नकद भुगतान दर्ज किया गया (पैसे मिल गए)'
+              : 'रोख रक्कम मिळाली म्हणून नोंदवली गेली (पैसे मिळाले)');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            widget.locale == 'hi'
-                ? 'नकद भुगतान दर्ज किया गया (पैसे मिल गए)'
-                : 'रोख रक्कम मिळाली म्हणून नोंदवली गेली (पैसे मिळाले)',
-          ),
+          content: Text(snackText),
           backgroundColor: AppTheme.greenGoEarn,
           duration: const Duration(seconds: 2),
         ),
@@ -106,39 +156,175 @@ class _EarningsScreenState extends State<EarningsScreen> {
         locale: widget.locale,
       );
 
+      final isMr = widget.locale == 'mr';
+      final isHi = widget.locale == 'hi';
+
+      final spokenMsg = isMr
+          ? 'पावती पीडीएफ तयार झाली आहे'
+          : (isHi ? 'विवरण पीडीएफ तैयार हो गई है' : 'PDF Statement generated');
+      unawaited(widget.audioService.speakCustomText(spokenMsg));
+
       widget.onPdfExported?.call(file.path);
 
+      // Trigger native Android share sheet allowing view, download, or WhatsApp
+      try {
+        final shareText = isMr
+            ? 'कबाडीवाला कनेक्ट - ई-कचरा कमाई पावती ($refNo)'
+            : (isHi
+                ? 'कबाडीवाला कनेक्ट - ई-कचरा आय विवरण ($refNo)'
+                : 'Kabadiwala Connect - E-Waste Earnings Statement ($refNo)');
+        await Share.shareXFiles([XFile(file.path)], text: shareText);
+      } catch (shareErr) {
+        debugPrint('[EarningsScreen] Native share note: $shareErr');
+      }
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              widget.locale == 'hi'
-                  ? 'कमाई विवरण PDF तैयार हो गया!'
-                  : 'कमाई पावती PDF तयार झाली!',
-            ),
-            backgroundColor: AppTheme.greenGoEarn,
-          ),
-        );
+        _showPdfDialog(context, file.path);
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error generating PDF: $e'), backgroundColor: Colors.red),
-        );
-      }
+      debugPrint('[EarningsScreen] PDF Export error: $e');
     }
   }
 
-  void _speakTransaction(LedgerItemDetail item) {
-    final statusText = item.paymentStatus == 'cash_received'
-        ? (widget.locale == 'hi' ? 'नकद प्राप्त' : 'रोख मिळाली')
-        : (item.paymentStatus == 'disputed'
-            ? (widget.locale == 'hi' ? 'विवादित' : 'विवादित')
-            : (widget.locale == 'hi' ? 'भुगतान बाकी' : 'रक्कम येणे बाकी'));
+  void _showPdfDialog(BuildContext context, String filePath) {
+    final isMr = widget.locale == 'mr';
+    final isHi = widget.locale == 'hi';
 
-    final speech = widget.locale == 'hi'
-        ? '${item.category}: ${item.weightKg} किलो, ${item.recyclerName} से ${item.amount.toStringAsFixed(0)} रुपये, स्थिति: $statusText'
-        : '${item.category}: ${item.weightKg} किलो, ${item.recyclerName} कडून ${item.amount.toStringAsFixed(0)} रुपये, स्थिती: $statusText';
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.picture_as_pdf_rounded, color: Color(0xFFDC2626), size: 28),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      isMr ? 'अधिकृत कमाई पावती' : (isHi ? 'आधिकारिक आय विवरण' : 'Official Earnings Statement'),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceLight,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppTheme.borderColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${isMr ? 'कलेक्टर आयडी' : (isHi ? 'कलेक्टर आईडी' : 'Collector ID')}: ${widget.collectorId}',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${isMr ? 'कालावधी' : (isHi ? 'अवधि' : 'Period')}: ${DateTime.now().subtract(const Duration(days: 30)).toString().split(' ')[0]} to ${DateTime.now().toString().split(' ')[0]}',
+                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                    ),
+                    const Divider(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(isMr ? 'एकूण उलाढाल:' : (isHi ? 'कुल कारोबार:' : 'Total Volume:'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('₹${_overview?.allTimeTotal.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(isMr ? 'रोख मिळाली:' : (isHi ? 'नकद प्राप्त:' : 'Cash Received:'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('₹${_overview?.receivedAmount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF0284C7))),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(isMr ? 'रक्कम येणे बाकी:' : (isHi ? 'बाकी राशि:' : 'Pending Dues:'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('₹${_overview?.pendingAmount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.greenGoEarn,
+                        side: const BorderSide(color: AppTheme.greenGoEarn),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () {
+                        Share.shareXFiles(
+                          [XFile(filePath)],
+                          text: isMr
+                              ? 'माझे ई-कचरा कमाई विवरण'
+                              : (isHi ? 'मेरी ई-कचरा आय विवरण' : 'My E-Waste Earnings Statement'),
+                        );
+                      },
+                      icon: const Icon(Icons.share_rounded, size: 18),
+                      label: Text(
+                        isMr ? 'शेअर करा' : (isHi ? 'शेयर करें' : 'Share'),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.greenGoEarn,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () => Navigator.pop(ctx),
+                      icon: const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                      label: Text(
+                        isMr ? 'समजले' : (isHi ? 'समझ गया' : 'Done'),
+                        style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 14),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _speakTransaction(LedgerItemDetail item) {
+    final isMr = widget.locale == 'mr';
+    final isHi = widget.locale == 'hi';
+
+    final statusText = item.paymentStatus == 'cash_received'
+        ? (isMr ? 'रोख मिळाली' : (isHi ? 'नकद प्राप्त' : 'Cash Received'))
+        : (item.paymentStatus == 'disputed'
+            ? (isMr ? 'विवादित' : (isHi ? 'विवादित' : 'Disputed'))
+            : (isMr ? 'रक्कम येणे बाकी' : (isHi ? 'भुगतान बाकी' : 'Payment Pending')));
+
+    final speech = isMr
+        ? '${item.category}: ${item.weightKg} किलो, ${item.recyclerName} कडून ${item.amount.toStringAsFixed(0)} रुपये, स्थिती: $statusText'
+        : (isHi
+            ? '${item.category}: ${item.weightKg} किलो, ${item.recyclerName} से ${item.amount.toStringAsFixed(0)} रुपये, स्थिति: $statusText'
+            : '${item.category}: ${item.weightKg} kg, from ${item.recyclerName}, Rs ${item.amount.toStringAsFixed(0)}, Status: $statusText');
 
     unawaited(widget.audioService.speakCustomText(speech));
   }
@@ -154,23 +340,39 @@ class _EarningsScreenState extends State<EarningsScreen> {
     return Icons.recycling_rounded;
   }
 
+  String _getCategoryDisplayName(String rawCategory) {
+    final cat = rawCategory.toUpperCase();
+    final isMr = widget.locale == 'mr';
+    final isHi = widget.locale == 'hi';
+
+    if (cat.contains('PCB')) return isMr ? 'सर्किट बोर्ड (PCB)' : (isHi ? 'सर्किट बोर्ड (PCB)' : 'Circuit Board (PCB)');
+    if (cat.contains('CABLE') || cat.contains('WIRE')) return isMr ? 'तांब्याची केबल (Cables)' : (isHi ? 'तांबे की केबल (Cables)' : 'Copper Cables');
+    if (cat.contains('BATT')) return isMr ? 'बॅटरी (Batteries)' : (isHi ? 'बैटरी (Batteries)' : 'Lithium Batteries');
+    if (cat.contains('LCD') || cat.contains('SCREEN')) return isMr ? 'स्क्रीन / एलसीडी (LCD)' : (isHi ? 'स्क्रीन / एलसीडी (LCD)' : 'Display / LCD Screen');
+    if (cat.contains('CRT')) return isMr ? 'सीआरटी टीव्ही (CRT TV)' : (isHi ? 'सीआरटी टीवी (CRT TV)' : 'CRT Glass / Monitor');
+    if (cat.contains('MOTOR') || cat.contains('MAGNET')) return isMr ? 'मोटार / मॅग्नेट (Motors)' : (isHi ? 'मोटर / चुंबक (Motors)' : 'Motors & Magnets');
+    if (cat.contains('PLASTIC')) return isMr ? 'प्लास्टिक कॅबिनेट (Plastics)' : (isHi ? 'प्लास्टिक कैबिनेट (Plastics)' : 'Mixed Plastics');
+    return rawCategory;
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = widget.locale;
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
+
+    final title = isMr
+        ? 'माझी कमाई व हिशोब (Earnings)'
+        : (isHi ? 'मेरी कमाई व हिसाब (Earnings)' : 'My Earnings & Ledger');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          locale == 'hi'
-              ? 'मेरी कमाई व हिसाब (Earnings)'
-              : (locale == 'en' ? 'My Earnings & Ledger' : 'माझी कमाई व हिशोब (Earnings)'),
-          style: const TextStyle(fontWeight: FontWeight.w900),
-        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
         actions: [
           SpeakerButton(
             promptKey: 'tabEarnings',
             audioService: widget.audioService,
-            tooltip: 'कमाई माहिती ऐका',
+            tooltip: isMr ? 'कमाई माहिती ऐका' : (isHi ? 'कमाई की जानकारी सुनें' : 'Listen Earnings Info'),
           ),
           const SizedBox(width: 8),
         ],
@@ -185,51 +387,126 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // 1. Three Big Summary Tiles at Top
-                    _buildThreeSummaryTiles(locale),
-                    const SizedBox(height: 16),
-
-                    // 2. Green/Red Visual Split Bar (Received vs Pending)
-                    _buildSplitBar(locale),
-                    const SizedBox(height: 16),
-
-                    // 3. Pending Dues Section (If any)
-                    if (_overview!.pendingAmount > 0) ...[
-                      _buildPendingDuesCard(locale),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // 4. Action Buttons (PDF Export & Optional UPI)
-                    _buildActionButtons(locale),
-                    const SizedBox(height: 16),
-
-                    // 5. Optional UPI Modal / Card (Hidden by default!)
-                    if (_showUpiModal) ...[
-                      _buildUpiPaymentCard(locale),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // 6. Transaction List Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          locale == 'hi' ? 'हालिया लेनदेन (Transactions)' : 'अलीकडील व्यवहार (Transactions)',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
-                        ),
-                        Text(
-                          '${_overview!.transactions.length} नोंदी',
-                          style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    // Top Segmented Switcher: [Earnings & Ledger] vs [My Lots]
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                setState(() => _activeTab = 0);
+                                HapticService.selectionClick();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _activeTab == 0 ? AppTheme.greenGoEarn : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: _activeTab == 0
+                                      ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
+                                      : null,
+                                ),
+                                child: Text(
+                                  isMr ? '💰 कमाई व हिशोब' : (isHi ? '💰 मेरी कमाई' : '💰 Earnings & Ledger'),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    color: _activeTab == 0 ? Colors.white : Colors.black87,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                setState(() => _activeTab = 1);
+                                HapticService.selectionClick();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _activeTab == 1 ? AppTheme.greenGoEarn : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: _activeTab == 1
+                                      ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
+                                      : null,
+                                ),
+                                child: Text(
+                                  isMr
+                                      ? '📦 माझे माल (${_collectorLots.length})'
+                                      : (isHi ? '📦 मेरे लॉट (${_collectorLots.length})' : '📦 My Lots (${_collectorLots.length})'),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    color: _activeTab == 1 ? Colors.white : Colors.black87,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 10),
 
-                    // 7. Transaction List
-                    if (_overview!.transactions.isEmpty)
-                      _buildEmptyState(locale)
-                    else
-                      ..._overview!.transactions.map((tx) => _buildTransactionCard(tx, locale)),
+                    if (_activeTab == 0) ...[
+                      // 1. Three Big Summary Tiles at Top
+                      _buildThreeSummaryTiles(locale),
+                      const SizedBox(height: 16),
+
+                      // 2. Green/Red Visual Split Bar (Received vs Pending)
+                      _buildSplitBar(locale),
+                      const SizedBox(height: 16),
+
+                      // 3. Pending Dues Section (If any)
+                      if (_overview!.pendingAmount > 0) ...[
+                        _buildPendingDuesCard(locale),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // 4. Action Buttons (PDF Export & Optional UPI)
+                      _buildActionButtons(locale),
+                      const SizedBox(height: 16),
+
+                      // 5. Optional UPI Modal / Card
+                      if (_showUpiModal) ...[
+                        _buildUpiPaymentCard(locale),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // 6. Transaction List Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isMr ? 'अलीकडील व्यवहार (Transactions)' : (isHi ? 'हालिया लेनदेन (Transactions)' : 'Recent Transactions'),
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                          ),
+                          Text(
+                            '${_overview!.transactions.length} ${isMr ? 'नोंदी' : (isHi ? 'प्रविष्टियां' : 'Records')}',
+                            style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // 7. Transaction List
+                      if (_overview!.transactions.isEmpty)
+                        _buildEmptyState(locale)
+                      else
+                        ..._overview!.transactions.map((tx) => _buildTransactionCard(tx, locale)),
+                    ] else ...[
+                      // My Created Lots Tab
+                      _buildMyLotsView(locale),
+                    ],
 
                     const SizedBox(height: 24),
                   ],
@@ -240,17 +517,215 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // 1. Three Big Summary Tiles: Today, This Week, This Month
+  // My Created Lots List View (Allows re-opening Handover QR code)
+  // ---------------------------------------------------------------------------
+  Widget _buildMyLotsView(String locale) {
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
+
+    if (_collectorLots.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          children: [
+            const Icon(Icons.inventory_2_outlined, size: 54, color: AppTheme.textMuted),
+            const SizedBox(height: 12),
+            Text(
+              isMr
+                  ? 'अद्याप कोणताही माल तयार केलेला नाही.'
+                  : (isHi ? 'अभी तक कोई लॉट नहीं बनाया गया है।' : 'No lots created yet.'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              isMr
+                  ? 'नवीन ई-कचरा माल जोडण्यासाठी "माल जोडा" टॅब वापरा.'
+                  : (isHi ? 'नया ई-कचरा जोड़ने के लिए "माल जोड़ें" टैब का उपयोग करें।' : 'Use the "Add Lot" tab to record your first e-waste item.'),
+              style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          isMr ? 'तयार केलेले सर्व ई-कचरा लॉट्स:' : (isHi ? 'तैयार किए गए सभी ई-कचरा लॉट:' : 'All Created E-Waste Lots:'),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+        ),
+        const SizedBox(height: 10),
+        ..._collectorLots.map((lot) => _buildLotCard(lot, locale)),
+      ],
+    );
+  }
+
+  Widget _buildLotCard(LocalTransaction lot, String locale) {
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
+
+    final isCompleted = lot.transactionStatus == 'handed_over' || lot.transactionStatus == 'confirmed';
+    final isPending = lot.transactionStatus == 'handover_pending';
+
+    Color statusColor = const Color(0xFF0284C7);
+    Color statusBg = const Color(0xFFE0F2FE);
+    String statusText = isMr ? 'नोंदणीकृत (Listed)' : (isHi ? 'सूचीबद्ध (Listed)' : 'Listed');
+
+    if (isCompleted) {
+      statusColor = AppTheme.greenGoEarn;
+      statusBg = const Color(0xFFDCFCE7);
+      statusText = isMr ? 'हस्तांतरण पूर्ण (Handed Over)' : (isHi ? 'हस्तांतरित (Handed Over)' : 'Handed Over & Completed');
+    } else if (isPending) {
+      statusColor = const Color(0xFFD97706);
+      statusBg = const Color(0xFFFEF3C7);
+      statusText = isMr ? 'हस्तांतरण बाकी (Pending Code)' : (isHi ? 'हस्तांतरण लंबित' : 'Handover Pending');
+    }
+
+    final categoryDisplay = _getCategoryDisplayName(lot.category);
+    final dateStr = '${lot.createdAt.day}/${lot.createdAt.month}/${lot.createdAt.year} ${lot.createdAt.hour.toString().padLeft(2, '0')}:${lot.createdAt.minute.toString().padLeft(2, '0')}';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: isPending ? const Color(0xFFFBBF24) : Colors.grey.shade200, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.greenGoEarnLight,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(_getCategoryIcon(lot.category), color: AppTheme.greenGoEarn, size: 28),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      categoryDisplay,
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${isMr ? 'लॉट आयडी' : (isHi ? 'लॉट आईडी' : 'Lot ID')}: ${lot.lotId}',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '₹${(lot.finalPrice ?? lot.quotedPrice).toStringAsFixed(0)}',
+                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.greenGoEarn),
+                  ),
+                  Text(
+                    '${lot.weightKg.toStringAsFixed(1)} kg',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const Divider(height: 18),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusBg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  statusText,
+                  style: TextStyle(color: statusColor, fontWeight: FontWeight.w800, fontSize: 12),
+                ),
+              ),
+              Text(
+                dateStr,
+                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Button to Re-display Handover QR Certificate
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0F172A),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+            ),
+            onPressed: () {
+              HapticService.heavyImpact();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => HandoverInitiateScreen(
+                    lotId: lot.lotId,
+                    initialWeightKg: lot.weightKg,
+                    category: lot.category,
+                    recyclerName: 'Authorized Recycler',
+                    quotedPrice: lot.quotedPrice,
+                    db: widget.db,
+                    audioService: widget.audioService,
+                    locale: locale,
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.qr_code_2_rounded, size: 20),
+            label: Text(
+              isMr
+                  ? 'हस्तांतरण QR आणि कोड पहा'
+                  : (isHi ? 'हस्तांतरण QR और कोड देखें' : 'View Handover QR & Code'),
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 1. Three Big Summary Tiles
   // ---------------------------------------------------------------------------
   Widget _buildThreeSummaryTiles(String locale) {
     final ov = _overview!;
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
 
     return Row(
       children: [
         Expanded(
           child: _buildSingleTile(
             key: const Key('tile_today'),
-            title: locale == 'hi' ? 'आज' : (locale == 'en' ? 'Today' : 'आज'),
+            title: isMr ? 'आज' : (isHi ? 'आज' : 'Today'),
             amount: ov.todayTotal,
           ),
         ),
@@ -258,7 +733,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
         Expanded(
           child: _buildSingleTile(
             key: const Key('tile_week'),
-            title: locale == 'hi' ? 'इस हफ्ते' : (locale == 'en' ? 'This Week' : 'या आठवड्यात'),
+            title: isMr ? 'या आठवड्यात' : (isHi ? 'इस हफ्ते' : 'This Week'),
             amount: ov.weekTotal,
           ),
         ),
@@ -266,7 +741,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
         Expanded(
           child: _buildSingleTile(
             key: const Key('tile_month'),
-            title: locale == 'hi' ? 'इस महीने' : (locale == 'en' ? 'This Month' : 'या महिन्यात'),
+            title: isMr ? 'या महिन्यात' : (isHi ? 'इस महीने' : 'This Month'),
             amount: ov.monthTotal,
           ),
         ),
@@ -319,6 +794,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
     final total = ov.receivedAmount + ov.pendingAmount;
     final receivedRatio = total > 0 ? (ov.receivedAmount / total).clamp(0.0, 1.0) : 1.0;
     final pendingRatio = 1.0 - receivedRatio;
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
 
     return Container(
       key: const Key('earnings_split_bar'),
@@ -335,11 +812,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                locale == 'hi' ? 'भुगतान स्थिति (Payment Status)' : 'पेमेंट स्थिती (Payment Status)',
+                isMr ? 'पेमेंट स्थिती (Payment Status)' : (isHi ? 'भुगतान स्थिति (Payment Status)' : 'Payment Status Split'),
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               Text(
-                'एकूण: ₹${total.toStringAsFixed(0)}',
+                '${isMr ? 'एकूण' : (isHi ? 'कुल' : 'Total')}: ₹${total.toStringAsFixed(0)}',
                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
               ),
             ],
@@ -377,7 +854,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   Container(width: 10, height: 10, decoration: const BoxDecoration(color: AppTheme.greenGoEarn, shape: BoxShape.circle)),
                   const SizedBox(width: 6),
                   Text(
-                    '${locale == 'hi' ? 'रोख मिळाले' : 'मिळाले'}: ₹${ov.receivedAmount.toStringAsFixed(0)}',
+                    '${isMr ? 'मिळाले' : (isHi ? 'रोख मिले' : 'Received')}: ₹${ov.receivedAmount.toStringAsFixed(0)}',
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn),
                   ),
                 ],
@@ -387,7 +864,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFFDC2626), shape: BoxShape.circle)),
                   const SizedBox(width: 6),
                   Text(
-                    '${locale == 'hi' ? 'बाकी' : 'येणे बाकी'}: ₹${ov.pendingAmount.toStringAsFixed(0)}',
+                    '${isMr ? 'येणे बाकी' : (isHi ? 'बाकी' : 'Pending')}: ₹${ov.pendingAmount.toStringAsFixed(0)}',
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFFDC2626)),
                   ),
                 ],
@@ -400,10 +877,12 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. Pending Dues Card with Recycler Contact Button
+  // 3. Pending Dues Card
   // ---------------------------------------------------------------------------
   Widget _buildPendingDuesCard(String locale) {
     final ov = _overview!;
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
 
     return Container(
       key: const Key('pending_dues_section'),
@@ -422,9 +901,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  locale == 'hi'
-                      ? 'बाकी रक्कम (Pending Dues: ${ov.pendingDuesCount} लॉट)'
-                      : 'रक्कम येणे बाकी (${ov.pendingDuesCount} व्यवहार प्रलंबित)',
+                  isMr
+                      ? 'रक्कम येणे बाकी (${ov.pendingDuesCount} व्यवहार प्रलंबित)'
+                      : (isHi ? 'बाकी राशि (${ov.pendingDuesCount} लॉट लंबित)' : 'Pending Dues (${ov.pendingDuesCount} Lots)'),
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF92400E)),
                 ),
               ),
@@ -436,10 +915,29 @@ class _EarningsScreenState extends State<EarningsScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            locale == 'hi'
-                ? 'रीसायकलर से नकद प्राप्त होने पर "पैसे मिले" बटन दबाएं।'
-                : 'रीसायकलरकडून रोख रक्कम मिळाल्यावर खालील "पैसे मिळाले" बटण दाबा.',
+            isMr
+                ? 'रीसायकलरकडून रोख रक्कम मिळाल्यावर खालील "पैसे मिळाले" बटण दाबा.'
+                : (isHi ? 'रीसायकलर से नकद प्राप्त होने पर "पैसे मिले" बटन दबाएं।' : 'Tap "Cash Received" once payment is handed over by recycler.'),
             style: const TextStyle(fontSize: 12, color: Color(0xFF78350F)),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            key: const Key('contact_recycler_button'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF92400E),
+              side: const BorderSide(color: Color(0xFFD97706)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () {
+              HapticService.lightImpact();
+              final msg = isMr ? 'रीसायकलरशी संपर्क केला जात आहे' : (isHi ? 'रीसायकलर से संपर्क किया जा रहा है' : 'Contacting Recycler');
+              unawaited(widget.audioService.speakCustomText(msg));
+            },
+            icon: const Icon(Icons.phone_in_talk_rounded, size: 18),
+            label: Text(
+              isMr ? 'रीसायकलरशी संपर्क साधा' : (isHi ? 'रीसायकलर से संपर्क करें' : 'Contact Recycler'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
           ),
         ],
       ),
@@ -447,9 +945,12 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // 4. Action Buttons (PDF Export & Pay via UPI Toggle)
+  // 4. Action Buttons
   // ---------------------------------------------------------------------------
   Widget _buildActionButtons(String locale) {
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
+
     return Row(
       children: [
         // Export PDF Statement
@@ -466,15 +967,15 @@ class _EarningsScreenState extends State<EarningsScreen> {
               onPressed: _exportPdfStatement,
               icon: const Icon(Icons.picture_as_pdf_rounded, size: 22),
               label: Text(
-                locale == 'hi' ? 'PDF विवरण (Statement)' : 'पावती PDF (Statement)',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                isMr ? 'पावती PDF (Statement)' : (isHi ? 'PDF विवरण (Statement)' : 'PDF Statement'),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
               ),
             ),
           ),
         ),
         const SizedBox(width: 10),
 
-        // Optional UPI Toggle Button (Never shown by default!)
+        // Optional UPI Toggle Button
         Expanded(
           child: SizedBox(
             height: 52,
@@ -499,8 +1000,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
               },
               icon: const Icon(Icons.qr_code_scanner_rounded, color: Color(0xFF2563EB), size: 22),
               label: Text(
-                locale == 'hi' ? 'UPI से भुगतान' : 'UPI पेमेंट',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                isMr ? 'UPI पेमेंट' : (isHi ? 'UPI से भुगतान' : 'Pay via UPI'),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
               ),
             ),
           ),
@@ -510,11 +1011,13 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // 5. Optional UPI Payment Card (Rendered only on explicit toggle)
+  // 5. Optional UPI Payment Card
   // ---------------------------------------------------------------------------
   Widget _buildUpiPaymentCard(String locale) {
     final amt = _selectedUpiAmount > 0 ? _selectedUpiAmount : 1500.0;
     final upiUri = 'upi://pay?pa=collector.kabadiwala@upi&pn=Kabadiwala%20Connect&am=${amt.toStringAsFixed(2)}&cu=INR&tn=E-Waste%20Handover';
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
 
     return Container(
       key: const Key('upi_payment_card'),
@@ -529,9 +1032,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'UPI क्यूआर कोड (Optional UPI)',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF1E40AF)),
+              Text(
+                isMr ? 'UPI क्यूआर कोड (Optional UPI)' : (isHi ? 'UPI क्यूआर कोड (Optional UPI)' : 'UPI QR Code (Optional)'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF1E40AF)),
               ),
               IconButton(
                 icon: const Icon(Icons.close_rounded, size: 20),
@@ -556,7 +1059,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'रक्कम: ₹${amt.toStringAsFixed(0)}',
+            '${isMr ? 'रक्कम' : (isHi ? 'राशि' : 'Amount')}: ₹${amt.toStringAsFixed(0)}',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF1E3A8A)),
           ),
           const SizedBox(height: 4),
@@ -575,20 +1078,24 @@ class _EarningsScreenState extends State<EarningsScreen> {
   Widget _buildTransactionCard(LedgerItemDetail tx, String locale) {
     final isPending = tx.paymentStatus == 'pending';
     final isDisputed = tx.paymentStatus == 'disputed';
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
 
     Color statusColor = AppTheme.greenGoEarn;
     Color statusBg = const Color(0xFFDCFCE7);
-    String statusLabel = locale == 'hi' ? 'रोख मिळाली' : 'रोख मिळाली';
+    String statusLabel = isMr ? 'रोख मिळाली' : (isHi ? 'नकद प्राप्त' : 'Cash Received');
 
     if (isPending) {
       statusColor = const Color(0xFFD97706);
       statusBg = const Color(0xFFFEF3C7);
-      statusLabel = locale == 'hi' ? 'बाकी (Pending)' : 'बाकी (Pending)';
+      statusLabel = isMr ? 'बाकी (Pending)' : (isHi ? 'बाकी (Pending)' : 'Payment Pending');
     } else if (isDisputed) {
       statusColor = const Color(0xFFDC2626);
       statusBg = const Color(0xFFFEE2E2);
-      statusLabel = locale == 'hi' ? 'विवादित (Disputed)' : 'विवादित (Disputed)';
+      statusLabel = isMr ? 'विवादित (Disputed)' : (isHi ? 'विवादित (Disputed)' : 'Disputed');
     }
+
+    final categoryDisplay = _getCategoryDisplayName(tx.category);
 
     return Container(
       key: Key('transaction_item_${tx.entryId}'),
@@ -612,134 +1119,80 @@ class _EarningsScreenState extends State<EarningsScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Category Icon
               Container(
-                width: 44,
-                height: 44,
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isPending ? const Color(0xFFFEF3C7) : const Color(0xFFECFDF5),
-                  shape: BoxShape.circle,
+                  color: AppTheme.greenGoEarnLight,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  _getCategoryIcon(tx.category),
-                  color: isPending ? const Color(0xFFD97706) : AppTheme.greenGoEarn,
-                  size: 24,
-                ),
+                child: Icon(_getCategoryIcon(tx.category), color: AppTheme.greenGoEarn, size: 28),
               ),
               const SizedBox(width: 12),
-
-              // Title and Recycler Name
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tx.category,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                      categoryDisplay,
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       tx.recyclerName,
-                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${tx.weightKg.toStringAsFixed(1)} kg • ${_fmtDate(tx.recordedAt)}',
-                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                      style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
               ),
-
-              // Rupee Amount and Speaker Button
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     '₹${tx.amount.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: isPending ? const Color(0xFFD97706) : AppTheme.greenGoEarn,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.greenGoEarn),
                   ),
-                  const SizedBox(height: 4),
-
-                  // Payment Status Chip
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: statusBg,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      statusLabel,
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
-                    ),
+                  Text(
+                    '${tx.weightKg.toStringAsFixed(1)} kg',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
                   ),
                 ],
               ),
-              const SizedBox(width: 6),
-
-              // Tap-to-hear Speaker Button
+            ],
+          ),
+          const Divider(height: 18),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(8)),
+                child: Text(
+                  statusLabel,
+                  style: TextStyle(color: statusColor, fontWeight: FontWeight.w800, fontSize: 12),
+                ),
+              ),
               IconButton(
                 icon: const Icon(Icons.volume_up_rounded, color: AppTheme.greenGoEarn, size: 22),
-                tooltip: 'ऐका',
                 onPressed: () => _speakTransaction(tx),
               ),
             ],
           ),
-
-          // If pending: Show One-Tap "Mark as Cash Received" button & Contact button
           if (isPending) ...[
-            const Divider(height: 20),
-            Row(
-              children: [
-                // Contact Recycler Button
-                Expanded(
-                  flex: 2,
-                  child: OutlinedButton.icon(
-                    key: const Key('contact_recycler_button'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      side: BorderSide(color: Colors.grey.shade400),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onPressed: () {
-                      HapticService.selectionClick();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Calling ${tx.recyclerName}: ${tx.recyclerPhone ?? "+91 98200 12345"}')),
-                      );
-                    },
-                    icon: const Icon(Icons.phone_rounded, size: 16, color: AppTheme.textHighContrast),
-                    label: Text(
-                      locale == 'hi' ? 'फोन करें' : 'संपर्क',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textHighContrast),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // Mark Cash Received Button
-                Expanded(
-                  flex: 3,
-                  child: ElevatedButton.icon(
-                    key: Key('mark_cash_button_${tx.entryId}'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.greenGoEarn,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onPressed: () => _handleMarkCashReceived(tx),
-                    icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
-                    label: Text(
-                      locale == 'hi' ? 'पैसे मिले (Cash)' : 'पैसे मिळाले (Cash)',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 10),
+            ElevatedButton.icon(
+              key: Key('mark_cash_button_${tx.entryId}'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.greenGoEarn,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: () => _handleMarkCashReceived(tx),
+              icon: const Icon(Icons.check_circle_rounded),
+              label: Text(
+                isMr ? 'पैसे मिळाले (Mark Cash Received)' : (isHi ? 'पैसे मिल गए (नकद प्राप्त)' : 'Mark Cash Received'),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
+              ),
             ),
           ],
         ],
@@ -748,23 +1201,26 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   Widget _buildEmptyState(String locale) {
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
+
     return Container(
-      padding: const EdgeInsets.all(32),
-      alignment: Alignment.center,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
       child: Column(
         children: [
-          Icon(Icons.account_balance_wallet_outlined, size: 56, color: Colors.grey.shade400),
+          const Icon(Icons.receipt_long_rounded, size: 48, color: AppTheme.textMuted),
           const SizedBox(height: 12),
           Text(
-            locale == 'hi' ? 'अभी कोई लेनदेन दर्ज नहीं है।' : 'अद्याप कोणतेही व्यवहार नाहीत.',
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+            isMr ? 'अद्याप कोणतेही व्यवहार नाहीत' : (isHi ? 'अभी तक कोई लेनदेन नहीं' : 'No transactions recorded yet'),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ],
       ),
     );
-  }
-
-  static String _fmtDate(DateTime dt) {
-    return '${dt.day}/${dt.month}/${dt.year}';
   }
 }

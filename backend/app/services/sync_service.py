@@ -1,12 +1,13 @@
-"""Offline-first batch push and delta pull synchronization engine."""
-
+import hashlib
+import json
 from datetime import UTC, datetime
 from typing import Any
 
+from geoalchemy2.elements import WKTElement
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.schema import SafetyContent, SyncActionStatus, SyncQueue
+from app.models.schema import DownstreamStatus, SafetyContent, SyncActionStatus, SyncQueue, Traceability
 from app.schemas.ledger import LedgerEntryCreate
 from app.schemas.lots import LotCreate, LotStatusUpdate
 from app.schemas.sync import (
@@ -62,11 +63,39 @@ class SyncService:
                     entry_create = LedgerEntryCreate(**op.payload)
                     await LedgerService.create_entry(collector_id, entry_create, db)
 
-                elif op.action == "update_lot":
+                elif op.action == "record_handover":
                     lot_id = op.payload.get("lot_id")
-                    status_update = LotStatusUpdate(**op.payload)
-                    if lot_id:
-                        await LotsService.update_lot_status(lot_id, status_update, db)
+                    ref_no = op.payload.get("handover_ref_no")
+                    if lot_id and ref_no:
+                        trace_res = await db.execute(
+                            select(Traceability).where(Traceability.lot_id == lot_id)
+                        )
+                        existing_trace = trace_res.scalar_one_or_none()
+                        if existing_trace:
+                            existing_trace.handover_ref_no = ref_no
+                            if "signature" in op.payload:
+                                existing_trace.qr_payload = json.dumps(op.payload, separators=(",", ":"))
+                        else:
+                            now_utc = datetime.now(UTC)
+                            qr_payload_str = json.dumps(op.payload, separators=(",", ":"))
+                            rec_hash = hashlib.sha256(f"{qr_payload_str}:{'0'*64}".encode()).hexdigest()
+                            new_trace = Traceability(
+                                lot_id=lot_id,
+                                photo_hashes=op.payload.get("photo_hashes", []),
+                                weight_kg=float(op.payload.get("weight_kg", 0.0)),
+                                timestamp=now_utc,
+                                gps_lat=float(op.payload.get("gps_lat", 19.0760)),
+                                gps_lng=float(op.payload.get("gps_lng", 72.8777)),
+                                location=WKTElement(f"POINT({op.payload.get('gps_lng', 72.8777)} {op.payload.get('gps_lat', 19.0760)})", srid=4326),
+                                handover_ref_no=ref_no,
+                                qr_payload=qr_payload_str,
+                                recycler_confirmation=False,
+                                downstream_status=DownstreamStatus.RECEIVED,
+                                record_hash=rec_hash,
+                                prev_hash="0" * 64,
+                                created_at=now_utc,
+                            )
+                            db.add(new_trace)
 
                 processed_ids.append(op.client_tx_id)
 

@@ -11,10 +11,10 @@ void main() {
     late AppDatabase db;
     late AudioFeedbackService audioService;
 
-    setUp(() {
+    setUp(() async {
       db = AppDatabase.inMemory();
       audioService = AudioFeedbackService();
-      DemoModeService.instance.setDemoMode(false);
+      await DemoModeService.instance.setDemoMode(false);
       DemoModeService.instance.setSimulatedOffline(false);
     });
 
@@ -68,7 +68,7 @@ void main() {
     });
 
     testWidgets('2. MainNavigationShell displays persistent yellow DEMO banner when active', (tester) async {
-      DemoModeService.instance.setDemoMode(true, db);
+      await DemoModeService.instance.setDemoMode(true, db);
 
       await tester.pumpWidget(
         MaterialApp(

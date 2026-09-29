@@ -64,6 +64,7 @@ class ConditionChips extends StatelessWidget {
           children: conditions.map((item) {
             final isSelected = selectedCondition == item.cond;
             return Material(
+              key: Key('condition_${item.cond.name}'),
               color: isSelected ? item.bg : AppTheme.surfaceLight,
               borderRadius: BorderRadius.circular(16),
               child: InkWell(

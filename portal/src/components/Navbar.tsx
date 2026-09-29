@@ -58,6 +58,7 @@ export function Navbar() {
           {user && (
             <div className="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
               <button
+                data-testid="btn-role-switcher"
                 onClick={() => switchRole(user.role === "recycler" ? "admin" : "recycler")}
                 className="flex items-center space-x-1.5 text-xs font-semibold px-2.5 py-1 rounded-md text-amber-300 hover:bg-slate-700 transition"
                 title="Switch Role for Demo testing"
@@ -85,7 +86,14 @@ export function Navbar() {
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
-          ) : null}
+          ) : (
+            <button
+              data-testid="btn-nav-login"
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-extrabold transition shadow shadow-emerald-950"
+            >
+              Login
+            </button>
+          )}
         </div>
       </div>
     </header>

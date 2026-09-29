@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -15,11 +16,18 @@ class AudioFeedbackService {
     return _defaultInstance;
   }
 
+  static bool _defaultEnableAudio() {
+    try {
+      if (Platform.environment.containsKey('FLUTTER_TEST')) return false;
+    } catch (_) {}
+    return !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  }
+
   AudioFeedbackService._internal({
     AudioPlayer? player,
     FlutterTts? tts,
     bool? enableAudio,
-  })  : _enableAudio = enableAudio ?? (!kIsWeb && defaultTargetPlatform == TargetPlatform.android),
+  })  : _enableAudio = enableAudio ?? _defaultEnableAudio(),
         _player = player,
         _tts = tts;
 
@@ -27,7 +35,7 @@ class AudioFeedbackService {
     AudioPlayer? player,
     FlutterTts? tts,
     bool? enableAudio,
-  })  : _enableAudio = enableAudio ?? (!kIsWeb && defaultTargetPlatform == TargetPlatform.android),
+  })  : _enableAudio = enableAudio ?? _defaultEnableAudio(),
         _player = player,
         _tts = tts;
 

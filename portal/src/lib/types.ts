@@ -59,6 +59,8 @@ export interface MatchedLot {
   status: "matched" | "accepted" | "counter_offered" | "declined" | "handover_pending" | "handed_over";
   counterOfferRate?: number;
   handoverRefNo?: string;
+  collectorConfirmed?: boolean;
+  recyclerConfirmed?: boolean;
 }
 
 export interface HandoverRecord {
@@ -72,6 +74,8 @@ export interface HandoverRecord {
   finalPrice: number;
   paymentMethod: "cash_received" | "digital_paid";
   paymentStatus: "cash_received" | "pending" | "digital_paid" | "disputed";
+  collectorConfirmed?: boolean;
+  recyclerConfirmed?: boolean;
   confirmedAt: string;
   recordHash: string;
   downstreamStatus: "received" | "dismantled" | "processed" | "certificate_issued";

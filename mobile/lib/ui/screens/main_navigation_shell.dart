@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/haptics/haptic_service.dart';
@@ -6,7 +7,7 @@ import '../../data/local_database.dart';
 import '../../data/repositories/lot_repository.dart';
 import '../../data/repositories/price_repository.dart';
 import '../../data/repositories/ledger_repository.dart';
-import '../widgets/big_tile.dart';
+import '../../data/sync/sync_engine.dart';
 import '../widgets/demo_banner.dart';
 import '../widgets/speaker_button.dart';
 import '../widgets/sync_status_badge.dart';
@@ -48,11 +49,14 @@ class MainNavigationShell extends StatefulWidget {
 class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
   bool _isOnline = false; // offline-first default
-  int _pendingCount = 2; // simulates offline queued items for demonstration
+  int _pendingCount = 2; // offline queue count
 
   late final AppDatabase _db;
   late final bool _ownsDb;
   late final LedgerRepository _ledgerRepo;
+  late final PriceRepository _priceRepo;
+  SyncEngine? _syncEngine;
+  StreamSubscription<SyncEngineState>? _syncSub;
 
   final List<String> _tabPromptKeys = [
     'tabAddLot',
@@ -71,10 +75,26 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       _db = widget.lotRepository!.db;
       _ownsDb = false;
     } else {
-      _db = AppDatabase.inMemory();
+      _db = AppDatabase();
       _ownsDb = true;
     }
     _ledgerRepo = widget.ledgerRepository ?? LedgerRepository(_db);
+    _priceRepo = widget.priceRepository ?? PriceRepository(_db);
+
+    if (!WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
+      try {
+        _syncEngine = SyncEngine(db: _db);
+        _syncSub = _syncEngine!.stateStream.listen((state) {
+          if (!mounted) return;
+          setState(() {
+            _isOnline = state.isOnline;
+            _pendingCount = state.pendingQueueCount;
+          });
+        });
+      } catch (e) {
+        debugPrint('[MainNavigationShell] SyncEngine init fallback: $e');
+      }
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.audioService.speakPrompt(_tabPromptKeys[_currentIndex]);
@@ -83,6 +103,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   @override
   void dispose() {
+    _syncSub?.cancel();
+    _syncEngine?.dispose();
     if (_ownsDb) {
       _db.close();
     }
@@ -106,114 +128,176 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       case 1:
         return locale == 'mr' ? 'आजचे दर फलक' : (locale == 'hi' ? 'आज का भाव' : 'Price Board');
       case 2:
-        return locale == 'mr' ? 'माझी कमाई' : (locale == 'hi' ? 'मेरी कमाई' : 'Earnings');
+        return locale == 'mr' ? 'माझी कमाई' : (locale == 'hi' ? 'मेरी कमाई' : 'Earnings & Lots');
       case 3:
-        return locale == 'mr' ? 'सुरक्षा नियम' : (locale == 'hi' ? 'सुरक्षा नियम' : 'Safety');
+        return locale == 'mr' ? 'सुरक्षा नियम' : (locale == 'hi' ? 'सुरक्षा नियम' : 'Safety Guidance');
       default:
-        return 'कबाडीवाला कनेक्ट';
+        return locale == 'en' ? 'Kabadiwala Connect' : 'कबाडीवाला कनेक्ट';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final locale = widget.initialLocale;
+    final isMr = locale == 'mr';
+    final isHi = locale == 'hi';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _appBarTitle,
-          style: const TextStyle(fontWeight: FontWeight.w900),
-        ),
-        actions: [
-          IconButton(
-            key: const Key('btn_open_privacy_screen'),
-            tooltip: locale == 'mr' ? 'गोपनीयता व सुरक्षा' : (locale == 'hi' ? 'गोपनीयता एवं सुरक्षा' : 'Privacy & Security'),
-            icon: const Icon(Icons.privacy_tip_outlined, color: AppTheme.greenGoEarn, size: 26),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PrivacyScreen(
-                    audioService: widget.audioService,
-                    db: _db,
-                    locale: locale,
-                  ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        if (_currentIndex != 0) {
+          setState(() {
+            _currentIndex = 0;
+          });
+          return;
+        }
+
+        final exitTitle = isMr ? 'अ‍ॅपमधून बाहेर पडायचे आहे का?' : (isHi ? 'ऐप बंद करें?' : 'Exit App?');
+        final exitContent = isMr
+            ? 'आपण कबाडीवाला कनेक्ट अ‍ॅपमधून बाहेर पडू इच्छिता?'
+            : (isHi ? 'क्या आप कबाडीवाला कनेक्ट से बाहर निकलना चाहते हैं?' : 'Are you sure you want to exit Kabadiwala Connect?');
+        final cancelText = isMr ? 'नाही (रद्द करा)' : (isHi ? 'नहीं, चालू रखें' : 'Cancel');
+        final confirmText = isMr ? 'होय, बाहेर पडा' : (isHi ? 'हां, बाहर निकलें' : 'Exit');
+
+        final shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Row(
+              children: [
+                const Icon(Icons.exit_to_app_rounded, color: AppTheme.dangerRed, size: 28),
+                const SizedBox(width: 8),
+                Text(
+                  exitTitle,
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
                 ),
-              );
-            },
-          ),
-          // Persistent speaker button on every screen
-          SpeakerButton(
-            promptKey: _tabPromptKeys[_currentIndex],
-            audioService: widget.audioService,
-            tooltip: 'या स्क्रीनबद्दल माहिती ऐका',
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            DemoBannerWidget(locale: locale),
-            // Connectivity & sync queue badge
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: SyncStatusBadge(
-                isOnline: _isOnline,
-                pendingCount: _pendingCount,
-                onTapSync: () {
-                  setState(() {
-                    _isOnline = !_isOnline;
-                    if (_isOnline) _pendingCount = 0;
-                  });
-                  HapticService.mediumImpact();
-                  widget.audioService.speakPrompt(_isOnline ? 'syncSuccess' : 'offlineNotice');
-                },
-              ),
+              ],
             ),
-            Expanded(
-              child: IndexedStack(
-                index: _currentIndex,
-                children: [
-                  _buildAddLotTab(context, locale),
-                  _buildPriceBoardTab(context, locale),
-                  _buildEarningsTab(context, locale),
-                  _buildSafetyTab(context, locale),
-                ],
-              ),
+            content: Text(
+              exitContent,
+              style: const TextStyle(fontSize: 14),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(cancelText, style: const TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.dangerRed),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(confirmText, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+        if (shouldExit == true && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            _appBarTitle,
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+          actions: [
+            IconButton(
+              key: const Key('btn_open_privacy_screen'),
+              tooltip: locale == 'mr' ? 'गोपनीयता व सुरक्षा' : (locale == 'hi' ? 'गोपनीयता एवं सुरक्षा' : 'Privacy & Security'),
+              icon: const Icon(Icons.privacy_tip_outlined, color: AppTheme.greenGoEarn, size: 26),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PrivacyScreen(
+                      audioService: widget.audioService,
+                      db: _db,
+                      locale: locale,
+                    ),
+                  ),
+                );
+              },
+            ),
+            // Persistent speaker button on every screen
+            SpeakerButton(
+              promptKey: _tabPromptKeys[_currentIndex],
+              audioService: widget.audioService,
+              tooltip: 'या स्क्रीनबद्दल माहिती ऐका',
+            ),
+            const SizedBox(width: 8),
           ],
         ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: AppTheme.borderColor, width: 1.5)),
+        body: SafeArea(
+          child: Column(
+            children: [
+              DemoBannerWidget(locale: locale),
+              // Connectivity & sync queue badge
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: SyncStatusBadge(
+                  isOnline: _isOnline,
+                  pendingCount: _pendingCount,
+                  onTapSync: () async {
+                    setState(() {
+                      _isOnline = true;
+                    });
+                    HapticService.mediumImpact();
+                    try {
+                      if (_syncEngine != null) {
+                        await _syncEngine!.triggerSync();
+                      } else {
+                        await _priceRepo.fetchLatestPricesFromServer();
+                      }
+                    } catch (_) {}
+                    widget.audioService.speakPrompt(_isOnline ? 'syncSuccess' : 'offlineNotice');
+                  },
+                ),
+              ),
+              Expanded(
+                child: IndexedStack(
+                  index: _currentIndex,
+                  children: [
+                    _buildAddLotTab(context, locale),
+                    _buildPriceBoardTab(context, locale),
+                    _buildEarningsTab(context, locale),
+                    _buildSafetyTab(context, locale),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onTabSelected,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.add_box_rounded, size: 30),
-              activeIcon: const Icon(Icons.add_box, size: 32),
-              label: locale == 'mr' ? 'माल जोडा' : (locale == 'hi' ? 'माल जोड़ें' : 'Add Lot'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.currency_rupee_rounded, size: 30),
-              activeIcon: const Icon(Icons.monetization_on, size: 32),
-              label: locale == 'mr' ? 'दर फलक' : (locale == 'hi' ? 'भाव सूची' : 'Price Board'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.account_balance_wallet_outlined, size: 30),
-              activeIcon: const Icon(Icons.account_balance_wallet, size: 32),
-              label: locale == 'mr' ? 'कमाई' : (locale == 'hi' ? 'कमाई' : 'Earnings'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.shield_outlined, size: 30),
-              activeIcon: const Icon(Icons.shield, size: 32),
-              label: locale == 'mr' ? 'सुरक्षा' : (locale == 'hi' ? 'सुरक्षा' : 'Safety'),
-            ),
-          ],
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: AppTheme.borderColor, width: 1.5)),
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onTabSelected,
+            items: [
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.add_box_rounded, size: 30, key: Key('nav_add_lot')),
+                activeIcon: const Icon(Icons.add_box, size: 32, key: Key('nav_add_lot')),
+                label: locale == 'mr' ? 'माल जोडा' : (locale == 'hi' ? 'माल जोड़ें' : 'Add Lot'),
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.currency_rupee_rounded, size: 30, key: Key('nav_price_board')),
+                activeIcon: const Icon(Icons.monetization_on, size: 32, key: Key('nav_price_board')),
+                label: locale == 'mr' ? 'दर फलक' : (locale == 'hi' ? 'भाव सूची' : 'Price Board'),
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.account_balance_wallet_outlined, size: 30, key: Key('nav_earnings')),
+                activeIcon: const Icon(Icons.account_balance_wallet, size: 32, key: Key('nav_earnings')),
+                label: locale == 'mr' ? 'कमाई' : (locale == 'hi' ? 'कमाई' : 'Earnings'),
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.shield_outlined, size: 30, key: Key('nav_safety')),
+                activeIcon: const Icon(Icons.shield, size: 32, key: Key('nav_safety')),
+                label: locale == 'mr' ? 'सुरक्षा' : (locale == 'hi' ? 'सुरक्षा' : 'Safety'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -223,157 +307,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   // Tab 1: Add Lot (माल जोडा)
   // ---------------------------------------------------------------------------
   Widget _buildAddLotTab(BuildContext context, String locale) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Large Photo Capture Button
-          Container(
-            height: 140,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.borderColor, width: 2),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () async {
-                await HapticService.mediumImpact();
-                if (!context.mounted) return;
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => AddLotScreen(
-                      audioService: widget.audioService,
-                      lotRepository: widget.lotRepository ?? LotRepository(AppDatabase.inMemory()),
-                      priceRepository: widget.priceRepository ?? PriceRepository(AppDatabase.inMemory()),
-                      locale: locale,
-                    ),
-                  ),
-                );
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.camera_alt_rounded,
-                    size: 54,
-                    color: AppTheme.greenGoEarn,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    locale == 'mr' ? 'मालाचा फोटो काढा' : (locale == 'hi' ? 'माल का फोटो लें' : 'Take Item Photo'),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.textHighContrast,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Categories Grid
-          Text(
-            locale == 'mr' ? 'प्रकार निवडा:' : (locale == 'hi' ? 'प्रकार चुनें:' : 'Select Category:'),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: BigTile(
-                  title: locale == 'mr' ? 'सर्किट बोर्ड' : 'सर्किट बोर्ड',
-                  subtitle: 'PCB',
-                  icon: Icons.memory_rounded,
-                  isSelected: true,
-                  primaryColor: AppTheme.greenGoEarn,
-                  minHeight: 90,
-                  onTap: () {},
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: BigTile(
-                  title: locale == 'mr' ? 'तांब्याची वायर' : 'तांबा तार',
-                  subtitle: 'Copper',
-                  icon: Icons.cable_rounded,
-                  isSelected: false,
-                  primaryColor: const Color(0xFFD97706),
-                  minHeight: 90,
-                  onTap: () {},
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: BigTile(
-                  title: locale == 'mr' ? 'बॅटरी' : 'बैटरी',
-                  subtitle: 'Battery',
-                  icon: Icons.battery_charging_full_rounded,
-                  isSelected: false,
-                  primaryColor: AppTheme.dangerRed,
-                  minHeight: 90,
-                  onTap: () {},
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: BigTile(
-                  title: locale == 'mr' ? 'टीव्ही/स्क्रीन' : 'स्क्रीन',
-                  subtitle: 'Display',
-                  icon: Icons.tv_rounded,
-                  isSelected: false,
-                  primaryColor: const Color(0xFF0284C7),
-                  minHeight: 90,
-                  onTap: () {},
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Save Offline Button (Min 56dp target)
-          SizedBox(
-            height: 64,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.greenGoEarn,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              onPressed: () async {
-                await HapticService.heavyImpact();
-                setState(() {
-                  _pendingCount++;
-                });
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      locale == 'mr'
-                          ? 'माल फोनमध्ये सुरक्षित सेव्ह झाला!'
-                          : 'माल फोन में सुरक्षित सहेज लिया गया!',
-                    ),
-                    backgroundColor: AppTheme.greenGoEarn,
-                  ),
-                );
-              },
-              icon: const Icon(Icons.save_rounded, size: 30),
-              label: Text(
-                locale == 'mr' ? 'माल सुरक्षित जतन करा' : (locale == 'hi' ? 'माल सुरक्षित सहेजें' : 'Save Lot Offline'),
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
+    return AddLotScreen(
+      audioService: widget.audioService,
+      lotRepository: widget.lotRepository ?? LotRepository(_db),
+      priceRepository: _priceRepo,
+      locale: locale,
     );
   }
 
@@ -383,8 +321,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   Widget _buildPriceBoardTab(BuildContext context, String locale) {
     return PriceBoardScreen(
       audioService: widget.audioService,
-      priceRepository: widget.priceRepository,
+      priceRepository: _priceRepo,
       locale: locale,
+      enableLiveStream: !WidgetsBinding.instance.runtimeType.toString().contains('Test'),
     );
   }
 

@@ -203,7 +203,15 @@ class OfflineMatchingEngine {
 
     // 2. Category accepted
     final lotCat = lot.category.trim().toLowerCase();
-    final accepts = candidate.materialsAccepted.any((m) => m.trim().toLowerCase() == lotCat);
+    final accepts = candidate.materialsAccepted.isEmpty ||
+        candidate.materialsAccepted.any((m) {
+          final mat = m.trim().toLowerCase();
+          return mat == lotCat ||
+              mat.contains(lotCat) ||
+              lotCat.contains(mat) ||
+              mat == 'all' ||
+              mat == 'e-waste';
+        });
     if (!accepts) {
       return false;
     }
@@ -252,6 +260,18 @@ class OfflineMatchingEngine {
 
   static double _round4(double val) => (val * 10000).round() / 10000;
 
+  static double _extractOfferedRate(Map<String, double> rates, String category) {
+    if (rates.containsKey(category)) return rates[category]!;
+    final catLower = category.toLowerCase();
+    for (final entry in rates.entries) {
+      final keyLower = entry.key.toLowerCase();
+      if (keyLower.contains(catLower) || catLower.contains(keyLower)) {
+        return entry.value;
+      }
+    }
+    return rates.values.isNotEmpty ? rates.values.first : 120.0;
+  }
+
   /// Ranks candidates deterministically using multi-criteria weighted sum.
   static List<RankedRecyclerResult> rankCandidates(
     List<RecyclerCandidateData> candidates,
@@ -269,7 +289,7 @@ class OfflineMatchingEngine {
       );
 
       if (passesHardFilters(c, lot, distKm, currentDate)) {
-        final rate = c.offeredRates[lot.category] ?? 0.0;
+        final rate = _extractOfferedRate(c.offeredRates, lot.category);
         passing.add(_PassingCandidate(c, distKm, rate));
       }
     }

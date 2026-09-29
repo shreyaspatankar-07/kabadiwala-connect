@@ -69,6 +69,7 @@ class _SpeakerButtonState extends State<SpeakerButton> with SingleTickerProvider
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          key: widget.key == null ? const Key('speaker_btn') : null,
           borderRadius: BorderRadius.circular(widget.size / 2),
           onTap: _handleTap,
           child: Container(

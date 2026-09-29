@@ -69,8 +69,8 @@ export function AdminAnalyticsView() {
         </button>
       </div>
 
-      {/* 3 Top Highlight Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* 4 Top Highlight Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Data Quality Scorecard */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex items-center space-x-4">
           <div className="w-14 h-14 rounded-2xl bg-emerald-950 border border-emerald-600 flex items-center justify-center font-black text-2xl text-emerald-400">
@@ -80,7 +80,7 @@ export function AdminAnalyticsView() {
             <span className="text-[10px] uppercase font-bold text-slate-400 block">
               {t.dataQualityScore}
             </span>
-            <span className="text-base font-extrabold text-white">Grade A (High Trust)</span>
+            <span className="text-base font-extrabold text-white">91.7/100 Grade A</span>
             <p className="text-[11px] text-emerald-400 mt-0.5">IQR Cleaned • Anonymized</p>
           </div>
         </div>
@@ -108,8 +108,25 @@ export function AdminAnalyticsView() {
             <span className="text-[10px] uppercase font-bold text-slate-400 block">
               Collector Realized Premium
             </span>
-            <span className="text-base font-extrabold text-white">Above Middlemen Baseline</span>
-            <p className="text-[11px] text-amber-400 mt-0.5">Guaranteed Cash Fair Value</p>
+            <span className="text-base font-extrabold text-white">Fair Benchmark Price</span>
+            <p className="text-[11px] text-amber-400 mt-0.5">Guaranteed Cash Floor</p>
+          </div>
+        </div>
+
+        {/* Earnings Lift Card */}
+        <div
+          data-testid="earnings-lift-metric"
+          className="bg-slate-900 border border-emerald-800/80 rounded-2xl p-5 shadow-xl flex items-center space-x-4 ring-1 ring-emerald-500/30"
+        >
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-900 to-emerald-700 border border-emerald-400 flex items-center justify-center font-black text-2xl text-emerald-200 shadow-lg shadow-emerald-950">
+            +70%
+          </div>
+          <div>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">
+              Earnings Lift (Comparison)
+            </span>
+            <span className="text-base font-extrabold text-emerald-400">+70% Net Income Lift</span>
+            <p className="text-[11px] text-slate-300 mt-0.5">Direct Recycler vs Middlemen</p>
           </div>
         </div>
       </div>

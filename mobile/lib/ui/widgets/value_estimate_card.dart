@@ -99,7 +99,7 @@ class ValueEstimateCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      locale == 'hi' ? 'न्यूनतम: ₹ $roundedMin' : 'किमान: ₹ $roundedMin',
+                      locale == 'en' ? 'Min: ₹ $roundedMin' : (locale == 'hi' ? 'न्यूनतम: ₹ $roundedMin' : 'किमान: ₹ $roundedMin'),
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -107,7 +107,7 @@ class ValueEstimateCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      locale == 'hi' ? 'अधिकतम: ₹ $roundedMax' : 'कमाल: ₹ $roundedMax',
+                      locale == 'en' ? 'Max: ₹ $roundedMax' : (locale == 'hi' ? 'अधिकतम: ₹ $roundedMax' : 'कमाल: ₹ $roundedMax'),
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,

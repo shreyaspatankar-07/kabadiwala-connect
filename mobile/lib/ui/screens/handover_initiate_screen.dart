@@ -26,6 +26,7 @@ class HandoverInitiateScreen extends StatefulWidget {
     this.initialGpsLat = 19.0760,
     this.initialGpsLng = 72.8777,
     this.handoverService,
+    this.autoGenerateQr = true,
   });
 
   final String lotId;
@@ -39,6 +40,7 @@ class HandoverInitiateScreen extends StatefulWidget {
   final double initialGpsLat;
   final double initialGpsLng;
   final OfflineHandoverService? handoverService;
+  final bool autoGenerateQr;
 
   @override
   State<HandoverInitiateScreen> createState() => _HandoverInitiateScreenState();
@@ -56,6 +58,11 @@ class _HandoverInitiateScreenState extends State<HandoverInitiateScreen> {
     _handoverService = widget.handoverService ?? OfflineHandoverService(widget.db);
     _weightInputString = widget.initialWeightKg.toStringAsFixed(
         widget.initialWeightKg.truncateToDouble() == widget.initialWeightKg ? 0 : 1);
+    if (widget.autoGenerateQr) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _generateHandoverQR();
+      });
+    }
   }
 
   double get _currentWeight => double.tryParse(_weightInputString) ?? widget.initialWeightKg;

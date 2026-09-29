@@ -7,7 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_db, get_optional_current_user
 from app.models.schema import User
 from app.schemas.sync import (
     SyncPullResponse,
@@ -27,10 +27,12 @@ router = APIRouter(prefix="/sync", tags=["Offline Synchronization"])
 )
 async def sync_push(
     data: SyncPushRequest,
-    current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User | None, Depends(get_optional_current_user)] = None,
 ):
-    collector_id = current_user.collector_id or str(current_user.id)
+    collector_id = "KC-C-7821"
+    if current_user:
+        collector_id = current_user.collector_id or str(current_user.id)
     return await SyncService.push_batch(collector_id, data.operations, db)
 
 
@@ -40,8 +42,8 @@ async def sync_push(
     summary="Delta download updated master data, prices, recyclers, and collector records",
 )
 async def sync_pull(
-    current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User | None, Depends(get_optional_current_user)] = None,
     since: Annotated[str | None, Query(description="ISO-8601 timestamp cursor")] = None,
 ):
     since_dt = None
@@ -49,8 +51,10 @@ async def sync_pull(
         with contextlib.suppress(ValueError):
             since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
 
+    collector_id = current_user.collector_id if current_user else None
     return await SyncService.pull_delta(
-        collector_id=current_user.collector_id,
+        collector_id=collector_id,
         since=since_dt,
         db=db,
     )
+

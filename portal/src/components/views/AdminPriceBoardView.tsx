@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { mockPriceBoards } from "../../lib/api";
+import { mockPriceBoards, fetchPriceBoardApi, overridePriceApi } from "../../lib/api";
 import { EwasteCategory, PriceBoardItem } from "../../lib/types";
-import { TrendingUp, ArrowUpRight, ArrowDownRight, Minus, Edit3, CheckCircle2 } from "lucide-react";
+import { TrendingUp, ArrowUpRight, ArrowDownRight, Minus, Edit3, CheckCircle2, Loader2 } from "lucide-react";
 
 export function AdminPriceBoardView() {
   const { t } = useLanguage();
@@ -13,26 +13,71 @@ export function AdminPriceBoardView() {
   const [overrideCategory, setOverrideCategory] = useState<EwasteCategory>("PCB");
   const [newRate, setNewRate] = useState("430");
   const [overrideMsg, setOverrideMsg] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleOverride = (e: React.FormEvent) => {
+  useEffect(() => {
+    let isMounted = true;
+    fetchPriceBoardApi(overrideDistrict).then((res) => {
+      if (isMounted && res && res.length > 0) {
+        setPrices(res);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [overrideDistrict]);
+
+  const handleOverride = async (e: React.FormEvent) => {
     e.preventDefault();
     const rate = parseFloat(newRate) || 0;
-    setPrices((prev) =>
-      prev.map((p) =>
-        p.district === overrideDistrict && p.category === overrideCategory
-          ? {
-              ...p,
-              buyingPrice: rate,
-              isOverridden: true,
-              lastUpdated: new Date().toISOString(),
-            }
-          : p
-      )
-    );
+    setIsSubmitting(true);
+
+    const success = await overridePriceApi({
+      district: overrideDistrict,
+      category: overrideCategory,
+      buyingPrice: rate,
+    });
+
+    setPrices((prev) => {
+      const exists = prev.some((p) => p.district === overrideDistrict && p.category === overrideCategory);
+      if (exists) {
+        return prev.map((p) =>
+          p.district === overrideDistrict && p.category === overrideCategory
+            ? {
+                ...p,
+                buyingPrice: rate,
+                isOverridden: true,
+                lastUpdated: new Date().toISOString(),
+              }
+            : p
+        );
+      } else {
+        return [
+          {
+            district: overrideDistrict,
+            category: overrideCategory,
+            buyingPrice: rate,
+            marketMin: Math.round(rate * 0.9),
+            marketMax: Math.round(rate * 1.1),
+            recyclerOfferedPrice: Math.round(rate * 1.05),
+            trend: "up" as const,
+            percentChange: 0,
+            confidence: "high" as const,
+            isOverridden: true,
+            lastUpdated: new Date().toISOString(),
+          },
+          ...prev,
+        ];
+      }
+    });
+
+    setIsSubmitting(false);
     setOverrideMsg(
-      `Price for ${overrideDistrict} - ${overrideCategory} overridden to ₹${rate}/kg.`
+      success
+        ? `Price for ${overrideDistrict} - ${overrideCategory} updated to ₹${rate}/kg and synced to server!`
+        : `Price for ${overrideDistrict} - ${overrideCategory} updated locally to ₹${rate}/kg (offline mode).`
     );
-    setTimeout(() => setOverrideMsg(null), 4000);
+    setTimeout(() => setOverrideMsg(null), 5000);
   };
 
   return (
@@ -110,10 +155,16 @@ export function AdminPriceBoardView() {
           <div className="flex items-end">
             <button
               type="submit"
-              data-testid="btn-apply-price-override"
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-2.5 px-4 rounded-xl shadow transition text-xs"
+              disabled={isSubmitting}
+              data-testid="btn-save-override"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-extrabold py-2.5 px-4 rounded-xl shadow transition text-xs flex items-center justify-center space-x-1.5"
             >
-              Apply Price Override
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="w-4 h-4" />
+              )}
+              <span>{isSubmitting ? "Syncing..." : "Save Override"}</span>
             </button>
           </div>
         </div>
@@ -138,6 +189,7 @@ export function AdminPriceBoardView() {
                 <th className="px-6 py-3.5">7-Day Trend</th>
                 <th className="px-6 py-3.5">Confidence</th>
                 <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 font-medium">
@@ -190,6 +242,21 @@ export function AdminPriceBoardView() {
                     ) : (
                       <span className="text-slate-500 text-[10px]">System Median</span>
                     )}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      type="button"
+                      data-testid={`btn-override-${p.category}-${p.district}`}
+                      onClick={() => {
+                        setOverrideDistrict(p.district);
+                        setOverrideCategory(p.category);
+                        setNewRate(p.buyingPrice.toString());
+                      }}
+                      className="bg-slate-800 hover:bg-emerald-600 text-emerald-400 hover:text-white px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold transition inline-flex items-center gap-1"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Override</span>
+                    </button>
                   </td>
                 </tr>
               ))}

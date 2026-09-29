@@ -369,6 +369,8 @@ class Transaction(Base):
         nullable=False,
         index=True,
     )
+    collector_confirmed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
+    recycler_confirmed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     anomaly_flag: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     anomaly_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
@@ -465,6 +467,8 @@ class LedgerEntry(Base):
     )
     description: Mapped[str] = mapped_column(String(255), nullable=False)
     balance_after: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+    collector_confirmed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
+    recycler_confirmed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     recorded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False, index=True
     )

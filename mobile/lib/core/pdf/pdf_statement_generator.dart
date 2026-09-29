@@ -32,7 +32,12 @@ class PdfStatementGenerator {
       locale: locale,
     );
 
-    final outputDir = targetDirectory ?? await getApplicationDocumentsDirectory();
+    Directory outputDir;
+    try {
+      outputDir = targetDirectory ?? await getTemporaryDirectory();
+    } catch (_) {
+      outputDir = targetDirectory ?? await getApplicationDocumentsDirectory();
+    }
     final file = File('${outputDir.path}/earnings_statement_$statementRefNo.pdf');
     await file.writeAsBytes(pdfBytes, flush: true);
     return file;

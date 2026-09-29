@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/local_database.dart';
 import '../../data/repositories/price_repository.dart';
 import '../widgets/big_keypad.dart';
 import '../widgets/sparkline_chart.dart';
@@ -145,6 +146,7 @@ class PriceBoardScreen extends StatefulWidget {
     this.district = 'Palghar',
     this.locale = 'mr',
     this.forcedRecordedAt, // For testing cache staleness
+    this.enableLiveStream = true,
   });
 
   final AudioFeedbackService audioService;
@@ -152,6 +154,7 @@ class PriceBoardScreen extends StatefulWidget {
   final String district;
   final String locale;
   final DateTime? forcedRecordedAt;
+  final bool enableLiveStream;
 
   @override
   State<PriceBoardScreen> createState() => _PriceBoardScreenState();
@@ -160,11 +163,92 @@ class PriceBoardScreen extends StatefulWidget {
 class _PriceBoardScreenState extends State<PriceBoardScreen> {
   CategoryBoardItem? _selectedCategory;
   late DateTime _lastCacheTime;
+  late String _selectedDistrict;
+  StreamSubscription<List<CachedPrice>>? _priceSub;
+  Map<String, CachedPrice> _cachedPricesMap = {};
+  bool _isRefreshing = false;
+
+  static const List<String> kAvailableDistricts = [
+    'Palghar',
+    'Thane',
+    'Mumbai',
+    'Pune',
+    'Nashik',
+    'Nagpur',
+    'Chhatrapati Sambhajinagar',
+    'Kolhapur',
+    'Solapur',
+  ];
 
   @override
   void initState() {
     super.initState();
     _lastCacheTime = widget.forcedRecordedAt ?? DateTime.now();
+    _selectedDistrict = widget.district;
+    _initPrices();
+  }
+
+  Future<void> _initPrices() async {
+    if (widget.priceRepository == null) return;
+    try {
+      final existing = await widget.priceRepository!.db.select(widget.priceRepository!.db.cachedPrices).get();
+      if (existing.isNotEmpty && mounted) {
+        _applyPrices(existing);
+      } else {
+        await widget.priceRepository!.seedInitialPricesIfEmpty();
+        if (mounted) _loadExistingPrices();
+      }
+    } catch (_) {}
+    _subscribePrices();
+  }
+
+  Future<void> _loadExistingPrices() async {
+    if (widget.priceRepository == null) return;
+    try {
+      final existing = await widget.priceRepository!.db.select(widget.priceRepository!.db.cachedPrices).get();
+      if (existing.isNotEmpty && mounted) {
+        _applyPrices(existing);
+      }
+    } catch (_) {}
+  }
+
+  void _applyPrices(List<CachedPrice> prices) {
+    final map = <String, CachedPrice>{};
+    DateTime? latest;
+    for (final p in prices) {
+      final canonical = PriceRepository.normalizeCategory(p.category);
+      final isTargetDistrict = p.district.toLowerCase() == _selectedDistrict.toLowerCase();
+      final key = canonical;
+      if (isTargetDistrict || !map.containsKey(key)) {
+        map[key] = p;
+      }
+      if (latest == null || p.recordedAt.isAfter(latest)) {
+        latest = p.recordedAt;
+      }
+    }
+    setState(() {
+      _cachedPricesMap = map;
+      if (widget.forcedRecordedAt == null && latest != null) {
+        _lastCacheTime = latest;
+      }
+    });
+  }
+
+  void _subscribePrices() {
+    if (!widget.enableLiveStream) return;
+    _priceSub?.cancel();
+    if (widget.priceRepository != null) {
+      _priceSub = widget.priceRepository!.watchAllPrices().listen((prices) {
+        if (!mounted) return;
+        _applyPrices(prices);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _priceSub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -173,6 +257,47 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
     if (widget.forcedRecordedAt != oldWidget.forcedRecordedAt) {
       _lastCacheTime = widget.forcedRecordedAt ?? DateTime.now();
     }
+    if (widget.district != oldWidget.district) {
+      _selectedDistrict = widget.district;
+      _subscribePrices();
+    }
+  }
+
+  List<CategoryBoardItem> get _displayedCategories {
+    return kStandardCategories.map((base) {
+      final cached = _cachedPricesMap[base.id];
+      if (cached == null) return base;
+
+      final trend = cached.buyingPrice > base.defaultRate
+          ? 'up'
+          : (cached.buyingPrice < base.defaultRate ? 'down' : base.trend);
+
+      final pct = base.defaultRate > 0
+          ? (((cached.buyingPrice - base.defaultRate) / base.defaultRate) * 100.0)
+          : 0.0;
+
+      return CategoryBoardItem(
+        id: base.id,
+        nameMr: base.nameMr,
+        nameHi: base.nameHi,
+        nameEn: base.nameEn,
+        icon: base.icon,
+        defaultRate: cached.buyingPrice,
+        marketMin: cached.marketMin,
+        marketMax: cached.marketMax,
+        recyclerQuote: cached.sellingQuotedPrice,
+        trend: trend,
+        pctChange: double.parse(pct.toStringAsFixed(1)),
+      );
+    }).toList();
+  }
+
+  CategoryBoardItem get _activeDetailCategory {
+    if (_selectedCategory == null) return kStandardCategories.first;
+    return _displayedCategories.firstWhere(
+      (c) => c.id == _selectedCategory!.id,
+      orElse: () => _selectedCategory!,
+    );
   }
 
   bool get _isCacheStale => PriceRepository.isCacheStale(_lastCacheTime);
@@ -189,6 +314,37 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
           style: const TextStyle(fontWeight: FontWeight.w900),
         ),
         actions: [
+          IconButton(
+            key: const Key('btn_refresh_prices'),
+            tooltip: isHi ? 'दर अपडेट करें' : 'दर अपडेट करा',
+            icon: _isRefreshing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.greenGoEarn),
+                  )
+                : const Icon(Icons.refresh_rounded, color: AppTheme.greenGoEarn),
+            onPressed: _isRefreshing
+                ? null
+                : () async {
+                    setState(() => _isRefreshing = true);
+                    await HapticService.selectionClick();
+                    final ok = await widget.priceRepository?.fetchLatestPricesFromServer();
+                    if (mounted) {
+                      setState(() => _isRefreshing = false);
+                      final msg = ok == true
+                          ? (isHi ? 'ताज़ा भाव अपडेट हो गए' : 'नवीन बाजार भाव अपडेट झाले')
+                          : (isHi ? 'ऑफलाइन मोड: सेव्ह केलेले भाव' : 'ऑफलाइन मोड: सेव्ह केलेले दर');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(msg, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          backgroundColor: ok == true ? AppTheme.greenGoEarn : AppTheme.yellowPending,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+          ),
           SpeakerButton(
             audioService: widget.audioService,
             promptKey: 'tabPriceBoard',
@@ -209,7 +365,7 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
             Expanded(
               child: _selectedCategory == null
                   ? _buildCategoryGrid(isHi)
-                  : _buildDetailView(_selectedCategory!, isHi),
+                  : _buildDetailView(_activeDetailCategory, isHi),
             ),
           ],
         ),
@@ -265,15 +421,52 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.location_on_rounded, color: AppTheme.greenGoEarn, size: 20),
-              const SizedBox(width: 4),
-              Text(
-                'जिल्हा: ${widget.district}',
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+          PopupMenuButton<String>(
+            key: const Key('price_board_district_picker'),
+            tooltip: 'जिल्हा निवडा / Select District',
+            onSelected: (dist) {
+              HapticService.selectionClick();
+              setState(() {
+                _selectedDistrict = dist;
+              });
+              _subscribePrices();
+            },
+            itemBuilder: (context) => kAvailableDistricts.map((d) {
+              return PopupMenuItem<String>(
+                value: d,
+                child: Row(
+                  children: [
+                    Icon(
+                      _selectedDistrict == d ? Icons.check_circle_rounded : Icons.location_city_rounded,
+                      color: _selectedDistrict == d ? AppTheme.greenGoEarn : AppTheme.textMuted,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(d, style: TextStyle(fontWeight: _selectedDistrict == d ? FontWeight.w900 : FontWeight.w600)),
+                  ],
+                ),
+              );
+            }).toList(),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppTheme.greenGoEarn, width: 1.5),
               ),
-            ],
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on_rounded, color: AppTheme.greenGoEarn, size: 20),
+                  const SizedBox(width: 4),
+                  Text(
+                    'जिल्हा: $_selectedDistrict',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppTheme.textHighContrast),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.arrow_drop_down_rounded, color: AppTheme.greenGoEarn, size: 22),
+                ],
+              ),
+            ),
           ),
           Row(
             children: [
@@ -302,18 +495,23 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
   // 1. Picture Grid of 7 Material Categories
   // ---------------------------------------------------------------------------
   Widget _buildCategoryGrid(bool isHi) {
-    return GridView.builder(
-      key: const Key('price_board_category_grid'),
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
-        childAspectRatio: 0.92,
-      ),
-      itemCount: kStandardCategories.length,
-      itemBuilder: (context, index) {
-        final cat = kStandardCategories[index];
+    final categories = _displayedCategories;
+    return RefreshIndicator(
+      onRefresh: () async {
+        await widget.priceRepository?.fetchLatestPricesFromServer();
+      },
+      child: GridView.builder(
+        key: const Key('price_board_category_grid'),
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          childAspectRatio: 0.92,
+        ),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final cat = categories[index];
         final isTrendUp = cat.trend == 'up';
         final isTrendDown = cat.trend == 'down';
         final trendColor = isTrendUp
@@ -435,8 +633,9 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
           ),
         );
       },
-    );
-  }
+    ),
+  );
+}
 
   // ---------------------------------------------------------------------------
   // 2. Detail View with Sparkline, Range Bar, and Speaker Read-out

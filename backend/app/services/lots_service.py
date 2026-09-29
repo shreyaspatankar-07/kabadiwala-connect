@@ -1,6 +1,8 @@
 """Lots (Transactions) management with offline idempotency service."""
 
 import hashlib
+import logging
+import math
 from datetime import UTC, datetime
 
 from geoalchemy2.elements import WKTElement
@@ -10,7 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import NotFoundError
 from app.models.schema import (
+    AuthorizationStatus,
     PaymentStatus,
+    Recycler,
     SyncActionStatus,
     SyncQueue,
     Traceability,
@@ -18,6 +22,69 @@ from app.models.schema import (
     TransactionStatus,
 )
 from app.schemas.lots import LotCreate, LotResponse, LotStatusUpdate
+
+logger = logging.getLogger("kabadiwala.lots")
+
+# GPS coarsening grid (≈500 m) — same constant as data pipeline anonymizer
+_GPS_GRID = 0.005
+
+
+def _coarsen(value: float) -> float:
+    return round(round(value / _GPS_GRID) * _GPS_GRID, 4)
+
+
+async def _find_matched_recycler_ids(
+    db: AsyncSession,
+    category: str,
+    lot_lat: float,
+    lot_lng: float,
+) -> list[str]:
+    """Return IDs of verified recyclers that accept the lot category and service area.
+
+    Used to scope the WebSocket broadcast — only matched recyclers receive the event.
+    """
+    result = await db.execute(
+        select(Recycler).where(
+            Recycler.authorization_status == AuthorizationStatus.VERIFIED,
+        )
+    )
+    recyclers = result.scalars().all()
+
+    matched: list[str] = []
+    cat_lower = category.strip().lower()
+    for r in recyclers:
+        # Category check
+        accepted = [m.strip().lower() for m in (r.materials_accepted or [])]
+        if cat_lower not in accepted:
+            continue
+
+        # Location check (pickup radius OR service-area district/state)
+        try:
+            pt = to_shape(r.facility_location)
+            r_lat, r_lng = pt.y, pt.x
+        except Exception:
+            r_lat, r_lng = 0.0, 0.0
+
+        dist_km = _haversine(lot_lat, lot_lng, r_lat, r_lng)
+        sa = r.service_area or {}
+        in_area = (
+            (r.pickup_radius_km and dist_km <= float(r.pickup_radius_km))
+            or sa.get("all") is True
+            or sa.get("state") == "Maharashtra"
+            or dist_km <= float(sa.get("max_distance_km", 0))
+        )
+        if in_area:
+            matched.append(r.id)
+
+    return matched
+
+
+def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    R = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
 class LotsService:
@@ -53,6 +120,8 @@ class LotsService:
             handover_at=t.handover_at,
             payment_status=t.payment_status.value,
             transaction_status=t.transaction_status.value,
+            collector_confirmed=getattr(t, "collector_confirmed", True),
+            recycler_confirmed=getattr(t, "recycler_confirmed", False),
             anomaly_flag=t.anomaly_flag,
             anomaly_reason=t.anomaly_reason,
             updated_at=t.updated_at,
@@ -64,8 +133,19 @@ class LotsService:
         collector_id: str,
         data: LotCreate,
         db: AsyncSession,
+        broadcast: bool = True,
     ) -> LotResponse:
-        """Idempotent lot creation: replayed requests return existing lot without duplication."""
+        """Idempotent lot creation: replayed requests return existing lot without duplication.
+
+        On first insert, broadcasts a ``lot.created`` WebSocket event to all matched,
+        verified recyclers with coarsened GPS (≈500 m grid). Replayed requests are
+        returned immediately without re-broadcasting.
+        """
+        logger.info(
+            "[lots] receive create_or_get_lot collector=%s client_lot_id=%s",
+            collector_id, data.client_lot_id,
+        )
+
         # 1. Check if client_lot_id was already processed in sync_queue
         res_sync = await db.execute(
             select(SyncQueue).where(
@@ -81,6 +161,7 @@ class LotsService:
             )
             lot = res_lot.scalar_one_or_none()
             if lot:
+                logger.info("[lots] idempotent replay lot_id=%s — skipping broadcast", existing_lot_id)
                 return cls._to_response(lot)
 
         # 2. Generate deterministic human-friendly lot ID
@@ -95,6 +176,7 @@ class LotsService:
         res_tx = await db.execute(select(Transaction).where(Transaction.lot_id == lot_id))
         existing_tx = res_tx.scalar_one_or_none()
         if existing_tx:
+            logger.info("[lots] lot_id already exists=%s — skipping broadcast", lot_id)
             return cls._to_response(existing_tx)
 
         # 4. Create new transaction
@@ -146,6 +228,49 @@ class LotsService:
 
         await db.commit()
         await db.refresh(lot)
+        logger.info("[lots] committed lot_id=%s category=%s", lot_id, data.category)
+
+        # 5. Broadcast to matched recyclers AFTER successful commit
+        if broadcast:
+            try:
+                from app.api.v1.ws import manager  # local import to avoid circular deps
+
+                matched_ids = await _find_matched_recycler_ids(
+                    db, data.category, data.collection_lat, data.collection_lng
+                )
+                # Only broadcast to recyclers who are currently connected
+                connected_matched = [
+                    rid for rid in matched_ids if rid in manager.connected_recycler_ids
+                ]
+                if connected_matched:
+                    ws_payload = {
+                        "type": "lot.created",
+                        "lot": {
+                            "lot_id": lot_id,
+                            "category": data.category,
+                            "weight_kg": float(data.weight_kg),
+                            "quoted_price": float(data.quoted_price),
+                            # Coarsened GPS — no exact location of collector sent
+                            "collection_lat": _coarsen(data.collection_lat),
+                            "collection_lng": _coarsen(data.collection_lng),
+                            "created_at": created_dt.isoformat(),
+                            "transaction_status": TransactionStatus.LISTED.value,
+                        },
+                    }
+                    sent = await manager.broadcast_to_recyclers(connected_matched, ws_payload)
+                    logger.info(
+                        "[lots] broadcast lot_id=%s matched=%d connected=%d sent=%d",
+                        lot_id, len(matched_ids), len(connected_matched), sent,
+                    )
+                else:
+                    logger.info(
+                        "[lots] no connected recyclers for lot_id=%s matched=%d",
+                        lot_id, len(matched_ids),
+                    )
+            except Exception as exc:  # noqa: BLE001
+                # Broadcast failure must never roll back a committed lot
+                logger.warning("[lots] broadcast error lot_id=%s err=%s", lot_id, exc)
+
         return cls._to_response(lot)
 
     @classmethod
@@ -155,6 +280,8 @@ class LotsService:
         collector_id: str | None = None,
         recycler_id: str | None = None,
         status: str | None = None,
+        settled: bool | None = None,
+        payment_status: str | None = None,
         limit: int = 50,
     ) -> list[LotResponse]:
         query = select(Transaction)
@@ -164,6 +291,18 @@ class LotsService:
             query = query.where(Transaction.recycler_id == recycler_id)
         if status:
             query = query.where(Transaction.transaction_status == TransactionStatus(status))
+        if payment_status:
+            query = query.where(Transaction.payment_status == PaymentStatus(payment_status))
+        if settled is True:
+            query = query.where(
+                Transaction.collector_confirmed.is_(True),
+                Transaction.recycler_confirmed.is_(True),
+            )
+        elif settled is False:
+            query = query.where(
+                (Transaction.collector_confirmed.is_(False))
+                | (Transaction.recycler_confirmed.is_(False))
+            )
 
         result = await db.execute(query.order_by(Transaction.created_at.desc()).limit(limit))
         lots = result.scalars().all()

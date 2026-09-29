@@ -12,7 +12,7 @@ interface AuthContextType {
 
 const defaultRecyclerUser: UserSession = {
   id: "REC-01",
-  email: "recycler@ecorecycle.com",
+  email: "recycler@ecorecycle.in",
   name: "Maharashtra Eco-Recyclers",
   role: "recycler",
   recyclerId: "REC-ECO-01",
@@ -45,10 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (email: string, role: UserRole) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const effectiveRole: UserRole =
+      cleanEmail.includes("admin") || cleanEmail === "admin@jnarddc.gov.in"
+        ? "admin"
+        : role;
+
     const newUser: UserSession =
-      role === "admin"
-        ? { ...defaultAdminUser, email }
-        : { ...defaultRecyclerUser, email };
+      effectiveRole === "admin"
+        ? { ...defaultAdminUser, email: cleanEmail || "admin@jnarddc.gov.in" }
+        : { ...defaultRecyclerUser, email: cleanEmail || "recycler@ecorecycle.in" };
     setUser(newUser);
     localStorage.setItem("kc_portal_session", JSON.stringify(newUser));
   };

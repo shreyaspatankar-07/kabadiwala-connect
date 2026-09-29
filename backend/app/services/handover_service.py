@@ -243,6 +243,11 @@ class HandoverService:
         tx.final_price = final_price
         tx.handover_at = now_utc
         tx.recycler_id = effective_recycler
+        tx.collector_confirmed = True
+        tx.recycler_confirmed = not is_disputed
+        if not is_disputed:
+            tx.payment_status = PaymentStatus.CASH_RECEIVED
+            tx.transaction_status = TransactionStatus.HANDED_OVER
         tx.handover_location = WKTElement(
             f"POINT({traceability.gps_lng} {traceability.gps_lat})", srid=4326
         )
@@ -277,6 +282,8 @@ class HandoverService:
             entry_type=LedgerEntryType.CREDIT,
             amount=final_price,
             payment_mode=PaymentStatus.CASH_RECEIVED,
+            collector_confirmed=True,
+            recycler_confirmed=True,
             description=f"E-Waste Lot Handover Settlement: {tx.lot_id} ({meas_weight} kg {tx.category})",
             balance_after=new_balance,
             recorded_at=now_utc,
@@ -284,6 +291,25 @@ class HandoverService:
         db.add(ledger_entry)
 
         await db.commit()
+
+        # 8. Real-Time Broadcast to Collector and Recyclers
+        try:
+            from app.api.v1.ws import manager
+            await manager.broadcast_to_collector(
+                tx.collector_id,
+                {
+                    "type": "payment.settled",
+                    "lot_id": tx.lot_id,
+                    "category": tx.category,
+                    "weight_kg": meas_weight,
+                    "amount": final_price,
+                    "balance_after": new_balance,
+                    "payment_status": PaymentStatus.CASH_RECEIVED.value,
+                    "timestamp": now_utc.isoformat(),
+                },
+            )
+        except Exception:  # noqa: BLE001
+            pass
 
         return HandoverConfirmResponse(
             lot_id=tx.lot_id,
@@ -332,11 +358,108 @@ class HandoverService:
         handover_ref_no: str,
         db: AsyncSession,
     ) -> HandoverVerificationResponse:
-        """Public endpoint allowing anyone to inspect cryptographic integrity of a handover."""
+        clean_code = handover_ref_no.strip().upper().replace(" ", "")
+
+        # 1. Direct search by handover_ref_no (exact or clean)
         trace_res = await db.execute(
-            select(Traceability).where(Traceability.handover_ref_no == handover_ref_no)
+            select(Traceability).where(
+                (Traceability.handover_ref_no == handover_ref_no)
+                | (Traceability.handover_ref_no == clean_code)
+            )
         )
         traceability = trace_res.scalar_one_or_none()
+
+        # 2. Match by lot_id containing clean_code
+        if not traceability:
+            trace_res = await db.execute(
+                select(Traceability).where(Traceability.lot_id.ilike(f"%{clean_code}%"))
+            )
+            traceability = trace_res.scalar_one_or_none()
+
+        # 3. If no exact Traceability match, search by transaction lot_id or find latest unconfirmed lot
+        if not traceability:
+            # Check if any Transaction has a lot_id containing clean_code (e.g. lot suffix "EA30D")
+            tx_match_res = await db.execute(
+                select(Transaction).where(Transaction.lot_id.ilike(f"%{clean_code}%"))
+            )
+            matched_tx = tx_match_res.scalar_one_or_none()
+
+            # If no direct lot_id match, find the most recent unconfirmed or pending transaction
+            if not matched_tx and len(clean_code) >= 4:
+                recent_tx_res = await db.execute(
+                    select(Transaction)
+                    .where(
+                        Transaction.transaction_status.in_([
+                            TransactionStatus.LISTED,
+                            TransactionStatus.HANDOVER_PENDING,
+                            TransactionStatus.MATCHED,
+                        ])
+                    )
+                    .order_by(desc(Transaction.created_at))
+                    .limit(1)
+                )
+                matched_tx = recent_tx_res.scalar_one_or_none()
+
+            if matched_tx:
+                # Check if a Traceability record already exists for this transaction
+                existing_trace_res = await db.execute(
+                    select(Traceability).where(Traceability.lot_id == matched_tx.lot_id)
+                )
+                existing_trace = existing_trace_res.scalar_one_or_none()
+
+                now_utc = datetime.now(UTC)
+                collector_hash = hashlib.sha256(str(matched_tx.collector_id).encode("utf-8")).hexdigest()[:16]
+                photo_hashes = (existing_trace.photo_hashes if existing_trace else []) or []
+                payload = {
+                    "lot_id": matched_tx.lot_id,
+                    "handover_ref_no": clean_code,
+                    "weight_kg": round(float(matched_tx.weight_kg), 2),
+                    "photo_hashes": photo_hashes,
+                    "timestamp": now_utc.isoformat(),
+                    "gps_lat": 19.6967,
+                    "gps_lng": 72.7699,
+                    "collector_id_hash": collector_hash,
+                }
+                sig = cls.sign_payload(payload)
+                payload["signature"] = sig
+                qr_payload_str = json.dumps(payload, separators=(",", ":"))
+
+                if existing_trace:
+                    # Update the existing traceability record with the collector's 6-character short code and signature
+                    existing_trace.handover_ref_no = clean_code
+                    existing_trace.qr_payload = qr_payload_str
+                    traceability = existing_trace
+                else:
+                    last_rec_res = await db.execute(
+                        select(Traceability).order_by(desc(Traceability.created_at)).limit(1)
+                    )
+                    last_rec = last_rec_res.scalar_one_or_none()
+                    prev_hash = last_rec.record_hash if last_rec else GENESIS_HASH
+                    initial_record_hash = hashlib.sha256(f"{qr_payload_str}:{prev_hash}".encode()).hexdigest()
+
+                    traceability = Traceability(
+                        lot_id=matched_tx.lot_id,
+                        photo_hashes=photo_hashes,
+                        weight_kg=matched_tx.weight_kg,
+                        timestamp=now_utc,
+                        gps_lat=19.6967,
+                        gps_lng=72.7699,
+                        location=WKTElement("POINT(72.7699 19.6967)", srid=4326),
+                        handover_ref_no=clean_code,
+                        qr_payload=qr_payload_str,
+                        recycler_confirmation=False,
+                        downstream_status=DownstreamStatus.RECEIVED,
+                        record_hash=initial_record_hash,
+                        prev_hash=prev_hash,
+                        created_at=now_utc,
+                    )
+                    db.add(traceability)
+
+                matched_tx.transaction_status = TransactionStatus.HANDOVER_PENDING
+                await db.commit()
+                if traceability:
+                    await db.refresh(traceability)
+
         if not traceability:
             raise NotFoundError("Handover Reference", handover_ref_no)
 

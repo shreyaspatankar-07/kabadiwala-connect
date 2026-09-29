@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/local_database.dart';
 import '../widgets/big_tile.dart';
 import '../widgets/speaker_button.dart';
 import 'pin_setup_screen.dart';
@@ -12,10 +13,12 @@ class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({
     super.key,
     required this.audioService,
+    this.db,
     this.onLanguageSelected,
   });
 
   final AudioFeedbackService audioService;
+  final AppDatabase? db;
   final ValueChanged<String>? onLanguageSelected;
 
   @override
@@ -46,6 +49,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => PinSetupScreen(
+          db: widget.db,
           audioService: widget.audioService,
           locale: locale,
         ),
@@ -55,17 +59,20 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMr = _selectedLocale == 'mr';
+    final isHi = _selectedLocale == 'hi';
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'कबाडीवाला कनेक्ट',
-          style: TextStyle(fontWeight: FontWeight.w900),
+        title: Text(
+          isMr ? 'कबाडीवाला कनेक्ट' : (isHi ? 'कबाडीवाला कनेक्ट' : 'Kabadiwala Connect'),
+          style: const TextStyle(fontWeight: FontWeight.w900),
         ),
         actions: [
           SpeakerButton(
             promptKey: 'languagePrompt',
             audioService: widget.audioService,
-            tooltip: 'भाषा निवडण्यासाठी सूचना ऐका',
+            tooltip: isMr ? 'भाषा निवडण्यासाठी सूचना ऐका' : (isHi ? 'भाषा चुनने के लिए सूचना सुनें' : 'Listen Instructions'),
           ),
           const SizedBox(width: 12),
         ],
@@ -109,6 +116,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
               // Marathi Big Tile (Default, recommended)
               BigTile(
+                key: const Key('lang_tile_mr'),
                 title: 'मराठी',
                 subtitle: 'महाराष्ट्र (Default)',
                 icon: Icons.record_voice_over_rounded,

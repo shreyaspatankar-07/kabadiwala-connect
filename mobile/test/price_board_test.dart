@@ -29,6 +29,7 @@ void main() {
   Widget buildTestableWidget({
     String locale = 'mr',
     DateTime? forcedRecordedAt,
+    bool enableLiveStream = false,
   }) {
     return MaterialApp(
       theme: AppTheme.lightTheme,
@@ -38,6 +39,7 @@ void main() {
         district: 'Palghar',
         locale: locale,
         forcedRecordedAt: forcedRecordedAt,
+        enableLiveStream: enableLiveStream,
       ),
     );
   }
@@ -182,6 +184,40 @@ void main() {
 
       // Verify audio feedback for report submission
       expect(audioService.lastSpokenText, contains('भाव नोंदवला गेला आहे'));
+    });
+
+    testWidgets('5. Dynamic update: when price is updated in repository, PriceBoardScreen immediately reflects new price',
+        (WidgetTester tester) async {
+      configureViewport(tester);
+
+      await tester.pumpWidget(buildTestableWidget(enableLiveStream: true));
+      await tester.pumpAndSettle();
+
+      // Initially PCB is ₹ 420 / kg
+      expect(find.text('₹ 420 / kg'), findsOneWidget);
+
+      // Simulate portal update arriving via sync/upsert: PCB price to 550.0
+      await priceRepo.upsertPrice(
+        category: 'PCB',
+        district: 'Palghar',
+        buyingPrice: 550.0,
+        marketMin: 520.0,
+        marketMax: 580.0,
+        recyclerQuote: 560.0,
+      );
+      await tester.pumpAndSettle();
+
+      // Verify that the UI immediately updated to ₹ 550 / kg
+      expect(find.text('₹ 550 / kg'), findsOneWidget);
+
+      // Open PCB detail view and verify updated rate
+      await tester.tap(find.byKey(const Key('category_tile_PCB')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('₹ 550'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
     });
   });
 }

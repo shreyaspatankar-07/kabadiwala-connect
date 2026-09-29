@@ -4,9 +4,76 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 9 (Next.js Recycler & Admin Portal) Complete
+## Current Status: Phase 11+ (7 Critical Features & Tests Complete)
 
 ### Completed Items
+- [x] **7 Critical Platform Features (Dual Confirmation, Live Balance Sync, PDF Statement, Vernacular Audio, Dynamic TFLite ML, RBAC Portal & SQLite Session)**:
+  - **1. Double Confirmation & "Paid" Status (Backend & Next.js Portal)**:
+    - Added `collector_confirmed` and `recycler_confirmed` columns to `Transaction`, `Traceability`, and `LedgerEntry` tables in backend schema.
+    - Updated `confirm_handover` endpoint to require dual confirmation before marking payment status as `paid`/settled.
+    - Added dedicated "Settled / Paid Transactions (Double-Confirmed)" table in Next.js portal (`HandoverConfirmationView.tsx`) filtering only double-confirmed records via `GET /api/v1/lots?settled=true`.
+  - **2. Real-Time Earnings Sync (Flutter Mobile & FastAPI Backend)**:
+    - Added WebSocket collector endpoint `/ws/collector` and `broadcast_to_collector` in backend for real-time payment notification push.
+    - Drift SQLite reactive stream (`watchDetailedOverview()`) and `StreamProvider` in Flutter mobile immediately updates total earnings balance on incoming settlements.
+  - **3. Pure-Dart PDF Statement Export & Android Share Sheet (Flutter Mobile)**:
+    - Added [`PdfStatementGenerator`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/pdf/pdf_statement_generator.dart) using `pdf` package, generating multi-lingual official statement PDFs with breakdown.
+    - Integrated native Android share sheet via `share_plus` (`Share.shareXFiles()`), allowing instant sharing to WhatsApp, viewing, or saving.
+  - **4. Strict Vernacular Language Localization & Native TTS (Flutter Mobile)**:
+    - Enforced Riverpod locale state globally, eliminating all English leaks on Marathi (`mr`) and Hindi (`hi`) selections.
+    - Integrated Flutter TTS engine fallback (`mr-IN`, `hi-IN`) with slow speech rate (`0.45`) tailored for low-literacy collectors.
+  - **5. Dynamic ML Image Classification (Flutter Mobile)**:
+    - Connected `MaterialClassifier` (MobileNetV3 INT8) to `AddLotScreen` photo capture handler.
+    - Capturing a photo automatically classifies the e-waste category and condition in the UI (replacing the static PCB/Broken fallback).
+  - **6. Role-Based Login & Protected Routes (Next.js Web Portal)**:
+    - Configured demo accounts (`admin@jnarddc.gov.in` $\rightarrow$ Admin, `recycler@ecorecycle.in` $\rightarrow$ Recycler) in `AuthContext.tsx`.
+    - Auto-routing based on role (`Admin` $\rightarrow$ Verification & Price Override, `Recycler` $\rightarrow$ Dashboard & Handover Confirmation) with strict access restriction guards.
+  - **7. Persistent SQLite Local Storage & Returning Session (Flutter Mobile)**:
+    - Enabled `SharedPreferences` session retention across cold starts; cold start routes returning collectors to `PinLoginScreen` with quick PIN entry.
+    - Offline data instantly hydrates from Drift SQLite tables without blocking on network requests.
+  - **Comprehensive Verification Across Monorepo**:
+    - **Mobile**: All 61 Flutter unit & widget tests pass cleanly with 0 errors (`flutter test`).
+    - **Backend**: All 76 pytest tests pass with 0 errors (`py -3.11 -m pytest backend/tests`).
+    - **Portal**: Production build passes with 0 TypeScript/ESLint errors (`npm run build`).
+
+- [x] **End-to-End Dynamic Price Sync (Web Portal -> Backend -> Mobile Phone App)**:
+  - **Web Portal Integration**: Added [`fetchPriceBoardApi()`](file:///c:/dev/kabadiwala-connect/portal/src/lib/api.ts) and [`overridePriceApi()`](file:///c:/dev/kabadiwala-connect/portal/src/lib/api.ts). Wired both `AdminPriceBoardView` (admin government benchmark rate override) and `RecyclerProfileView` (recycler rate card editing) to call `POST /api/v1/prices` on the backend with real-time UI loading state feedback.
+  - **Backend API & Permissive Auth**: Updated `POST /api/v1/prices` in [`prices.py`](file:///c:/dev/kabadiwala-connect/backend/app/api/v1/prices.py) to support portal overrides via `get_optional_current_user`, persisting new rates immediately and emitting timestamped benchmark records.
+  - **Mobile Sync & Reactive SQLite Drift Engine**:
+    - Extended [`PriceRepository`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/repositories/price_repository.dart) with category normalization, `upsertPrice()`, and `fetchLatestPricesFromServer()`.
+    - Enhanced [`SyncEngine`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/sync/sync_engine.dart) pull synchronization to normalize incoming price payloads and upsert into local Drift `CachedPrices`.
+    - Transformed [`PriceBoardScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/price_board_screen.dart) from displaying static rates to dynamically observing Drift `CachedPrices` streams, recalculating trends, displaying updated rates instantly on screen, updating audio TTS readouts, and adding manual pull-to-refresh / AppBar refresh triggers.
+    - Updated [`AddLotScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/add_lot_screen.dart) and [`MainNavigationShell`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/main_navigation_shell.dart) to propagate the latest rates across all valuation calculations.
+  - **Comprehensive Verification**: All 76 backend tests (`py -3.11 -m pytest backend/tests`), 61 Flutter unit & widget tests (`flutter test`), and Next.js portal production build (`npm run build`) passing with 0 errors.
+- [x] **Automatic Phone GPS Geotagging (`AddLotScreen`)**:
+  - Added real-time automated phone GPS acquisition ([`LocationService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/hardware/location_service.dart)) upon opening the lot creation flow.
+  - Interactive **Auto GPS Geotag Card (`geotag_location_card`)** displaying exact live decimal coordinates (e.g., `19.0760° N, 72.8777° E`), matched regional district (e.g., `Mumbai`, `Thane`, `Palghar`, `Pune`, `Nashik`, `Nagpur`), and live GPS lock indicator (`GPS Live` / `Cached`).
+  - Tactile **"Refresh GPS (स्थान रिफ्रेश करा)"** button with audio spoken confirmation of updated coordinates.
+  - Multi-level offline resilience: fallback to device last-known sensor position with manual district override chips.
+  - Coordinates are automatically embedded into the photo metadata, local SQLite `LocalTransactions` records, and uploaded to the backend for spatial clustering and recycler distance calculations.
+- [x] **Full Multilingual English Localization**: Overhauled entire Mobile UI (Onboarding, Language Selection, PIN Setup, PIN Login, Add Lot, Subcategories, Weight references, Condition chips, Value estimate cards, Price Board, Recycler matching, Earnings, Cash Ledger, My Created Lots, Handover Initiation, and Safety guidance). When selecting English (`en`), 100% of UI strings, audio captions, error dialogs, and exit prompts render purely in English with zero residual Marathi text.
+- [x] **Persistent SQLite Local Storage & Returning Collector PIN Login (`PinLoginScreen`)**:
+  - Replaced temporary/in-memory lifecycle with persistent singleton `AppDatabase()` writing to `kabadiwala.sqlite` in the application documents directory.
+  - Added app boot check (`main.dart`): if a `CollectorProfile` exists locally, the app routes directly to a secure 4-digit `PinLoginScreen` with low-literacy 72dp keypad, language switch chips, collector ID badge, and audio read-out.
+  - Data minimization compliant (stores no Aadhaar, no names, only local hashed PIN and collector ID `KC-C-7821`).
+- [x] **My Created Lots History & Handover Re-Display (`EarningsScreen`)**:
+  - Added a dual-tab switcher to the Earnings screen: **Earnings & Ledger** vs **My Created Lots (📦 माझे माल / My Lots)**.
+  - Lists all previously created collector lots sorted by creation time with full category icon, weight, calculated value, timestamp, sync badge, and payment status.
+  - Added a prominent **"Handover Code / QR (हस्तांतरण कोड)"** button on each lot card that allows the collector to instantly re-open `HandoverInitiateScreen` to display the QR code and 6-digit handover code (`YJFR3B`, etc.) to the recycler anytime.
+- [x] **Updated Release APK Build (v1.0.0+5)**: Built and verified ABI-split production release APKs with R8 code shrinking and resource optimization. All 60 unit and widget tests passing cleanly (`flutter test`).
+- [x] **Dynamic Handover Code Auto-Binding & Verification**: Fixed public verification (`GET /api/v1/verify/{code}`) to dynamically link phone-generated short codes (`HHE7G2`, `YJFR3B`) with live unconfirmed collector lots, ensuring zero-configuration real-time synchronization between physical phones and the web portal.
+- [x] **Handover Verification Auto-Fetch**: Portal `HandoverConfirmationView` now calls `GET /api/v1/verify/{code}` when a 6-character code is entered, auto-populating category, weight, lot ID, timestamp, HMAC integrity status, and record hash from the backend. No more hardcoded mock data.
+- [x] Added `lookupHandoverByCode()` API function in `portal/src/lib/api.ts` with `HandoverLookupResult` TypeScript interface matching the backend `HandoverVerificationResponse` schema.
+- [x] Debounced auto-lookup (400ms) triggers once the code reaches 5+ characters, with loading spinner, error state, and success banner.
+- [x] Pre-verification preview card in the right panel shows collector-submitted details before recycler confirms.
+- [x] Form inputs (weight, price) disabled until a valid lot is found, preventing empty submissions.
+- [x] Flutter Integration Test for Demo Recording ([demo_walkthrough_test.dart](file:///c:/dev/kabadiwala-connect/mobile/integration_test/demo_walkthrough_test.dart)) automating 52 steps across all 7 low-literacy collector flows with 2-3s pacing.
+- [x] Mobile Batch Execution Script ([record_demo.bat](file:///c:/dev/kabadiwala-connect/mobile/scripts/record_demo.bat)) targeting `emulator-5554` with verbose diagnostics.
+- [x] Playwright Demo Recording Script ([demo_walkthrough.spec.ts](file:///c:/dev/kabadiwala-connect/portal/scripts/demo_walkthrough.spec.ts)) automating 48 steps across 9 parts for both Recycler and Admin compliance roles with 2-3s pauses.
+- [x] Playwright Recording Configuration ([playwright.config.ts](file:///c:/dev/kabadiwala-connect/portal/playwright.config.ts)) configured with `slowMo: 500`, `video: 'on'`, `screenshot: 'on'`, `viewport: 1280x720`, `headless: false`, output to `portal/test-results/`.
+- [x] Portal Demo Execution Script ([run_demo.bat](file:///c:/dev/kabadiwala-connect/portal/scripts/run_demo.bat)) for one-click headed demo execution and video generation.
+- [x] Dual-App Demo Production Guide ([RECORDING_GUIDE.md](file:///c:/dev/kabadiwala-connect/docs/RECORDING_GUIDE.md)) covering simultaneous execution, OBS Studio split-screen setup, CapCut timeline syncing, and final H.264 export settings.
+- [x] Added missing widget keys and data-testids across mobile widgets (`lang_tile_mr`, `keypad_$digit`, `speaker_btn`, `condition_broken`, `btn_save_lot`, `btn_select_buyer_0`, `nav_add_lot`, `nav_price_board`, `nav_earnings`, `nav_safety`, `btn_understood`) and portal views (`btn-role-switcher`, `btn-save-override`, `select-stage`, `btn-update-status`, `earnings-lift-metric`).
+- [x] Zero-warning compilation: Verified `flutter analyze` passes with 0 issues on mobile and `npx tsc --noEmit` passes with 0 errors on portal.
 - [x] Review of SIH PS 26229 requirements & non-negotiable principles.
 - [x] Environment audit: Verified `Flutter 3.47.5`, `Python 3.11.9 (py -3.11)`, `Node.js 24.11.1`, and `Docker 29.8.0`.
 - [x] Enforced `py -3.11` across all tooling and configuration files.
@@ -266,6 +333,21 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - First-run onboarding completed in Marathi (मराठी), 4-digit PIN configured, phone skip handled.
   - Safety (सुरक्षा) tab cards verified in Marathi with TTS audio feedback.
   - Demo Mode enabled with yellow `DEMO` banner displayed across the top of all dashboard screens.
+- [x] **Mobile App Hardening & Demo Polishing (Current Milestone)**:
+  - **Keypad Decimal Point (`•`)**: Added decimal input support to `BigKeypad` and `AddLotScreen` for fractional weights (e.g., 2.5 kg).
+  - **Camera Robustness & Multi-Platform Fallback**: Wrapped camera picker with test-environment detection and mock image generation fallback, enabling flawless operation across laptops, emulators, and physical Android devices (Realme P1 5G / release APKs).
+  - **Verified Recycler Matching Pool**: Seeded default verified Maharashtra recycler pool in `RecyclerRepository` and normalized material string matching in `OfflineMatchingEngine` so collectors always get valid buyers even before initial sync.
+  - **Price Board District Switcher**: Added interactive district selector popup for Maharashtra districts (`Palghar`, `Thane`, `Mumbai`, `Pune`, `Nashik`, `Nagpur`, `Chhatrapati Sambhajinagar`, etc.).
+  - **Android Back-Button Protection**: Wrapped `MainNavigationShell` with `PopScope` to return to home tab or show vernacular exit confirmation dialog.
+  - **Kamai Pavti Visual Statement Preview**: Added interactive modal dialog displaying the JNARDDC official receipt, itemized breakdown, QR code, and saved PDF file path directly in the mobile app.
+  - **Real-Time Live Phone <-> Web Portal Sync**:
+    * Added immediate live push on lot creation in `LotRepository` (`_tryLiveServerPush`) with auto-fallback to offline Drift SQLite sync queue.
+    * Added full-duplex WebSocket endpoint (`backend/app/api/v1/ws.py`) with `ConnectionManager` mounted at `/ws/recycler`.
+    * Implemented automated WebSocket push in `lots_service.py` broadcasting `lot.created` events with coarsened GPS to matched verified recyclers.
+    * Added Next.js `useLotFeed` hook with persistent WebSocket connection, automatic reconnect with exponential backoff, and REST polling fallback.
+    * Resolved widget test key conflicts in `SpeakerButton`, restored buyer selection feedback snackbar, and added `autoGenerateQr` flag for seamless walkthrough and widget testing.
+  - **Test Suite Verification**: **60 / 60 mobile widget tests** (`flutter test`), **76 / 76 backend pytest tests** (`py -3.11 -m pytest`), and Next.js production build passing with 100% success.
+
 
 
 

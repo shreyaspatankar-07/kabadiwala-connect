@@ -41,7 +41,8 @@ export default function PortalPage() {
 
   const handleLogin = (role: "recycler" | "admin") => {
     login(email, role);
-    setActiveTab(role === "admin" ? "verification" : "dashboard");
+    const targetRole = email.includes("admin") ? "admin" : role;
+    setActiveTab(targetRole === "admin" ? "verification" : "dashboard");
   };
 
   // If user is not logged in, render high-contrast login screen
@@ -62,7 +63,7 @@ export default function PortalPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleLogin(email.includes("admin") ? "admin" : "recycler");
+                handleLogin(email.toLowerCase().includes("admin") ? "admin" : "recycler");
               }}
               className="space-y-4"
             >
@@ -75,7 +76,7 @@ export default function PortalPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. recycler@ecorecycle.com"
+                  placeholder="e.g. recycler@ecorecycle.in or admin@jnarddc.gov.in"
                   data-testid="input-email"
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm font-semibold focus:outline-none focus:border-emerald-500"
                 />
@@ -114,7 +115,8 @@ export default function PortalPage() {
                   type="button"
                   data-testid="btn-demo-recycler"
                   onClick={() => {
-                    setEmail("recycler@ecorecycle.com");
+                    setEmail("recycler@ecorecycle.in");
+                    setPassword("recycler123");
                     handleLogin("recycler");
                   }}
                   className="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-emerald-400 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center space-x-1 transition"
@@ -127,6 +129,7 @@ export default function PortalPage() {
                   data-testid="btn-demo-admin"
                   onClick={() => {
                     setEmail("admin@jnarddc.gov.in");
+                    setPassword("admin123");
                     handleLogin("admin");
                   }}
                   className="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-amber-400 font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center space-x-1 transition"
@@ -142,6 +145,10 @@ export default function PortalPage() {
     );
   }
 
+  // Admin tabs list for role-based protection
+  const adminTabs = ["verification", "expiry", "price_board", "anomalies", "analytics"];
+  const isAccessForbidden = user.role !== "admin" && adminTabs.includes(activeTab);
+
   // Render main portal shell with sidebar and views
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
@@ -153,16 +160,36 @@ export default function PortalPage() {
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-20 md:pb-8">
-          {activeTab === "dashboard" && <RecyclerDashboardView />}
-          {activeTab === "inbox" && <MatchedLotsInboxView />}
-          {activeTab === "handover" && <HandoverConfirmationView />}
-          {activeTab === "downstream" && <DownstreamTrackingView />}
-          {activeTab === "profile" && <RecyclerProfileView />}
-          {activeTab === "verification" && <AdminVerificationQueueView />}
-          {activeTab === "expiry" && <AdminExpiryAlertsView />}
-          {activeTab === "price_board" && <AdminPriceBoardView />}
-          {activeTab === "anomalies" && <AdminAnomalyReviewView />}
-          {activeTab === "analytics" && <AdminAnalyticsView />}
+          {isAccessForbidden ? (
+            <div className="bg-slate-900 border border-amber-800/50 rounded-2xl p-8 text-center space-y-4 max-w-lg mx-auto mt-12 shadow-xl">
+              <div className="w-12 h-12 rounded-full bg-amber-950 text-amber-400 border border-amber-700 flex items-center justify-center mx-auto">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h2 className="text-xl font-bold text-white">Access Restricted</h2>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                This section requires JNARDDC Administrator privileges. Log in with an administrator account (e.g. <span className="font-mono text-amber-300">admin@jnarddc.gov.in</span>) to access compliance verification and governance tools.
+              </p>
+              <button
+                onClick={() => setActiveTab("dashboard")}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition"
+              >
+                Return to Recycler Dashboard
+              </button>
+            </div>
+          ) : (
+            <>
+              {activeTab === "dashboard" && <RecyclerDashboardView />}
+              {activeTab === "inbox" && <MatchedLotsInboxView />}
+              {activeTab === "handover" && <HandoverConfirmationView />}
+              {activeTab === "downstream" && <DownstreamTrackingView />}
+              {activeTab === "profile" && <RecyclerProfileView />}
+              {activeTab === "verification" && <AdminVerificationQueueView />}
+              {activeTab === "expiry" && <AdminExpiryAlertsView />}
+              {activeTab === "price_board" && <AdminPriceBoardView />}
+              {activeTab === "anomalies" && <AdminAnomalyReviewView />}
+              {activeTab === "analytics" && <AdminAnalyticsView />}
+            </>
+          )}
         </main>
       </div>
 

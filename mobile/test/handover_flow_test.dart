@@ -91,6 +91,7 @@ void main() {
             audioService: audioService,
             locale: 'mr',
             handoverService: handoverService,
+            autoGenerateQr: false,
           ),
         ),
       );

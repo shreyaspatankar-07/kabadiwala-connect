@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useLanguage } from "../../context/LanguageContext";
-import { mockRecyclerProfile } from "../../lib/api";
+import { mockRecyclerProfile, overridePriceApi } from "../../lib/api";
 import { EwasteCategory, RecyclerProfile } from "../../lib/types";
 import {
   FileText,
@@ -13,6 +13,7 @@ import {
   IndianRupee,
   Save,
   FileCheck,
+  Loader2,
 } from "lucide-react";
 
 const ALL_CATEGORIES: EwasteCategory[] = [
@@ -74,8 +75,29 @@ export function RecyclerProfileView() {
     }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSaving(true);
+
+    // Sync offered rates to backend across service districts
+    const primaryDistrict = profile.serviceAreaDistricts[0] || "Mumbai";
+    const syncPromises = Object.entries(profile.offeredRates).map(([category, rate]) => {
+      if (rate > 0) {
+        return overridePriceApi({
+          district: primaryDistrict,
+          category,
+          buyingPrice: rate,
+          recyclerOfferedPrice: rate,
+        });
+      }
+      return Promise.resolve(true);
+    });
+
+    await Promise.all(syncPromises);
+
+    setIsSaving(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 4000);
   };
@@ -91,11 +113,12 @@ export function RecyclerProfileView() {
         </div>
         <button
           type="submit"
+          disabled={isSaving}
           data-testid="btn-save-profile"
-          className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-6 py-2.5 rounded-xl shadow-lg shadow-emerald-900/40 text-xs flex items-center space-x-2 transition"
+          className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-extrabold px-6 py-2.5 rounded-xl shadow-lg shadow-emerald-900/40 text-xs flex items-center space-x-2 transition"
         >
-          <Save className="w-4 h-4" />
-          <span>Save Changes</span>
+          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          <span>{isSaving ? "Saving..." : "Save Changes"}</span>
         </button>
       </div>
 

@@ -10,6 +10,269 @@ import {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
+export function getCategoryPhotoUrl(category: string): string {
+  const catLower = (category || "").toLowerCase();
+  if (catLower.includes("pcb") || catLower.includes("circuit") || catLower.includes("board")) {
+    return "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80";
+  }
+  if (catLower.includes("batt")) {
+    return "https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=400&q=80";
+  }
+  if (catLower.includes("cable") || catLower.includes("wire")) {
+    return "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80";
+  }
+  if (catLower.includes("crt") || catLower.includes("tv")) {
+    return "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&q=80";
+  }
+  if (catLower.includes("lcd") || catLower.includes("monitor") || catLower.includes("screen")) {
+    return "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&q=80";
+  }
+  if (catLower.includes("motor") || catLower.includes("magnet")) {
+    return "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=400&q=80";
+  }
+  return "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&q=80";
+}
+
+export async function fetchLiveLots(): Promise<MatchedLot[]> {
+  try {
+    const res = await fetch(`${API_BASE}/lots`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+
+    return data.map((item: any) => {
+      const cat = item.category || "PCB";
+      let matchedCategory: EwasteCategory = "PCB";
+      if (cat.includes("PCB")) matchedCategory = "PCB";
+      else if (cat.includes("Batt")) matchedCategory = "Batteries";
+      else if (cat.includes("Cable")) matchedCategory = "Cables";
+      else if (cat.includes("CRT")) matchedCategory = "CRT";
+      else if (cat.includes("LCD")) matchedCategory = "LCD";
+      else if (cat.includes("Motor")) matchedCategory = "Motors_Magnets";
+      else if (cat.includes("Plastic")) matchedCategory = "Mixed_Plastics";
+      else matchedCategory = "Other";
+
+      const weight = Number(item.weight_kg) || 1.0;
+      const quoted = Number(item.quoted_price) || 500;
+
+      let status: MatchedLot["status"] = "matched";
+      if (item.transaction_status === "accepted") status = "accepted";
+      else if (item.transaction_status === "handover_pending") status = "handover_pending";
+      else if (item.transaction_status === "handed_over" || item.transaction_status === "confirmed") status = "handed_over";
+      else if (item.transaction_status === "cancelled") status = "declined";
+
+      return {
+        id: item.lot_id,
+        lotId: item.lot_id,
+        clientLotUuid: item.lot_id,
+        collectorRefId: item.collector_id || "KC-C-7821",
+        category: matchedCategory,
+        subCategory: item.category,
+        condition: "broken",
+        weightKg: weight,
+        estimatedValue: quoted,
+        distanceKm: 3.5,
+        quotedPrice: quoted,
+        pickupRequested: true,
+        photoUrl: getCategoryPhotoUrl(item.category),
+        photoHash: (item.photo_hashes && item.photo_hashes[0]) || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        createdAt: item.created_at || new Date().toISOString(),
+        status,
+        handoverRefNo: `REF${item.lot_id.replace(/[^A-Z0-9]/gi, "").slice(-4).toUpperCase()}`,
+      };
+    });
+  } catch (err) {
+    console.warn("fetchLiveLots error:", err);
+    return [];
+  }
+}
+
+export async function updateLotStatusApi(lotId: string, status: string, finalPrice?: number): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/lots/${lotId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transaction_status: status,
+        final_price: finalPrice,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Lookup a handover record by its 6-character reference code.
+ * Calls GET /api/v1/verify/{code} which returns the collector's lot details.
+ */
+export interface HandoverLookupResult {
+  handover_ref_no: string;
+  is_valid: boolean;
+  lot_id: string;
+  category: string;
+  collector_weight_kg: number;
+  measured_weight_kg: number | null;
+  final_price: number | null;
+  timestamp: string;
+  recycler_confirmed: boolean;
+  confirmed_at: string | null;
+  confirmed_by: string | null;
+  downstream_status: string;
+  record_hash: string;
+  integrity_status: string;
+}
+
+export async function lookupHandoverByCode(code: string): Promise<HandoverLookupResult | null> {
+  try {
+    const trimmed = code.trim().toUpperCase().replace(/\s+/g, "");
+    if (trimmed.length < 4) return null;
+    const res = await fetch(`${API_BASE}/verify/${trimmed}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn("lookupHandoverByCode error:", err);
+    return null;
+  }
+}
+
+export async function fetchPriceBoardApi(district: string = "Mumbai"): Promise<PriceBoardItem[]> {
+  try {
+    const res = await fetch(`${API_BASE}/prices/board?district=${encodeURIComponent(district)}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return mockPriceBoards;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.rates) || data.rates.length === 0) {
+      return mockPriceBoards;
+    }
+    return data.rates.map((r: any) => ({
+      district: data.district || district,
+      category: r.category as EwasteCategory,
+      buyingPrice: Number(r.current_buying_price || r.avg_buying_price || 0),
+      marketMin: Number(r.market_min || r.min_rate_inr || 0),
+      marketMax: Number(r.market_max || r.max_rate_inr || 0),
+      recyclerOfferedPrice: Number(r.recycler_offered_price || 0),
+      trend: (r.trend_7d === "up" || r.trend_7d === "down" ? r.trend_7d : "flat") as "up" | "down" | "flat",
+      percentChange: Number(r.pct_change_7d || 0),
+      confidence: (r.confidence_level === "low" || r.confidence_level === "medium" ? r.confidence_level : "high") as "high" | "medium" | "low",
+      lastUpdated: r.last_updated || new Date().toISOString(),
+    }));
+  } catch (err) {
+    console.warn("fetchPriceBoardApi error:", err);
+    return mockPriceBoards;
+  }
+}
+
+export async function overridePriceApi(data: {
+  district: string;
+  category: string;
+  buyingPrice: number;
+  marketMin?: number;
+  marketMax?: number;
+  recyclerOfferedPrice?: number;
+}): Promise<boolean> {
+  try {
+    const minPrice = data.marketMin ?? Math.round(data.buyingPrice * 0.9);
+    const maxPrice = data.marketMax ?? Math.round(data.buyingPrice * 1.1);
+    const res = await fetch(`${API_BASE}/prices`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        category: data.category,
+        sub_category: "standard",
+        district: data.district,
+        city: data.district,
+        latitude: 19.0760,
+        longitude: 72.8777,
+        buying_price: data.buyingPrice,
+        selling_quoted_price: data.recyclerOfferedPrice ?? (data.buyingPrice * 1.05),
+        unit: "kg",
+        market_min: minPrice,
+        market_max: maxPrice,
+        source: "field_survey",
+      }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn("overridePriceApi error:", err);
+    return false;
+  }
+}
+
+export async function confirmHandoverApi(payload: {
+  handoverRefNo: string;
+  measuredWeightKg: number;
+  finalPrice: number;
+  recyclerId?: string;
+  paymentMode?: string;
+}): Promise<any> {
+  try {
+    const res = await fetch(`${API_BASE}/handover/confirm`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        handover_ref_no: payload.handoverRefNo,
+        measured_weight_kg: payload.measuredWeightKg,
+        final_price: payload.finalPrice,
+        recycler_id: payload.recyclerId || "REC-ECO-01",
+      }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn("confirmHandoverApi error:", err);
+    return null;
+  }
+}
+
+export async function fetchSettledLotsApi(): Promise<HandoverRecord[]> {
+  try {
+    const res = await fetch(`${API_BASE}/lots?settled=true`, { cache: "no-store" });
+    if (!res.ok) return mockHandoverRecords;
+    const data = await res.json();
+    if (!Array.isArray(data)) return mockHandoverRecords;
+
+    return data.map((item: any) => {
+      const cat = item.category || "PCB";
+      let matchedCategory: EwasteCategory = "PCB";
+      if (cat.includes("PCB")) matchedCategory = "PCB";
+      else if (cat.includes("Batt")) matchedCategory = "Batteries";
+      else if (cat.includes("Cable")) matchedCategory = "Cables";
+      else if (cat.includes("CRT")) matchedCategory = "CRT";
+      else if (cat.includes("LCD")) matchedCategory = "LCD";
+      else if (cat.includes("Motor")) matchedCategory = "Motors_Magnets";
+      else if (cat.includes("Plastic")) matchedCategory = "Mixed_Plastics";
+      else matchedCategory = "Other";
+
+      const weight = Number(item.weight_kg) || 1.0;
+      const finalPrice = Number(item.final_price || item.quoted_price) || 0;
+
+      return {
+        handoverRefNo: `HND-${item.lot_id.slice(-4).toUpperCase()}`,
+        lotId: item.lot_id,
+        collectorRefId: item.collector_id || "KC-C-7821",
+        category: matchedCategory,
+        collectorWeightKg: weight,
+        measuredWeightKg: weight,
+        weightMismatchPercent: 0.0,
+        finalPrice: finalPrice,
+        paymentMethod: "cash_received",
+        paymentStatus: item.payment_status || "cash_received",
+        collectorConfirmed: item.collector_confirmed ?? true,
+        recyclerConfirmed: item.recycler_confirmed ?? true,
+        confirmedAt: item.handover_at || item.updated_at || new Date().toISOString(),
+        recordHash: `hash-${item.lot_id.toLowerCase()}-verified`,
+        downstreamStatus: "received",
+      };
+    });
+  } catch (err) {
+    console.warn("fetchSettledLotsApi error:", err);
+    return mockHandoverRecords;
+  }
+}
+
 // Mock dataset for immediate testability and offline demonstration
 export const mockRecyclerProfile: RecyclerProfile = {
   id: "REC-ECO-01",

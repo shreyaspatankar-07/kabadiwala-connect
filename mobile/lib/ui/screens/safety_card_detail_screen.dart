@@ -366,6 +366,7 @@ class _SafetyCardDetailScreenState extends State<SafetyCardDetailScreen> {
 
               // 5. "I Understood" Action Button (Min 56dp Touch Target)
               SizedBox(
+                key: const Key('btn_understood'),
                 height: 56,
                 child: ElevatedButton.icon(
                   key: const Key('btn_i_understood'),
@@ -407,6 +408,11 @@ class _SafetyCardDetailScreenState extends State<SafetyCardDetailScreen> {
                         duration: const Duration(seconds: 2),
                       ),
                     );
+                    Future.delayed(const Duration(milliseconds: 600), () {
+                      if (context.mounted && Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
+                    });
                   },
                 ),
               ),

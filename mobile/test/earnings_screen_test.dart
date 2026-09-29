@@ -75,7 +75,7 @@ void main() {
             quotedPrice: 4200.0,
             collectionLat: 19.0760,
             collectionLng: 72.8777,
-            createdAt: now.subtract(const Duration(hours: 2)),
+            createdAt: now.subtract(const Duration(minutes: 5)),
             finalPrice: const drift.Value(4200.0),
             recyclerId: const drift.Value('REC-ECO-01'),
             paymentStatus: const drift.Value('cash_received'),
@@ -112,7 +112,7 @@ void main() {
             paymentMode: const drift.Value('cash_received'),
             description: 'Cash received for 10kg PCB',
             balanceAfter: 4200.0,
-            recordedAt: now.subtract(const Duration(hours: 2)),
+            recordedAt: now.subtract(const Duration(minutes: 5)),
           ),
         );
 
@@ -141,6 +141,7 @@ void main() {
           theme: AppTheme.lightTheme,
           home: EarningsScreen(
             db: db,
+            collectorId: 'KC-C-TEST01',
             audioService: audioService,
             locale: 'mr',
             ledgerRepository: ledgerRepo,
@@ -171,6 +172,7 @@ void main() {
           theme: AppTheme.lightTheme,
           home: EarningsScreen(
             db: db,
+            collectorId: 'KC-C-TEST01',
             audioService: audioService,
             locale: 'mr',
             ledgerRepository: ledgerRepo,
@@ -193,6 +195,7 @@ void main() {
           theme: AppTheme.lightTheme,
           home: EarningsScreen(
             db: db,
+            collectorId: 'KC-C-TEST01',
             audioService: audioService,
             locale: 'mr',
             ledgerRepository: ledgerRepo,
@@ -219,6 +222,7 @@ void main() {
           theme: AppTheme.lightTheme,
           home: EarningsScreen(
             db: db,
+            collectorId: 'KC-C-TEST01',
             audioService: audioService,
             locale: 'mr',
             ledgerRepository: ledgerRepo,
@@ -259,6 +263,7 @@ void main() {
           theme: AppTheme.lightTheme,
           home: EarningsScreen(
             db: db,
+            collectorId: 'KC-C-TEST01',
             audioService: audioService,
             locale: 'mr',
             ledgerRepository: ledgerRepo,

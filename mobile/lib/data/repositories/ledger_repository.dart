@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:drift/drift.dart';
+import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import '../local_database.dart';
 
@@ -261,5 +263,66 @@ class LedgerRepository {
         status: const Value('pending'),
       ),
     );
+  }
+
+  /// Real-time stream of Detailed collector overview from local SQLite database
+  Stream<EarningsOverviewData> watchDetailedOverview(String collectorId) {
+    return _db.select(_db.localLedger).watch().asyncMap((_) async {
+      return await getDetailedOverview(collectorId);
+    });
+  }
+
+  /// Sync ledger and payment updates directly from backend
+  Future<bool> syncLedgerFromServer(String collectorId, [String? serverBaseUrl]) async {
+    try {
+      if (Platform.environment.containsKey('FLUTTER_TEST')) return false;
+    } catch (_) {}
+    final List<String> candidateUrls = [];
+    if (serverBaseUrl != null) {
+      candidateUrls.add(serverBaseUrl);
+    } else {
+      candidateUrls.addAll([
+        'http://10.0.2.2:8000/api/v1',
+        'http://localhost:8000/api/v1',
+        'http://127.0.0.1:8000/api/v1',
+      ]);
+    }
+
+    for (final base in candidateUrls) {
+      try {
+        final uri = Uri.parse('$base/sync/pull?collector_id=$collectorId');
+        final resp = await http.get(uri).timeout(const Duration(seconds: 4));
+        if (resp.statusCode == 200) {
+          final data = jsonDecode(resp.body);
+          final ledgerList = data['ledger_entries'] as List<dynamic>?;
+          if (ledgerList != null) {
+            for (final item in ledgerList) {
+              final id = item['id']?.toString() ?? _uuid.v4();
+              final amount = (item['amount'] as num?)?.toDouble() ?? 0.0;
+              final balance = (item['balance_after'] as num?)?.toDouble() ?? amount;
+              final mode = item['payment_mode']?.toString() ?? 'cash_received';
+              final desc = item['description']?.toString() ?? 'Payment';
+              final recorded = DateTime.tryParse(item['recorded_at']?.toString() ?? '') ?? DateTime.now();
+
+              await _db.into(_db.localLedger).insertOnConflictUpdate(
+                LocalLedgerCompanion.insert(
+                  id: id,
+                  collectorId: collectorId,
+                  entryType: 'credit',
+                  amount: amount,
+                  paymentMode: Value(mode),
+                  description: desc,
+                  balanceAfter: balance,
+                  recordedAt: recorded,
+                  isSynced: const Value(true),
+                ),
+              );
+            }
+          }
+          return true;
+        }
+      } catch (_) {}
+    }
+    return false;
   }
 }

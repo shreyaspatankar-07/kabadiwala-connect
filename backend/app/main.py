@@ -12,6 +12,7 @@ from app.api.v1.recyclers import router as recyclers_router
 from app.api.v1.router import api_v1_router
 from app.api.v1.safety import router as safety_router
 from app.api.v1.verify import router as verify_router
+from app.api.v1.ws import router as ws_router
 from app.core.config import settings
 from app.core.errors import AppError, app_error_handler, generic_http_error_handler
 from app.core.logging import StructuredLoggingMiddleware
@@ -53,6 +54,9 @@ app.include_router(ledger_router)
 app.include_router(ml_router)
 app.include_router(safety_router)
 app.include_router(collectors_router)
+# WebSocket router — must be mounted at root scope (not under /api/v1)
+# so that HTTP → WebSocket upgrades work through standard proxies.
+app.include_router(ws_router)
 
 
 @app.get("/health", tags=["Health"])

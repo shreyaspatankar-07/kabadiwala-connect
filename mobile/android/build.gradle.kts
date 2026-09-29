@@ -18,16 +18,17 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
-subprojects {
-    plugins.withId("com.android.library") {
-        configure<com.android.build.gradle.BaseExtension> {
-            ndkVersion = "28.2.13676358"
-        }
-    }
-    plugins.withId("com.android.application") {
-        configure<com.android.build.gradle.BaseExtension> {
-            ndkVersion = "28.2.13676358"
-        }
+
+// ---------------------------------------------------------------------------
+// Force compileSdk=36 on ALL Android sub-projects (Flutter plugins).
+// gradle.afterProject fires AFTER each project finishes its own evaluation,
+// so our value wins over the plugin's own hardcoded compileSdkVersion(33).
+// This is the Gradle 9-compatible replacement for afterEvaluate.
+// ---------------------------------------------------------------------------
+gradle.afterProject {
+    extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
+        compileSdkVersion(36)
+        ndkVersion = "28.2.13676358"
     }
 }
 

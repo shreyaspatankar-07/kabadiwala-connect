@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
 import '../../data/matching/offline_matching_engine.dart';
 import '../../data/repositories/recycler_repository.dart';
+import 'handover_initiate_screen.dart';
 
 class BestBuyersScreen extends StatefulWidget {
   const BestBuyersScreen({
@@ -207,12 +208,12 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
         final buyer = _buyers[index];
         final isRankOne = buyer.rank == 1;
 
-        return _buildRecyclerCard(buyer, isRankOne, locale);
+        return _buildRecyclerCard(buyer, isRankOne, locale, index);
       },
     );
   }
 
-  Widget _buildRecyclerCard(RankedRecyclerResult buyer, bool isRankOne, String locale) {
+  Widget _buildRecyclerCard(RankedRecyclerResult buyer, bool isRankOne, String locale, int index) {
     const goldBorderColor = Color(0xFFF59E0B);
     final regularBorderColor = Colors.grey.shade300;
 
@@ -319,6 +320,7 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                     ),
                     // Speaker read-out button for this card
                     IconButton(
+                      key: Key('btn_speaker_buyer_$index'),
                       icon: const Icon(Icons.volume_up_rounded, color: AppTheme.greenGoEarn),
                       tooltip: 'ऐका / Listen',
                       onPressed: () {
@@ -346,7 +348,7 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            locale == 'hi' ? 'प्रस्तावित दर' : 'दिला जाणारा भाव',
+                            locale == 'en' ? 'Offered Rate' : (locale == 'hi' ? 'प्रस्तावित दर' : 'दिला जाणारा भाव'),
                             style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 2),
@@ -375,7 +377,7 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                           const Icon(Icons.location_on_rounded, color: Color(0xFFEF4444), size: 24),
                           const SizedBox(width: 4),
                           Text(
-                            '${buyer.distanceKm.toStringAsFixed(buyer.distanceKm.truncateToDouble() == buyer.distanceKm ? 0 : 1)} किमी',
+                            '${buyer.distanceKm.toStringAsFixed(buyer.distanceKm.truncateToDouble() == buyer.distanceKm ? 0 : 1)} ${locale == 'en' ? 'km' : 'किमी'}',
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                           ),
                         ],
@@ -402,10 +404,14 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                     Expanded(
                       child: Text(
                         buyer.pickupAvailable
-                            ? (locale == 'hi'
-                                ? 'घर पर पिकअप सुविधा (${buyer.estimatedPickupTime})'
-                                : 'घरी येऊन उचलणार (${buyer.estimatedPickupTime})')
-                            : (locale == 'hi' ? 'स्वयं ले जाएं (ड्रॉप-ऑफ)' : 'स्वतः केंद्रावर घेऊन जा (ड्रॉप-ऑफ)'),
+                            ? (locale == 'en'
+                                ? 'Doorstep Pickup (${buyer.estimatedPickupTime})'
+                                : (locale == 'hi'
+                                    ? 'घर पर पिकअप सुविधा (${buyer.estimatedPickupTime})'
+                                    : 'घरी येऊन उचलणार (${buyer.estimatedPickupTime})'))
+                            : (locale == 'en'
+                                ? 'Self Drop-off'
+                                : (locale == 'hi' ? 'स्वयं ले जाएं (ड्रॉप-ऑफ)' : 'स्वतः केंद्रावर घेऊन जा (ड्रॉप-ऑफ)')),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
@@ -435,7 +441,7 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                           HapticService.selectionClick();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('कॉल करत आहे: ${buyer.phone}'),
+                              content: Text(locale == 'en' ? 'Calling: ${buyer.phone}' : 'कॉल करत आहे: ${buyer.phone}'),
                               duration: const Duration(seconds: 2),
                             ),
                           );
@@ -448,6 +454,7 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                     // "Select this buyer" button (Primary Green, min 56dp height)
                     Expanded(
                       child: SizedBox(
+                        key: Key('btn_select_buyer_$index'),
                         height: 56,
                         child: ElevatedButton.icon(
                           key: Key('select_buyer_button_${buyer.recyclerId}'),
@@ -464,9 +471,27 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                                 content: Text(
                                   locale == 'hi'
                                       ? '${buyer.name} का चयन किया गया।'
-                                      : '${buyer.name} निवडले गेले.',
+                                      : (locale == 'en'
+                                          ? '${buyer.name} selected.'
+                                          : '${buyer.name} निवडले गेले.'),
                                 ),
                                 backgroundColor: AppTheme.greenGoEarn,
+                              ),
+                            );
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => HandoverInitiateScreen(
+                                  lotId: widget.lot.lotId ?? 'LOT-${DateTime.now().millisecondsSinceEpoch}',
+                                  initialWeightKg: widget.lot.weightKg,
+                                  category: widget.lot.category,
+                                  recyclerName: buyer.name,
+                                  quotedPrice: buyer.offeredRate,
+                                  db: widget.db,
+                                  audioService: widget.audioService,
+                                  locale: widget.locale,
+                                  initialGpsLat: widget.lot.collectionLat,
+                                  initialGpsLng: widget.lot.collectionLng,
+                                ),
                               ),
                             );
                           },
