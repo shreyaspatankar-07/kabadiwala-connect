@@ -44,6 +44,7 @@ dependencies:
   flutter_tts: ^4.2.5
   share_plus: ^13.3.0
   pdf: ^3.13.1
+  url_launcher: ^6.2.6
 
 dev_dependencies:
   flutter_test:

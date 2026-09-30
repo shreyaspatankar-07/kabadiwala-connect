@@ -1,10 +1,13 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../core/haptics/haptic_service.dart';
+import '../../core/sharing/share_service.dart';
 import '../../core/theme/app_theme.dart';
 
 class HandoverReceiptCard extends StatefulWidget {
@@ -42,7 +45,6 @@ class _HandoverReceiptCardState extends State<HandoverReceiptCard> {
     await HapticService.selectionClick();
     if (widget.onShareClicked != null) {
       widget.onShareClicked!();
-      return;
     }
 
     try {
@@ -50,13 +52,35 @@ class _HandoverReceiptCardState extends State<HandoverReceiptCard> {
       if (boundary != null) {
         final image = await boundary.toImage(pixelRatio: 2.0);
         final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-        if (byteData != null && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('पावती तयार झाली (Ready to Share via WhatsApp)'),
-              backgroundColor: AppTheme.greenGoEarn,
-            ),
+        if (byteData != null) {
+          final tempDir = await getTemporaryDirectory();
+          final filePath = '${tempDir.path}/handover_${widget.handoverRefNo}.png';
+          final file = File(filePath);
+          await file.writeAsBytes(byteData.buffer.asUint8List());
+
+          final shareText = widget.locale == 'hi'
+              ? 'हस्तांतरण डिजिटल पावती (Ref: ${widget.handoverRefNo}) - वजन: ${widget.weightKg}kg | कबाडीवाला कनेक्ट'
+              : (widget.locale == 'en'
+                  ? 'Digital Handover Certificate (Ref: ${widget.handoverRefNo}) - Weight: ${widget.weightKg}kg | Kabadiwala Connect'
+                  : 'डिजिटल हस्तांतरण पावती (Ref: ${widget.handoverRefNo}) - वजन: ${widget.weightKg}kg | कबाडीवाला कनेक्ट');
+
+          await ShareService.shareToWhatsApp(
+            filePath: file.path,
+            text: shareText,
           );
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  widget.locale == 'hi'
+                      ? 'पावती WhatsApp वर पाठवण्यासाठी तयार आहे'
+                      : 'पावती WhatsApp वर पाठवण्यासाठी तयार आहे (Ready to Share)',
+                ),
+                backgroundColor: const Color(0xFF25D366),
+              ),
+            );
+          }
         }
       }
     } catch (e) {

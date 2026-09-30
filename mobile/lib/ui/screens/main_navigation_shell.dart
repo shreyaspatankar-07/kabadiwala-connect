@@ -238,9 +238,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 child: SyncStatusBadge(
                   isOnline: _isOnline,
                   pendingCount: _pendingCount,
+                  locale: locale,
+                  audioService: widget.audioService,
                   onTapSync: () async {
                     setState(() {
                       _isOnline = true;
+                      _pendingCount = 0;
                     });
                     HapticService.mediumImpact();
                     try {
@@ -250,7 +253,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         await _priceRepo.fetchLatestPricesFromServer();
                       }
                     } catch (_) {}
-                    widget.audioService.speakPrompt(_isOnline ? 'syncSuccess' : 'offlineNotice');
                   },
                 ),
               ),

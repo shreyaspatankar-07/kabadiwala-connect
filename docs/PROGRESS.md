@@ -4,9 +4,18 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 11+ (7 Critical Features & Tests Complete)
+## Current Status: Phase 12+ (Online/Offline System UI, WhatsApp Integration & Updated APKs)
 
 ### Completed Items
+- [x] **Online/Offline System UI & Interactive Diagnostics Dialog**:
+  - Added modern, high-contrast, pulsating connectivity badge in `SyncStatusBadge` with multilingual support (`mr`, `hi`, `en`).
+  - Created [`SystemStatusDialog`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/system_status_dialog.dart) bottom sheet diagnostics showing network status, Drift SQLite local engine status, JNARDDC cloud sync queue, and interactive one-tap "Check Connection & Sync" with vernacular TTS voice narration.
+- [x] **Direct WhatsApp Sharing Integration**:
+  - Added [`ShareService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/sharing/share_service.dart) with direct WhatsApp URL scheme support and fallback to Android system share sheet.
+  - Implemented high-resolution PNG receipt card capture and instant WhatsApp sharing in [`HandoverReceiptCard`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/handover_receipt_card.dart).
+  - Added dedicated WhatsApp button (`#25D366`) and general share actions to the PDF Earnings Statement export modal in [`EarningsScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/earnings_screen.dart).
+- [x] **Updated Release APK Generation**:
+  - Built universal release APK (`app-release.apk`) and architecture-split release APKs (`app-arm64-v8a-release.apk`, `app-armeabi-v7a-release.apk`, `app-x86_64-release.apk`) strictly adhering to size budgets (<25MB, ~18-20MB).
 - [x] **7 Critical Platform Features (Dual Confirmation, Live Balance Sync, PDF Statement, Vernacular Audio, Dynamic TFLite ML, RBAC Portal & SQLite Session)**:
   - **1. Double Confirmation & "Paid" Status (Backend & Next.js Portal)**:
     - Added `collector_confirmed` and `recycler_confirmed` columns to `Transaction`, `Traceability`, and `LedgerEntry` tables in backend schema.

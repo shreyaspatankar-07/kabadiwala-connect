@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/pdf/pdf_statement_generator.dart';
+import '../../core/sharing/share_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
 import '../../data/repositories/ledger_repository.dart';
@@ -179,16 +180,17 @@ class _EarningsScreenState extends State<EarningsScreen> {
       }
 
       if (mounted) {
-        _showPdfDialog(context, file.path);
+        _showPdfDialog(context, file.path, refNo);
       }
     } catch (e) {
       debugPrint('[EarningsScreen] PDF Export error: $e');
     }
   }
 
-  void _showPdfDialog(BuildContext context, String filePath) {
+  void _showPdfDialog(BuildContext context, String filePath, [String? statementRef]) {
     final isMr = widget.locale == 'mr';
     final isHi = widget.locale == 'hi';
+    final statementRefNo = statementRef ?? 'STMT-${DateTime.now().millisecondsSinceEpoch % 10000}';
 
     showDialog(
       context: context,
@@ -260,19 +262,48 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
+              // WhatsApp Share Action
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  key: const Key('btn_share_whatsapp_pdf'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF25D366),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                  onPressed: () async {
+                    await ShareService.shareToWhatsApp(
+                      filePath: filePath,
+                      text: isMr
+                          ? 'कबाडीवाला कनेक्ट - ई-कचरा कमाई पावती ($statementRefNo)'
+                          : (isHi
+                              ? 'कबाडीवाला कनेक्ट - ई-कचरा आय विवरण ($statementRefNo)'
+                              : 'Kabadiwala Connect - E-Waste Earnings Statement ($statementRefNo)'),
+                    );
+                  },
+                  icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
+                  label: Text(
+                    isMr ? 'WhatsApp वर पाठवा' : (isHi ? 'WhatsApp पर भेजें' : 'Share via WhatsApp'),
+                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.greenGoEarn,
-                        side: const BorderSide(color: AppTheme.greenGoEarn),
+                        foregroundColor: const Color(0xFF0284C7),
+                        side: const BorderSide(color: Color(0xFF0284C7)),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       onPressed: () {
-                        Share.shareXFiles(
-                          [XFile(filePath)],
+                        ShareService.shareGeneral(
+                          filePath: filePath,
                           text: isMr
                               ? 'माझे ई-कचरा कमाई विवरण'
                               : (isHi ? 'मेरी ई-कचरा आय विवरण' : 'My E-Waste Earnings Statement'),
@@ -280,7 +311,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                       },
                       icon: const Icon(Icons.share_rounded, size: 18),
                       label: Text(
-                        isMr ? 'शेअर करा' : (isHi ? 'शेयर करें' : 'Share'),
+                        isMr ? 'इतर शेअर' : (isHi ? 'अन्य शेयर' : 'Other Share'),
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ),
