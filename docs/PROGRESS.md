@@ -4,9 +4,29 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 12+ (Online/Offline System UI, WhatsApp Integration & Updated APKs)
+## Current Status: Phase 14 (ML Model Serving: LightGBM Valuation & Isolation Forest Fraud Detection)
 
 ### Completed Items
+- [x] **LightGBM Valuation & Isolation Forest Fraud Detection Serving**:
+  - Implemented modern FastAPI lifespan caching in [`backend/app/main.py`](file:///c:/dev/kabadiwala-connect/backend/app/main.py) to load `valuation_lightgbm.txt` and `anomaly_detector.joblib` into memory on startup via `lightgbm.Booster` and `joblib.load`.
+  - Added Pydantic schemas: `ValuationRequest` (`weight_kg`, `condition_score`, `region_index`, `market_demand_index`, `category`), `ValuationResponse`, `TransactionRequest` (`user_history_score`, `transaction_frequency`, `weight_anomaly_score`, `price_variance`), and `FraudCheckResponse`.
+  - Built endpoint `POST /api/v1/valuate` formatting inputs into a 4-feature Pandas DataFrame and running LightGBM regressor inference.
+  - Built endpoint `POST /api/v1/fraud-check` formatting inputs into a 2D NumPy array and running Isolation Forest inference returning `1` (Normal) or `-1` (Fraudulent/Anomaly).
+  - Added robust try/except error handling with HTTP 500 status on missing binaries or inference failures.
+  - Updated [`backend/requirements.txt`](file:///c:/dev/kabadiwala-connect/backend/requirements.txt) with `lightgbm`, `scikit-learn`, `joblib`, and `pandas`.
+  - Added automated test suite in [`backend/tests/test_model_serving.py`](file:///c:/dev/kabadiwala-connect/backend/tests/test_model_serving.py) (all 81 backend tests passing).
+
+- [x] **INT8 Quantized Edge AI Vision Model & Camera Integration**:
+  - Added [`EdgeMaterialClassifier`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/ml/edge_material_classifier.dart) with asynchronous TFLite model loading (`assets/models/material_classifier_int8.tflite`).
+  - Implemented exact INT8 input tensor scale and zero_point extraction via interpreter (`inputTensor.params.scale`, `inputTensor.params.zeroPoint`).
+  - Image preprocessing: 224x224 frame resize and RGB pixel extraction using `image` package.
+  - Implemented exact INT8 quantization formula: `((pixel_value / scale) + zero_point)` cast to signed 8-bit integer (`-128` to `127`).
+  - Output tensor inference & mapping to 10 alphabetically sorted categories: `['Battery', 'Keyboard', 'Microwave', 'Mobile', 'Mouse', 'PCB', 'Player', 'Printer', 'Television', 'Washing Machine']`.
+  - Fallback logic: if confidence < 0.55, triggers fallback state displaying warning banner: *"Low Confidence: Please select item manually from the grid."* and opens interactive manual selection grid; otherwise displays predicted category and confidence percentage.
+  - Added [`MaterialScanScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/material_scan_screen.dart) featuring live camera preview (`CameraPreview`), 224x224 viewfinder targeting box, 72dp tactile capture shutter button, flash toggle, camera flip, vernacular audio TTS guidance, and lifecycle pause/resume management.
+  - Added `tflite_flutter` and `image` to `mobile/pubspec.yaml` (alongside `camera`).
+  - Added full test suite in [`edge_material_classifier_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/edge_material_classifier_test.dart) and [`material_scan_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/material_scan_screen_test.dart). All 69 tests pass with 0 errors.
+
 - [x] **Online/Offline System UI & Interactive Diagnostics Dialog**:
   - Added modern, high-contrast, pulsating connectivity badge in `SyncStatusBadge` with multilingual support (`mr`, `hi`, `en`).
   - Created [`SystemStatusDialog`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/system_status_dialog.dart) bottom sheet diagnostics showing network status, Drift SQLite local engine status, JNARDDC cloud sync queue, and interactive one-tap "Check Connection & Sync" with vernacular TTS voice narration.
