@@ -193,5 +193,49 @@ void main() {
 
       expect(confirmedCategory, 'Mobile');
     });
+
+    testWidgets('4. Scanned Image Preview: Clicking image icon opens ImagePreviewDialog',
+        (WidgetTester tester) async {
+      final highConfMock = MockEdgeMaterialClassifier(
+        mockResult: const MaterialClassificationResult(
+          category: 'Mobile',
+          confidence: 0.89,
+          isLowConfidence: false,
+          confidences: {'Mobile': 0.89},
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: MaterialScanScreen(
+            classifier: highConfMock,
+            audioService: audioService,
+            locale: 'mr',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Capture frame
+      await tester.tap(find.byKey(const Key('btn_scan_capture')));
+      await tester.pumpAndSettle();
+
+      // Scanned photo thumbnail and image icon are displayed
+      expect(find.byKey(const Key('btn_preview_scanned_image')), findsOneWidget);
+      expect(find.byKey(const Key('btn_preview_scanned_image_icon')), findsOneWidget);
+
+      // Tap preview image icon button
+      await tester.tap(find.byKey(const Key('btn_preview_scanned_image_icon')));
+      await tester.pumpAndSettle();
+
+      // ImagePreviewDialog is displayed
+      expect(find.byKey(const Key('dialog_image_preview')), findsOneWidget);
+
+      // Close dialog
+      await tester.tap(find.byKey(const Key('btn_close_image_preview')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('dialog_image_preview')), findsNothing);
+    });
   });
 }

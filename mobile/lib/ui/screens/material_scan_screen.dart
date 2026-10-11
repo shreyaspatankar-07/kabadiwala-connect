@@ -6,7 +6,9 @@ import 'package:image/image.dart' as img;
 import '../../core/audio/audio_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/ml/edge_material_classifier.dart';
+import '../../core/services/location_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../widgets/image_preview_dialog.dart';
 import '../widgets/speaker_button.dart';
 
 /// Live Camera Screen integrating INT8 Quantized Edge AI Material Classifier.
@@ -59,6 +61,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
   MaterialClassificationResult? _lastResult;
   String? _manuallySelectedCategory;
   Uint8List? _capturedFrameBytes;
+  String? _capturedLocationString;
 
   @override
   void initState() {
@@ -236,12 +239,19 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
 
       _capturedFrameBytes = imageBytes;
 
-      // Run INT8 model inference
-      final result = await _classifier.classifyImage(imageBytes);
+      // Run INT8 model inference & fetch real device GPS coordinates concurrently
+      final futures = await Future.wait([
+        _classifier.classifyImage(imageBytes),
+        LocationService.getCurrentLocationString(),
+      ]);
+
+      final result = futures[0] as MaterialClassificationResult;
+      final locationString = futures[1] as String;
 
       if (mounted) {
         setState(() {
           _lastResult = result;
+          _capturedLocationString = locationString;
           _manuallySelectedCategory = result.isLowConfidence ? null : result.category;
           _isProcessingFrame = false;
         });
@@ -293,6 +303,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
       _lastResult = null;
       _manuallySelectedCategory = null;
       _capturedFrameBytes = null;
+      _capturedLocationString = null;
     });
   }
 
@@ -602,6 +613,9 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
             ),
             const SizedBox(height: 14),
 
+            // Captured frame preview bar with clickable image icon
+            _buildScannedImageThumbnailBar(),
+
             if (isLowConfidence) ...[
               // Fallback Warning UI requirement:
               // Display a warning UI saying "Low Confidence: Please select item manually from the grid."
@@ -664,6 +678,119 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
           ],
         ),
       ),
+    );
+  }
+
+  /// Clickable thumbnail bar showing the captured image with an image icon to preview.
+  Widget _buildScannedImageThumbnailBar() {
+    if (_capturedFrameBytes == null) return const SizedBox.shrink();
+
+    final String previewLabel = widget.locale == 'hi'
+        ? 'फोटो देखें'
+        : (widget.locale == 'en' ? 'View Photo' : 'फोटो पहा');
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderColor),
+      ),
+      child: Row(
+        children: [
+          // Clickable image thumbnail with zoom icon
+          GestureDetector(
+            key: const Key('btn_preview_scanned_image'),
+            onTap: _showScannedImagePreview,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.memory(
+                    _capturedFrameBytes!,
+                    width: 52,
+                    height: 52,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: AppTheme.greenGoEarnLight,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.image_rounded,
+                        color: AppTheme.greenGoEarn,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
+                    color: Colors.black87,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.zoom_in_rounded, size: 14, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.locale == 'hi'
+                      ? 'स्कैन की गई फोटो'
+                      : (widget.locale == 'en' ? 'Scanned Photo' : 'स्कॅन केलेला फोटो'),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  '${(_capturedFrameBytes!.length / 1024.0).toStringAsFixed(1)} KB • AI स्कॅनिंग',
+                  style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                ),
+              ],
+            ),
+          ),
+          // Clickable image icon button
+          TextButton.icon(
+            key: const Key('btn_preview_scanned_image_icon'),
+            onPressed: _showScannedImagePreview,
+            icon: const Icon(Icons.image_rounded, size: 20, color: AppTheme.greenGoEarn),
+            label: Text(
+              previewLabel,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: AppTheme.greenGoEarn,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showScannedImagePreview() {
+    if (_capturedFrameBytes == null) return;
+    ImagePreviewDialog.show(
+      context: context,
+      imageBytes: _capturedFrameBytes!,
+      title: widget.locale == 'hi'
+          ? 'स्कैन फोटो पूर्वावलोकन'
+          : (widget.locale == 'en' ? 'Scanned Photo Preview' : 'स्कॅन फोटो पूर्वावलोकन'),
+      sizeInKb: _capturedFrameBytes!.length / 1024.0,
+      locationString: _capturedLocationString,
+      locale: widget.locale,
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/hardware/image_processor.dart';
 import '../../core/hardware/location_service.dart';
+import '../../core/services/location_service.dart' as gps_service;
 import '../../core/hardware/scale_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/ml/material_classifier.dart';
@@ -176,12 +177,29 @@ class _AddLotScreenState extends State<AddLotScreen> {
   Future<void> _handleCapturePhoto() async {
     if (_currentPhotos.length >= 4) return;
 
+    // Fetch real-time device location using Geolocator
+    final String locationStr = await gps_service.LocationService.getCurrentLocationString();
+    final coords = gps_service.LocationService.parseCoordinates(locationStr);
+    final double? currentLat = coords?.latitude ?? _currentLocation?.latitude;
+    final double? currentLng = coords?.longitude ?? _currentLocation?.longitude;
+
+    if (coords != null && _currentLocation != null) {
+      _currentLocation = CollectorLocation(
+        district: _currentLocation!.district,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        isFallback: false,
+        source: 'gps',
+      );
+    }
+
     ProcessedPhoto photo;
     if (_isTestEnvironment) {
       photo = ImageProcessor.createMockPhoto(
         photoId: 'IMG_TEST_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-        latitude: _currentLocation?.latitude,
-        longitude: _currentLocation?.longitude,
+        latitude: currentLat,
+        longitude: currentLng,
+        locationString: locationStr,
       );
     } else {
       try {
@@ -198,21 +216,24 @@ class _AddLotScreenState extends State<AddLotScreen> {
           photo = await ImageProcessor.processImage(
             rawBytes: rawBytes,
             photoId: 'IMG_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-            latitude: _currentLocation?.latitude,
-            longitude: _currentLocation?.longitude,
+            latitude: currentLat,
+            longitude: currentLng,
+            locationString: locationStr,
           );
         } else {
           photo = ImageProcessor.createMockPhoto(
             photoId: 'IMG_DEMO_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-            latitude: _currentLocation?.latitude,
-            longitude: _currentLocation?.longitude,
+            latitude: currentLat,
+            longitude: currentLng,
+            locationString: locationStr,
           );
         }
       } catch (_) {
         photo = ImageProcessor.createMockPhoto(
           photoId: 'IMG_FALLBACK_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-          latitude: _currentLocation?.latitude,
-          longitude: _currentLocation?.longitude,
+          latitude: currentLat,
+          longitude: currentLng,
+          locationString: locationStr,
         );
       }
     }

@@ -29,6 +29,39 @@ class MaterialCategoryInfo {
   }
 }
 
+/// Diagnostics for inspecting INT8 input tensor distribution, range, and saturation.
+class TensorDiagnostics {
+  final int min;
+  final int max;
+  final double mean;
+  final double stdDev;
+  final int saturatedMinCount; // Count of -128 values
+  final int saturatedMaxCount; // Count of 127 values
+  final int totalElements;
+  final bool isSaturated;
+
+  const TensorDiagnostics({
+    required this.min,
+    required this.max,
+    required this.mean,
+    required this.stdDev,
+    required this.saturatedMinCount,
+    required this.saturatedMaxCount,
+    required this.totalElements,
+    required this.isSaturated,
+  });
+
+  /// Ratio of saturated elements (-128 or 127) vs total tensor size.
+  double get saturationRatio =>
+      totalElements > 0 ? (saturatedMinCount + saturatedMaxCount) / totalElements : 0.0;
+
+  @override
+  String toString() =>
+      'TensorDiagnostics(min: $min, max: $max, mean: ${mean.toStringAsFixed(2)}, '
+      'stdDev: ${stdDev.toStringAsFixed(2)}, saturated: $isSaturated '
+      '(${(saturationRatio * 100).toStringAsFixed(1)}% pegged))';
+}
+
 /// Output result of the Edge AI classification.
 class MaterialClassificationResult {
   final String category;
@@ -36,6 +69,7 @@ class MaterialClassificationResult {
   final bool isLowConfidence;
   final Map<String, double> confidences;
   final Uint8List? frameBytes;
+  final TensorDiagnostics? tensorDiagnostics;
 
   const MaterialClassificationResult({
     required this.category,
@@ -43,6 +77,7 @@ class MaterialClassificationResult {
     required this.isLowConfidence,
     required this.confidences,
     this.frameBytes,
+    this.tensorDiagnostics,
   });
 
   int get confidencePercent => (confidence * 100).round();
@@ -218,6 +253,35 @@ class EdgeMaterialClassifier {
     }
   }
 
+  /// Center-crops an image to a 1:1 square before resizing to [targetSize]x[targetSize].
+  ///
+  /// Prevents non-square camera frames (16:9, 4:3) from being squashed or stretched,
+  /// preserving critical aspect ratios of e-waste scrap (PCBs, cables, appliances).
+  static img.Image centerCropAndResize(
+    img.Image source, {
+    int targetSize = 224,
+    img.Interpolation interpolation = img.Interpolation.linear,
+  }) {
+    final int cropSize = min(source.width, source.height);
+    final int cropX = (source.width - cropSize) ~/ 2;
+    final int cropY = (source.height - cropSize) ~/ 2;
+
+    final img.Image cropped = img.copyCrop(
+      source,
+      x: cropX,
+      y: cropY,
+      width: cropSize,
+      height: cropSize,
+    );
+
+    return img.copyResize(
+      cropped,
+      width: targetSize,
+      height: targetSize,
+      interpolation: interpolation,
+    );
+  }
+
   /// Exact INT8 quantization formula:
   /// (pixel_value / scale) + zero_point, casting to Int8 (-128 to 127).
   static int quantizePixelToInt8(num pixelValue, double scale, int zeroPoint) {
@@ -226,24 +290,96 @@ class EdgeMaterialClassifier {
     return quantized.clamp(-128, 127);
   }
 
+  /// Quantizes raw 0-255 pixels with automatic model domain normalization.
+  ///
+  /// Prevents input tensor saturation (where dividing 255 by ~0.00784 clamps every pixel to 127).
+  /// - If scale < 0.05 and zeroPoint between -30 and 30: Model expects normalized [-1.0, 1.0].
+  /// - If scale < 0.05 and zeroPoint < -50: Model expects normalized [0.0, 1.0].
+  /// - Otherwise: Model expects raw 0-255 inputs.
+  static int quantizeNormalizedPixelToInt8(
+    num rawPixel,
+    double scale,
+    int zeroPoint, {
+    bool? forceMinusOneToOne,
+  }) {
+    final double effectiveScale = (scale != 0.0) ? scale : 1.0;
+    final double floatDomainVal;
+
+    if (forceMinusOneToOne == true ||
+        (forceMinusOneToOne == null && scale < 0.05 && zeroPoint >= -30 && zeroPoint <= 30)) {
+      // Standard MobileNet [-1.0, 1.0] domain
+      floatDomainVal = (rawPixel / 127.5) - 1.0;
+    } else if (forceMinusOneToOne == false ||
+        (forceMinusOneToOne == null && scale < 0.05 && zeroPoint < -50)) {
+      // Standard [0.0, 1.0] domain
+      floatDomainVal = rawPixel / 255.0;
+    } else {
+      // Direct raw pixel domain
+      floatDomainVal = rawPixel.toDouble();
+    }
+
+    final int quantized = ((floatDomainVal / effectiveScale) + zeroPoint).round();
+    return quantized.clamp(-128, 127);
+  }
+
+  /// Inspects tensor values to detect clipping, flat distributions, or saturation.
+  static TensorDiagnostics computeTensorDiagnostics(List<List<List<List<int>>>> tensor) {
+    int minVal = 127;
+    int maxVal = -128;
+    int sumVal = 0;
+    double sumSq = 0.0;
+    int satMin = 0;
+    int satMax = 0;
+    int total = 0;
+
+    for (final batch in tensor) {
+      for (final row in batch) {
+        for (final pixel in row) {
+          for (final channel in pixel) {
+            if (channel < minVal) minVal = channel;
+            if (channel > maxVal) maxVal = channel;
+            if (channel == -128) satMin++;
+            if (channel == 127) satMax++;
+            sumVal += channel;
+            sumSq += channel * channel;
+            total++;
+          }
+        }
+      }
+    }
+
+    final double mean = total > 0 ? sumVal / total : 0.0;
+    final double variance = total > 0 ? (sumSq / total) - (mean * mean) : 0.0;
+    final double stdDev = variance > 0 ? sqrt(variance) : 0.0;
+    final double saturationRatio = total > 0 ? (satMin + satMax) / total : 0.0;
+    // Saturated if > 80% pegged at bounds or identical values across entire tensor
+    final bool isSaturated = (saturationRatio > 0.80) || (minVal == maxVal && total > 1);
+
+    return TensorDiagnostics(
+      min: minVal,
+      max: maxVal,
+      mean: mean,
+      stdDev: stdDev,
+      saturatedMinCount: satMin,
+      saturatedMaxCount: satMax,
+      totalElements: total,
+      isSaturated: isSaturated,
+    );
+  }
+
   /// Preprocesses frame bytes, applies INT8 quantization, runs model, and returns prediction.
   Future<MaterialClassificationResult> classifyImage(Uint8List imageBytes) async {
     if (!_isModelLoaded) {
       await loadModel();
     }
 
-    // 1. Image Preprocessing: Decode and resize to 224x224
+    // 1. Image Preprocessing: Decode, center-crop (1:1), and resize to 224x224
     final img.Image? decoded = img.decodeImage(imageBytes);
     if (decoded == null) {
       throw ArgumentError('Unable to decode image frame bytes for classification.');
     }
 
-    final img.Image resized = img.copyResize(
-      decoded,
-      width: 224,
-      height: 224,
-      interpolation: img.Interpolation.linear,
-    );
+    final img.Image resized = centerCropAndResize(decoded, targetSize: 224);
 
     // 2. Extract RGB pixels and construct quantized INT8 input tensor [1, 224, 224, 3]
     final input = List.generate(
@@ -254,14 +390,23 @@ class EdgeMaterialClassifier {
           224,
           (x) {
             final pixel = resized.getPixel(x, y);
-            final int r = quantizePixelToInt8(pixel.r, _inputScale, _inputZeroPoint);
-            final int g = quantizePixelToInt8(pixel.g, _inputScale, _inputZeroPoint);
-            final int b = quantizePixelToInt8(pixel.b, _inputScale, _inputZeroPoint);
+            final int r = quantizeNormalizedPixelToInt8(pixel.r, _inputScale, _inputZeroPoint);
+            final int g = quantizeNormalizedPixelToInt8(pixel.g, _inputScale, _inputZeroPoint);
+            final int b = quantizeNormalizedPixelToInt8(pixel.b, _inputScale, _inputZeroPoint);
             return [r, g, b];
           },
         ),
       ),
     );
+
+    // 3. Tensor validation diagnostics
+    final diagnostics = computeTensorDiagnostics(input);
+    if (kDebugMode) {
+      print('[EdgeMaterialClassifier] $diagnostics');
+      if (diagnostics.isSaturated) {
+        print('[EdgeMaterialClassifier] WARNING: Input tensor is saturated! Check quantization scale/zeroPoint.');
+      }
+    }
 
     List<double> probabilities;
 
@@ -322,6 +467,7 @@ class EdgeMaterialClassifier {
       isLowConfidence: isLowConfidence,
       confidences: confidences,
       frameBytes: imageBytes,
+      tensorDiagnostics: diagnostics,
     );
   }
 

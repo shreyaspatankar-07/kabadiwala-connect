@@ -25,7 +25,19 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - Fallback logic: if confidence < 0.55, triggers fallback state displaying warning banner: *"Low Confidence: Please select item manually from the grid."* and opens interactive manual selection grid; otherwise displays predicted category and confidence percentage.
   - Added [`MaterialScanScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/material_scan_screen.dart) featuring live camera preview (`CameraPreview`), 224x224 viewfinder targeting box, 72dp tactile capture shutter button, flash toggle, camera flip, vernacular audio TTS guidance, and lifecycle pause/resume management.
   - Added `tflite_flutter` and `image` to `mobile/pubspec.yaml` (alongside `camera`).
-  - Added full test suite in [`edge_material_classifier_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/edge_material_classifier_test.dart) and [`material_scan_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/material_scan_screen_test.dart). All 69 tests pass with 0 errors.
+  - Added full test suite in [`edge_material_classifier_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/edge_material_classifier_test.dart) and [`material_scan_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/material_scan_screen_test.dart).
+
+- [x] **Edge AI Model Accuracy & Tensor Preprocessing Enhancements**:
+  - **Aspect-Ratio Center Crop**: Added `EdgeMaterialClassifier.centerCropAndResize()` to crop rectangular camera frames (16:9 / 4:3) into a 1:1 square before downscaling to 224x224, preventing geometric stretching and distortion of e-waste parts (PCBs, cables, monitors).
+  - **Model Domain Normalization**: Added `quantizeNormalizedPixelToInt8()` preventing INT8 input tensor saturation (where raw 0-255 pixels divided by tiny quantization scales like `0.00784` pegged all channels to `127`). Dynamically identifies normalized domain (`[-1.0, 1.0]` vs `[0.0, 1.0]` vs raw `[0, 255]`) and ensures well-distributed inputs across the entire `[-128, 127]` INT8 spectrum.
+  - **Tensor Validation Diagnostics**: Added [`TensorDiagnostics`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/ml/edge_material_classifier.dart) calculating tensor `min`, `max`, `mean`, `stdDev`, `saturationRatio`, and `isSaturated` flag. Alerts in debug mode if tensor saturation occurs and attaches telemetry to `MaterialClassificationResult.tensorDiagnostics`.
+  - Expanded unit test coverage in [`edge_material_classifier_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/edge_material_classifier_test.dart) with 4 new tests. All 73 mobile tests pass with 0 errors.
+
+- [x] **Interactive High-Resolution Image Preview Feature**:
+  - Created [`ImagePreviewDialog`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/image_preview_dialog.dart) featuring full interactive pinch-to-zoom (`InteractiveViewer`), metadata display (file size in KB, SHA-256 cryptographic audit hash, GPS coordinates), vernacular Marathi/Hindi/English titles, and large 56dp tactile close button.
+  - Integrated into [`CameraCaptureCard`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/camera_capture_card.dart): clicking any captured photo thumbnail or image icon (`btn_preview_photo_$index`) instantly launches the interactive preview modal.
+  - Integrated into [`MaterialScanScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/material_scan_screen.dart): clicking the scanned photo preview thumbnail or image icon button (`btn_preview_scanned_image` / `btn_preview_scanned_image_icon`) opens the full photo preview modal.
+  - Added dedicated unit & widget test suite in [`image_preview_dialog_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/image_preview_dialog_test.dart) and updated [`material_scan_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/material_scan_screen_test.dart). All 76 mobile tests pass with 0 errors.
 
 - [x] **Online/Offline System UI & Interactive Diagnostics Dialog**:
   - Added modern, high-contrast, pulsating connectivity badge in `SyncStatusBadge` with multilingual support (`mr`, `hi`, `en`).
