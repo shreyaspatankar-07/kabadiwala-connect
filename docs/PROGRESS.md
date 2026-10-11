@@ -4,17 +4,16 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 15 (ML Encoding Hardening & Model Fallback Safeguards)
+## Current Status: Phase 15 (ML Model Fallback Safeguards & Verification)
 
 ### Completed Items
-- [x] **Encoding & Vernacular Devanagari Hardening**:
-  - Verified and confirmed UTF-8 encoding and Rupee sign (`₹` / `\u20b9`) integrity in [`ml/src/anomaly/anomaly_detector.py`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py).
-  - Updated category metadata in [`EdgeMaterialClassifier`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/ml/edge_material_classifier.dart) with authentic Devanagari translations across all 10 categories (Battery, Keyboard, Microwave, Mobile, Mouse, PCB, Player, Printer, Television, Washing Machine).
-  - Cleaned all mojibake byte patterns across codebase.
 - [x] **Strict Model Loading & Fallback Safeguards**:
   - Updated [`AnomalyDetector._load_model`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py) to log failed loads at ERROR level with exact file path.
   - Added `model_source` property recording `"trained"` vs `"synthetic_fallback"`.
   - Added strict enforcement via `KABADIWALA_REQUIRE_TRAINED_MODELS="1"`, raising an exception instead of silently replacing models.
+- [x] **Encoding & Asset Verification**:
+  - Verified and confirmed UTF-8 encoding integrity and Rupee sign (`₹` / `\u20b9`) in [`ml/src/anomaly/anomaly_detector.py`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py).
+  - Verified [`EdgeMaterialClassifier`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/ml/edge_material_classifier.dart) contains clean UTF-8 Devanagari characters with 0 mojibake markers; preserved original category strings pending native-speaker review.
 - [x] **Cross-Stack ML Architectural Investigation**:
   - Detailed feature matrix comparison for Isolation Forest anomaly detection (3-feature runtime vs 8-feature scratch training pipeline).
   - Audited legacy `/api/v1/fraud-check` and `/api/v1/valuate` endpoints vs `ValuationService` and mobile offline evaluation.
