@@ -163,15 +163,15 @@ class EdgeMaterialClassifier {
     'Mobile': MaterialCategoryInfo(
       id: 'Mobile',
       displayNameEn: 'Mobile Phone',
-      displayNameMr: 'मोबाईल फोन (Mobile)',
-      displayNameHi: 'मोबाइल फोन (Mobile)',
+      displayNameMr: 'मोबाइल (Mobile)',
+      displayNameHi: 'मोबाइल (Mobile)',
       icon: Icons.smartphone_rounded,
       color: Color(0xFF7C3AED), // Purple
     ),
     'Mouse': MaterialCategoryInfo(
       id: 'Mouse',
       displayNameEn: 'Computer Mouse',
-      displayNameMr: 'माऊस (Mouse)',
+      displayNameMr: 'माउस (Mouse)',
       displayNameHi: 'माउस (Mouse)',
       icon: Icons.mouse_rounded,
       color: Color(0xFF0D9488), // Teal
@@ -179,15 +179,15 @@ class EdgeMaterialClassifier {
     'PCB': MaterialCategoryInfo(
       id: 'PCB',
       displayNameEn: 'Circuit Board (PCB)',
-      displayNameMr: 'सर्किट बोर्ड (PCB)',
-      displayNameHi: 'सर्किट बोर्ड (PCB)',
+      displayNameMr: 'पीसीबी (PCB)',
+      displayNameHi: 'पीसीबी (PCB)',
       icon: Icons.memory_rounded,
       color: Color(0xFF047857), // Green
     ),
     'Player': MaterialCategoryInfo(
       id: 'Player',
       displayNameEn: 'Media / DVD Player',
-      displayNameMr: 'प्लेअर (Player)',
+      displayNameMr: 'प्लेयर (Player)',
       displayNameHi: 'प्लेयर (Player)',
       icon: Icons.speaker_rounded,
       color: Color(0xFFEA580C), // Orange
@@ -203,8 +203,8 @@ class EdgeMaterialClassifier {
     'Television': MaterialCategoryInfo(
       id: 'Television',
       displayNameEn: 'Television (TV)',
-      displayNameMr: 'टीव्ही (Television)',
-      displayNameHi: 'टेलीविजन (TV)',
+      displayNameMr: 'टेलिव्हिजन (Television)',
+      displayNameHi: 'टेलीविज़न (Television)',
       icon: Icons.tv_rounded,
       color: Color(0xFF0284C7), // Sky Blue
     ),

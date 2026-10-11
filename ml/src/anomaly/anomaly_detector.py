@@ -10,13 +10,17 @@ Detects anomalous e-waste lots via:
 Produces actionable, plain-language reason strings (English / translatable).
 """
 
+import logging
 import math
+import os
 from pathlib import Path
 from typing import Any
 
 import joblib
 import numpy as np
 from sklearn.ensemble import IsolationForest
+
+logger = logging.getLogger(__name__)
 
 # Weight bounds per category from data pipeline schemas
 CATEGORY_WEIGHT_BOUNDS = {
@@ -68,15 +72,31 @@ class AnomalyDetector:
             )
 
         self.iso_forest: IsolationForest | None = None
+        self.model_source: str = "synthetic_fallback"
         self._load_model()
 
     def _load_model(self) -> None:
         if self.model_path.exists():
             try:
                 self.iso_forest = joblib.load(self.model_path)
-            except Exception:
+                self.model_source = "trained"
+            except Exception as exc:
+                logger.error(
+                    f"Failed to load trained anomaly model from {self.model_path}: {exc}",
+                    exc_info=True,
+                )
+                if os.environ.get("KABADIWALA_REQUIRE_TRAINED_MODELS") == "1":
+                    raise
                 self.iso_forest = None
+        else:
+            msg = f"Trained anomaly model file not found at {self.model_path}"
+            logger.error(msg)
+            if os.environ.get("KABADIWALA_REQUIRE_TRAINED_MODELS") == "1":
+                raise FileNotFoundError(msg)
+            self.iso_forest = None
+
         if self.iso_forest is None:
+            self.model_source = "synthetic_fallback"
             self._fit_default_model()
 
     def _fit_default_model(self) -> None:

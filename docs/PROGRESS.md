@@ -4,9 +4,21 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 14 (ML Model Serving: LightGBM Valuation & Isolation Forest Fraud Detection)
+## Current Status: Phase 15 (ML Encoding Hardening & Model Fallback Safeguards)
 
 ### Completed Items
+- [x] **Encoding & Vernacular Devanagari Hardening**:
+  - Verified and confirmed UTF-8 encoding and Rupee sign (`₹` / `\u20b9`) integrity in [`ml/src/anomaly/anomaly_detector.py`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py).
+  - Updated category metadata in [`EdgeMaterialClassifier`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/ml/edge_material_classifier.dart) with authentic Devanagari translations across all 10 categories (Battery, Keyboard, Microwave, Mobile, Mouse, PCB, Player, Printer, Television, Washing Machine).
+  - Cleaned all mojibake byte patterns across codebase.
+- [x] **Strict Model Loading & Fallback Safeguards**:
+  - Updated [`AnomalyDetector._load_model`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py) to log failed loads at ERROR level with exact file path.
+  - Added `model_source` property recording `"trained"` vs `"synthetic_fallback"`.
+  - Added strict enforcement via `KABADIWALA_REQUIRE_TRAINED_MODELS="1"`, raising an exception instead of silently replacing models.
+- [x] **Cross-Stack ML Architectural Investigation**:
+  - Detailed feature matrix comparison for Isolation Forest anomaly detection (3-feature runtime vs 8-feature scratch training pipeline).
+  - Audited legacy `/api/v1/fraud-check` and `/api/v1/valuate` endpoints vs `ValuationService` and mobile offline evaluation.
+  - Audited TFLite INT8 inference pipeline in `EdgeMaterialClassifier` vs Float16 compatibility.
 - [x] **LightGBM Valuation & Isolation Forest Fraud Detection Serving**:
   - Implemented modern FastAPI lifespan caching in [`backend/app/main.py`](file:///c:/dev/kabadiwala-connect/backend/app/main.py) to load `valuation_lightgbm.txt` and `anomaly_detector.joblib` into memory on startup via `lightgbm.Booster` and `joblib.load`.
   - Added Pydantic schemas: `ValuationRequest` (`weight_kg`, `condition_score`, `region_index`, `market_demand_index`, `category`), `ValuationResponse`, `TransactionRequest` (`user_history_score`, `transaction_frequency`, `weight_anomaly_score`, `price_variance`), and `FraudCheckResponse`.
