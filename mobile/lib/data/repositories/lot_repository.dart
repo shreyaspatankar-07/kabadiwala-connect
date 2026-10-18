@@ -4,11 +4,13 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
+import '../../core/config/app_config.dart';
 import '../local_database.dart';
 import '../models/lot_item_draft.dart';
 
 class LotRepository {
-  LotRepository(this._db, {this.apiBaseUrl = 'http://10.0.2.2:8000/api/v1'});
+  LotRepository(this._db, {String? apiBaseUrl})
+      : apiBaseUrl = apiBaseUrl ?? AppConfig.apiBaseUrl;
 
   final AppDatabase _db;
   AppDatabase get db => _db;
@@ -111,11 +113,7 @@ class LotRepository {
   Future<void> _tryLiveServerPush(String clientUuid, Map<String, dynamic> payload) async {
     final urlsToTry = [
       apiBaseUrl,
-      'http://10.149.199.230:8000/api/v1',   // PC LAN IP for physical phone on same WiFi
-      'http://192.168.137.1:8000/api/v1',     // Mobile hotspot bridge IP
-      'http://10.0.2.2:8000/api/v1',          // Android emulator → host loopback
-      'http://localhost:8000/api/v1',
-      'http://127.0.0.1:8000/api/v1',
+      ...AppConfig.candidateUrls,
     ];
 
     for (final base in urlsToTry.toSet()) {

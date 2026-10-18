@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import '../auth/session_service.dart';
 import '../../data/local_database.dart';
 
 class HandoverInitiateResult {
@@ -98,12 +99,15 @@ class OfflineHandoverService {
     required List<String> photoHashes,
     required double gpsLat,
     required double gpsLng,
-    String collectorId = 'KC-C-7821',
+    String? collectorId,
     DateTime? timestamp,
   }) async {
+    final effectiveCollectorId = collectorId ??
+        await SessionService.getCollectorId() ??
+        await SessionService.getOrCreateCollectorId();
     final now = timestamp ?? DateTime.now().toUtc();
     final refNo = generateShortCode();
-    final collectorHash = sha256.convert(utf8.encode(collectorId)).toString().substring(0, 16);
+    final collectorHash = sha256.convert(utf8.encode(effectiveCollectorId)).toString().substring(0, 16);
 
     final payloadMap = {
       'collector_id_hash': collectorHash,
@@ -156,7 +160,7 @@ class OfflineHandoverService {
     await _db.into(_db.syncQueueEntries).insert(
           SyncQueueEntriesCompanion.insert(
             clientTxId: _uuid.v4(),
-            collectorId: collectorId,
+            collectorId: effectiveCollectorId,
             action: 'record_handover',
             payloadJson: qrPayloadStr,
             clientTimestamp: now,

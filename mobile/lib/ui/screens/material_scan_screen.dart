@@ -431,7 +431,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
             width: 250,
             height: 250,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withOpacity(0.85), width: 2.5),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.85), width: 2.5),
               borderRadius: BorderRadius.circular(24),
             ),
             child: Stack(
@@ -503,7 +503,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.65),
+              color: Colors.black.withValues(alpha: 0.65),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -531,7 +531,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
-          colors: [Colors.black.withOpacity(0.9), Colors.transparent],
+          colors: [Colors.black.withValues(alpha: 0.9), Colors.transparent],
         ),
       ),
       child: Column(
@@ -550,7 +550,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
                 color: AppTheme.greenGoEarn,
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.greenGoEarn.withOpacity(0.4),
+                    color: AppTheme.greenGoEarn.withValues(alpha: 0.4),
                     blurRadius: 16,
                     spreadRadius: 4,
                   ),
@@ -853,9 +853,9 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
       key: const Key('card_confident_prediction'),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: categoryColor.withOpacity(0.08),
+        color: categoryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: categoryColor.withOpacity(0.4), width: 2),
+        border: Border.all(color: categoryColor.withValues(alpha: 0.4), width: 2),
       ),
       child: Column(
         children: [
@@ -995,7 +995,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
                 constraints: const BoxConstraints(minHeight: 56), // 56dp per AGENTS.md
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? categoryColor.withOpacity(0.12) : Colors.grey.shade50,
+                  color: isSelected ? categoryColor.withValues(alpha: 0.12) : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected ? categoryColor : Colors.grey.shade300,
@@ -1008,7 +1008,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isSelected ? categoryColor : categoryColor.withOpacity(0.15),
+                        color: isSelected ? categoryColor : categoryColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(

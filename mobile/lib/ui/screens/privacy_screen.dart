@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
+import '../../core/auth/session_service.dart';
 import '../../core/demo/demo_mode_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -15,7 +16,7 @@ class PrivacyScreen extends StatelessWidget {
   final AudioFeedbackService audioService;
   final AppDatabase db;
   final String locale;
-  final String collectorId;
+  final String? collectorId;
   final VoidCallback? onDataDeleted;
 
   const PrivacyScreen({
@@ -23,7 +24,7 @@ class PrivacyScreen extends StatelessWidget {
     required this.audioService,
     required this.db,
     this.locale = 'mr',
-    this.collectorId = 'KC-C-7821',
+    this.collectorId,
     this.onDataDeleted,
   });
 
@@ -82,36 +83,42 @@ class PrivacyScreen extends StatelessWidget {
     );
 
     if (confirmed == true) {
-      // 1. Purge all local Drift database tables
-      await db.delete(db.localTransactions).go();
-      await db.delete(db.localTraceability).go();
-      await db.delete(db.localLedger).go();
-      await db.delete(db.syncQueueEntries).go();
-      SafetyRepository().clearAcknowledgements();
+      try {
+        // 1. Purge all local Drift database tables & hardware keystore credentials
+        await db.delete(db.localTransactions).go();
+        await db.delete(db.localTraceability).go();
+        await db.delete(db.localLedger).go();
+        await db.delete(db.syncQueueEntries).go();
+        await SessionService.clearSession();
+        SafetyRepository().clearAcknowledgements();
 
-      // 2. Play audio feedback and haptics
-      unawaited(HapticService.heavyImpact());
-      await audioService.speakPrompt('dataDeletedNotice', localeOverride: locale);
+        // 2. Play audio feedback and haptics
+        unawaited(HapticService.heavyImpact());
+        await audioService.speakPrompt('dataDeletedNotice', localeOverride: locale);
 
-      // 3. Show confirmation snackbar
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            isMr ? 'सर्व डेटा यशस्वीरीत्या नष्ट करण्यात आला' : (isHi ? 'सारा डेटा सफलतापूर्वक हटा दिया गया' : 'All data erased successfully'),
-          ),
-          backgroundColor: AppTheme.dangerRed,
-        ),
-      );
-
-      // 4. Navigate back to onboarding language selection or trigger callback
-      if (onDataDeleted != null) {
-        onDataDeleted!();
-      } else {
-        navigator.pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => LanguageSelectionScreen(audioService: audioService),
+        // 3. Show confirmation snackbar
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              isMr ? 'सर्व डेटा यशस्वीरीत्या नष्ट करण्यात आला' : (isHi ? 'सारा डेटा सफलतापूर्वक हटा दिया गया' : 'All data erased successfully'),
+            ),
+            backgroundColor: AppTheme.dangerRed,
           ),
         );
+
+        // 4. Navigate back to onboarding language selection or trigger callback
+        if (onDataDeleted != null) {
+          onDataDeleted!();
+        } else {
+          navigator.pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => LanguageSelectionScreen(audioService: audioService),
+            ),
+          );
+        }
+      } catch (e, st) {
+        // ignore: avoid_print
+        print('[PrivacyScreen] Delete error: $e\n$st');
       }
     }
   }

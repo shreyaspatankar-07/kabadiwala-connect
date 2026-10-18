@@ -11,6 +11,7 @@ import 'package:kabadiwala_mobile/ui/screens/add_lot_screen.dart';
 import 'package:kabadiwala_mobile/ui/widgets/camera_capture_card.dart';
 import 'package:kabadiwala_mobile/ui/widgets/condition_chips.dart';
 import 'package:kabadiwala_mobile/ui/widgets/reference_weight_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kabadiwala_mobile/ui/widgets/value_estimate_card.dart';
 
 void main() {
@@ -22,6 +23,7 @@ void main() {
     late MaterialClassifier classifier;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       db = AppDatabase.inMemory();
       lotRepo = LotRepository(db);
       priceRepo = PriceRepository(db);
@@ -216,7 +218,7 @@ void main() {
       expect(queuedEntries.isNotEmpty, isTrue);
       expect(queuedEntries.first.action, equals('create_lot'));
       expect(queuedEntries.first.status, equals('pending'));
-      expect(queuedEntries.first.collectorId, equals('KC-C-7821'));
+      expect(queuedEntries.first.collectorId, startsWith('KC-C-'));
     });
   });
 }

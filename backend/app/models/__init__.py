@@ -30,6 +30,9 @@ from app.models.schema import (
     UserRole,
 )
 
+from app.models.pickup import PickupRequest, PickupStatus
+from app.models.system_config import SystemConfig
+
 __all__ = [
     "Base",
     "Collector",
@@ -58,4 +61,7 @@ __all__ = [
     "PreferredLanguage",
     "User",
     "UserRole",
+    "PickupRequest",
+    "PickupStatus",
+    "SystemConfig",
 ]

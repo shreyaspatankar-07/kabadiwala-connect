@@ -55,14 +55,18 @@ def do_run_migrations(connection: Connection) -> None:
         context.run_migrations()
 
 
-async def run_async_migrations() -> None:
-    """In this scenario we need to create an Engine
-    and associate a connection with the context.
-    """
+    url = config.get_main_option("sqlalchemy.url") or ""
+    connect_args = {}
+    if "supabase" in url or "pooler" in url or "sslmode=require" in url or "ssl=require" in url:
+        connect_args["ssl"] = "require"
+        if ":6543" in url:
+            connect_args["statement_cache_size"] = 0
+
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args=connect_args,
     )
 
     async with connectable.connect() as connection:

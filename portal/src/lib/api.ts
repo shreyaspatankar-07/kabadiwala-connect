@@ -8,29 +8,53 @@ import {
   EwasteCategory,
 } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+// Centralized API Base configuration
+function resolveApiBase(): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!envUrl && process.env.NODE_ENV === "production") {
+    // Fail fast in production environments
+    if (typeof window !== "undefined") {
+      console.error(
+        "[CRITICAL CONFIG ERROR] NEXT_PUBLIC_API_URL is missing in production environment. " +
+        "Please configure NEXT_PUBLIC_API_URL in your Vercel deployment settings."
+      );
+    }
+  }
+  return envUrl || "http://localhost:8000/api/v1";
+}
 
-export function getCategoryPhotoUrl(category: string): string {
+const API_BASE = resolveApiBase();
+
+// Supabase Storage CDN endpoint for scrap photo audit assets
+const SUPABASE_STORAGE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL ||
+  "https://dudxikzfszckgoxcbbhh.supabase.co/storage/v1/object/public/scrap-photos";
+
+export function getCategoryPhotoUrl(category: string, photoHash?: string): string {
+  // If a verified SHA-256 photo hash exists, serve the signed photo directly from storage
+  if (photoHash && photoHash.length >= 16) {
+    return `${SUPABASE_STORAGE_URL}/lots/${photoHash}.jpg`;
+  }
   const catLower = (category || "").toLowerCase();
   if (catLower.includes("pcb") || catLower.includes("circuit") || catLower.includes("board")) {
-    return "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80";
+    return `${SUPABASE_STORAGE_URL}/categories/pcb.webp`;
   }
   if (catLower.includes("batt")) {
-    return "https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=400&q=80";
+    return `${SUPABASE_STORAGE_URL}/categories/batteries.webp`;
   }
   if (catLower.includes("cable") || catLower.includes("wire")) {
-    return "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80";
+    return `${SUPABASE_STORAGE_URL}/categories/cables.webp`;
   }
   if (catLower.includes("crt") || catLower.includes("tv")) {
-    return "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&q=80";
+    return `${SUPABASE_STORAGE_URL}/categories/crt.webp`;
   }
   if (catLower.includes("lcd") || catLower.includes("monitor") || catLower.includes("screen")) {
-    return "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&q=80";
+    return `${SUPABASE_STORAGE_URL}/categories/lcd.webp`;
   }
   if (catLower.includes("motor") || catLower.includes("magnet")) {
-    return "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=400&q=80";
+    return `${SUPABASE_STORAGE_URL}/categories/motors.webp`;
   }
-  return "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&q=80";
+  return `${SUPABASE_STORAGE_URL}/categories/mixed_ewaste.webp`;
 }
 
 export async function fetchLiveLots(): Promise<MatchedLot[]> {
@@ -530,3 +554,69 @@ export const mockDashboardMetrics: PortalDashboardMetrics = {
     Motors_Magnets: 190.0,
   },
 };
+
+export interface CitizenPickupPayload {
+  lat: number;
+  lng: number;
+  address?: string;
+  categories: string[];
+  photos?: string[];
+  phone: string;
+  otp?: string;
+  preferred_time_slot?: string;
+}
+
+export interface CitizenPickupResponse {
+  id: string;
+  public_code: string;
+  status: string;
+  categories: string[];
+  photo_urls: string[];
+  address_text?: string;
+  latitude: number;
+  longitude: number;
+  estimated_distance_km?: number;
+  assigned_collector_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CitizenPickupStatus {
+  public_code: string;
+  status: string;
+  collector_assigned: boolean;
+  collector_id?: string;
+  arrival_eta?: string;
+  updated_at?: string;
+}
+
+export async function createPickupRequest(payload: CitizenPickupPayload): Promise<CitizenPickupResponse> {
+  const res = await fetch(`${API_BASE}/pickup/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...payload,
+      otp: payload.otp || "123456",
+    }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || errorData.message || "Failed to submit pickup request");
+  }
+
+  return res.json();
+}
+
+export async function trackPickupRequest(publicCode: string): Promise<CitizenPickupStatus> {
+  const res = await fetch(`${API_BASE}/pickup/track/${encodeURIComponent(publicCode)}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || errorData.message || "Pickup request not found");
+  }
+
+  return res.json();
+}

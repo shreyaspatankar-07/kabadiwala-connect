@@ -60,16 +60,26 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     return radius_earth_km * c
 
 
-class AnomalyDetector:
-    """Combines Rule-Based heuristic filters and an Isolation Forest model."""
+class FraudAnomalyDetector:
+    """Combines Rule-Based heuristic filters and an Isolation Forest model with dynamic fraud thresholds."""
 
-    def __init__(self, model_path: Path | str | None = None):
+    def __init__(
+        self,
+        model_path: Path | str | None = None,
+        config: dict[str, Any] | None = None,
+    ):
         if model_path:
             self.model_path = Path(model_path)
         else:
             self.model_path = (
                 Path(__file__).resolve().parent.parent.parent / "models" / "anomaly_detector.joblib"
             )
+
+        cfg = config or {}
+        # Dynamic configurable thresholds with safe fallbacks (120s, 50km, 10%)
+        self.velocity_burst_seconds: int = int(cfg.get("velocity_burst_seconds", 120))
+        self.max_gps_jump_km: float = float(cfg.get("max_gps_jump_km", 50.0))
+        self.weight_tolerance_percent: float = float(cfg.get("weight_tolerance_percent", 10.0))
 
         self.iso_forest: IsolationForest | None = None
         self.model_source: str = "synthetic_fallback"
@@ -162,7 +172,7 @@ class AnomalyDetector:
                 f"Quoted rate ₹{price_per_kg:.2f}/kg deviates significantly from normal market range (₹{lower_bound:.0f} - ₹{upper_bound:.0f}/kg) for {category}."
             )
 
-        # Rule 3: Repeated identical lots within 1 hour
+        # Rule 3: Velocity burst & repeated identical lots
         if previous_lot:
             prev_collector = previous_lot.get("collector_id")
             prev_cat = previous_lot.get("category")
@@ -175,15 +185,22 @@ class AnomalyDetector:
                 and prev_collector == collector_id
                 and prev_cat == category
                 and abs(prev_weight - weight_kg) < 0.05
-                and elapsed_seconds < 3600
             ):
-                is_anomalous = True
-                flags.append("REPEATED_IDENTICAL_LOT")
-                reasons.append(
-                    f"Duplicate lot detected: identical category ({category}) and weight ({weight_kg} kg) submitted within {elapsed_seconds // 60} minutes."
-                )
+                if elapsed_seconds <= self.velocity_burst_seconds:
+                    is_anomalous = True
+                    flags.append("VELOCITY_BURST")
+                    flags.append("REPEATED_IDENTICAL_LOT")
+                    reasons.append(
+                        f"Velocity burst detected: identical category ({category}) and weight ({weight_kg} kg) submitted within {elapsed_seconds}s (limit: {self.velocity_burst_seconds}s)."
+                    )
+                elif elapsed_seconds < 3600:
+                    is_anomalous = True
+                    flags.append("REPEATED_IDENTICAL_LOT")
+                    reasons.append(
+                        f"Duplicate lot detected: identical category ({category}) and weight ({weight_kg} kg) submitted within {elapsed_seconds // 60} minutes."
+                    )
 
-            # Rule 4: GPS jump > 50 km
+            # Rule 4: GPS coordinate jump > max_gps_jump_km
             prev_lat = previous_lot.get("latitude")
             prev_lng = previous_lot.get("longitude")
             if (
@@ -193,11 +210,22 @@ class AnomalyDetector:
                 and prev_lng is not None
             ):
                 dist_km = haversine_distance_km(prev_lat, prev_lng, latitude, longitude)
-                if dist_km > 50.0 and elapsed_seconds < 7200:
+                if dist_km > self.max_gps_jump_km and elapsed_seconds < 7200:
                     is_anomalous = True
                     flags.append("GPS_JUMP_SUSPICIOUS")
                     reasons.append(
-                        f"Unrealistic spatial jump of {dist_km:.1f} km detected within {elapsed_seconds // 60} minutes."
+                        f"Unrealistic spatial jump of {dist_km:.1f} km detected within {elapsed_seconds // 60} minutes (threshold: {self.max_gps_jump_km:.1f} km)."
+                    )
+
+            # Rule 5: Weight tolerance mismatch check (e.g. collector vs recycler weight)
+            expected_weight = previous_lot.get("expected_weight_kg")
+            if expected_weight is not None and expected_weight > 0:
+                diff_pct = abs(weight_kg - expected_weight) / expected_weight * 100.0
+                if diff_pct > self.weight_tolerance_percent:
+                    is_anomalous = True
+                    flags.append("WEIGHT_TOLERANCE_EXCEEDED")
+                    reasons.append(
+                        f"Weight mismatch of {diff_pct:.1f}% exceeds tolerance threshold of {self.weight_tolerance_percent:.1f}%."
                     )
 
         # Rule 5: Isolation Forest Multivariate check
@@ -227,3 +255,7 @@ class AnomalyDetector:
             "final_price": final_price,
             "price_per_kg": round(price_per_kg, 2),
         }
+
+
+# Backward-compatible alias for existing imports
+AnomalyDetector = FraudAnomalyDetector

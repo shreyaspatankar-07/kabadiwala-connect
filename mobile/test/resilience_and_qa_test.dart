@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kabadiwala_mobile/core/audio/audio_service.dart';
 import 'package:kabadiwala_mobile/core/theme/app_theme.dart';
 import 'package:kabadiwala_mobile/data/local_database.dart';
@@ -16,6 +17,7 @@ void main() {
     late AudioFeedbackService audioService;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       db = AppDatabase.inMemory();
       lotRepo = LotRepository(db);
       priceRepo = PriceRepository(db);

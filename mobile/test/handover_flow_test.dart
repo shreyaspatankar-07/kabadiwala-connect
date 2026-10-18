@@ -13,6 +13,7 @@ import 'package:kabadiwala_mobile/ui/screens/recycler_confirm_screen.dart';
 import 'package:kabadiwala_mobile/ui/screens/verify_handover_screen.dart';
 import 'package:kabadiwala_mobile/ui/widgets/downstream_timeline_widget.dart';
 import 'package:kabadiwala_mobile/ui/widgets/handover_receipt_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   late AppDatabase db;
@@ -20,6 +21,7 @@ void main() {
   late OfflineHandoverService handoverService;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     HapticService.enableHaptics = false;
     db = AppDatabase.inMemory();
     audioService = AudioFeedbackService(enableAudio: false);

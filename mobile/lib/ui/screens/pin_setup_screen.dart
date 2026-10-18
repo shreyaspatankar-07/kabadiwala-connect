@@ -124,15 +124,18 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   void _finishSetup() async {
     final pinHash = sha256.convert(utf8.encode(_firstPin)).toString();
 
-    // 1. Save fast session in SharedPreferences for instant cold-start restore
+    // 0. Dynamically resolve or generate secure Zero-PII Collector ID
+    final collectorId = await SessionService.getOrCreateCollectorId();
+
+    // 1. Save fast session in SharedPreferences and KeyStore
     try {
       await SessionService.saveSession(
-        collectorId: 'KC-C-7821',
+        collectorId: collectorId,
         pinHash: pinHash,
         locale: widget.locale,
       );
     } catch (e) {
-      debugPrint('[PinSetup] Error saving session to SharedPreferences: $e');
+      debugPrint('[PinSetup] Error saving session: $e');
     }
 
     // 2. Save heavy relational record to SQLite
@@ -140,7 +143,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
       try {
         await widget.db!.into(widget.db!.collectorProfile).insertOnConflictUpdate(
               CollectorProfileCompanion.insert(
-                collectorId: 'KC-C-7821',
+                collectorId: collectorId,
                 preferredLanguage: drift.Value(widget.locale),
                 operatingArea: 'Palghar',
                 quickPinHash: drift.Value(pinHash),
