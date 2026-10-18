@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/audio/audio_service.dart';
+import '../../core/auth/session_service.dart';
 import '../../core/hardware/image_processor.dart';
 import '../../core/hardware/location_service.dart';
+import '../../core/services/location_service.dart' as gps_service;
 import '../../core/hardware/scale_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/ml/material_classifier.dart';
@@ -32,22 +34,28 @@ class AddLotScreen extends StatefulWidget {
     required this.lotRepository,
     required this.priceRepository,
     this.locale = 'mr',
-    this.collectorId = 'KC-C-7821',
+    this.collectorId,
     this.materialClassifier,
     this.locationService,
     this.scaleService,
     this.onLotSaved,
+    this.initialCategory,
+    this.initialPublicCode,
+    this.initialPhotoUrl,
   });
 
   final AudioFeedbackService audioService;
   final LotRepository lotRepository;
   final PriceRepository priceRepository;
   final String locale;
-  final String collectorId;
+  final String? collectorId;
   final MaterialClassifier? materialClassifier;
   final LocationService? locationService;
   final BluetoothScaleService? scaleService;
   final ValueChanged<LocalTransaction>? onLotSaved;
+  final String? initialCategory;
+  final String? initialPublicCode;
+  final String? initialPhotoUrl;
 
   @override
   State<AddLotScreen> createState() => _AddLotScreenState();
@@ -57,6 +65,11 @@ class _AddLotScreenState extends State<AddLotScreen> {
   late MaterialClassifier _classifier;
   late LocationService _locationService;
   late BluetoothScaleService _scaleService;
+  late TextEditingController _manualWeightController;
+  StreamSubscription<double>? _scaleWeightSubscription;
+  StreamSubscription<ScaleConnectionStatus>? _scaleStatusSubscription;
+  ScaleConnectionStatus _scaleStatus = ScaleConnectionStatus.disconnected;
+  String _activeCollectorId = 'KC-C-COLLECTOR';
 
   // Active Draft Items
   final List<LotItemDraft> _draftItems = [];
@@ -91,11 +104,62 @@ class _AddLotScreenState extends State<AddLotScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.collectorId != null && widget.collectorId!.isNotEmpty) {
+      _activeCollectorId = widget.collectorId!;
+    } else {
+      _initCollectorId();
+    }
+
+    if (widget.initialCategory != null && widget.initialCategory!.isNotEmpty) {
+      _selectedCategory = widget.initialCategory!;
+    }
     _classifier = widget.materialClassifier ?? MaterialClassifier();
     _locationService = widget.locationService ?? LocationService();
-    _scaleService = widget.scaleService ?? StubBluetoothScaleService();
+    _scaleService = widget.scaleService ?? (_isTestEnvironment ? StubBluetoothScaleService() : BleScaleService());
+    _manualWeightController = TextEditingController(text: _weightInputString);
+
+    _scaleStatus = _scaleService.currentStatus;
+    _isScaleConnected = (_scaleStatus == ScaleConnectionStatus.connected);
+
+    _scaleStatusSubscription = _scaleService.statusStream.listen((status) {
+      if (mounted) {
+        setState(() {
+          _scaleStatus = status;
+          _isScaleConnected = (status == ScaleConnectionStatus.connected);
+        });
+      }
+    });
+
+    _scaleWeightSubscription = _scaleService.weightStream.listen((weight) {
+      if (mounted) {
+        setState(() {
+          _weightInputString = weight.toStringAsFixed(weight.truncateToDouble() == weight ? 0 : 2);
+          _manualWeightController.text = _weightInputString;
+        });
+      }
+    });
 
     _initAsyncServices();
+  }
+
+  Future<void> _initCollectorId() async {
+    final id = await SessionService.getOrCreateCollectorId();
+    if (mounted) {
+      setState(() {
+        _activeCollectorId = id;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scaleWeightSubscription?.cancel();
+    _scaleStatusSubscription?.cancel();
+    _manualWeightController.dispose();
+    if (widget.scaleService == null) {
+      _scaleService.dispose();
+    }
+    super.dispose();
   }
 
   Future<void> _initAsyncServices() async {
@@ -176,12 +240,29 @@ class _AddLotScreenState extends State<AddLotScreen> {
   Future<void> _handleCapturePhoto() async {
     if (_currentPhotos.length >= 4) return;
 
+    // Fetch real-time device location using Geolocator
+    final String locationStr = await gps_service.LocationService.getCurrentLocationString();
+    final coords = gps_service.LocationService.parseCoordinates(locationStr);
+    final double? currentLat = coords?.latitude ?? _currentLocation?.latitude;
+    final double? currentLng = coords?.longitude ?? _currentLocation?.longitude;
+
+    if (coords != null && _currentLocation != null) {
+      _currentLocation = CollectorLocation(
+        district: _currentLocation!.district,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        isFallback: false,
+        source: 'gps',
+      );
+    }
+
     ProcessedPhoto photo;
     if (_isTestEnvironment) {
       photo = ImageProcessor.createMockPhoto(
         photoId: 'IMG_TEST_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-        latitude: _currentLocation?.latitude,
-        longitude: _currentLocation?.longitude,
+        latitude: currentLat,
+        longitude: currentLng,
+        locationString: locationStr,
       );
     } else {
       try {
@@ -198,21 +279,24 @@ class _AddLotScreenState extends State<AddLotScreen> {
           photo = await ImageProcessor.processImage(
             rawBytes: rawBytes,
             photoId: 'IMG_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-            latitude: _currentLocation?.latitude,
-            longitude: _currentLocation?.longitude,
+            latitude: currentLat,
+            longitude: currentLng,
+            locationString: locationStr,
           );
         } else {
           photo = ImageProcessor.createMockPhoto(
             photoId: 'IMG_DEMO_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-            latitude: _currentLocation?.latitude,
-            longitude: _currentLocation?.longitude,
+            latitude: currentLat,
+            longitude: currentLng,
+            locationString: locationStr,
           );
         }
       } catch (_) {
         photo = ImageProcessor.createMockPhoto(
           photoId: 'IMG_FALLBACK_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-          latitude: _currentLocation?.latitude,
-          longitude: _currentLocation?.longitude,
+          latitude: currentLat,
+          longitude: currentLng,
+          locationString: locationStr,
         );
       }
     }
@@ -273,6 +357,7 @@ class _AddLotScreenState extends State<AddLotScreen> {
       } else if (_weightInputString.length < 7) {
         _weightInputString += digit;
       }
+      _manualWeightController.text = _weightInputString;
     });
   }
 
@@ -283,6 +368,7 @@ class _AddLotScreenState extends State<AddLotScreen> {
       } else {
         _weightInputString = '0';
       }
+      _manualWeightController.text = _weightInputString;
     });
   }
 
@@ -308,6 +394,7 @@ class _AddLotScreenState extends State<AddLotScreen> {
       _draftItems.add(newItem);
       _currentPhotos.clear();
       _weightInputString = '0';
+      _manualWeightController.text = '0';
     });
 
     HapticService.heavyImpact();
@@ -427,8 +514,13 @@ class _AddLotScreenState extends State<AddLotScreen> {
       final lat = _currentLocation?.latitude ?? 19.6967;
       final lng = _currentLocation?.longitude ?? 72.7699;
 
+      final effectiveCollectorId = widget.collectorId ??
+          (_activeCollectorId != 'KC-C-COLLECTOR'
+              ? _activeCollectorId
+              : await SessionService.getOrCreateCollectorId());
+
       final createdLot = await widget.lotRepository.createLotOffline(
-        collectorId: widget.collectorId,
+        collectorId: effectiveCollectorId,
         category: primaryCategory,
         weightKg: totalWeight > 0 ? totalWeight : _currentWeightKg,
         quotedPrice: totalQuotedPrice > 0 ? totalQuotedPrice : _currentEstimatedValue,
@@ -1043,40 +1135,137 @@ class _AddLotScreenState extends State<AddLotScreen> {
           ),
           const SizedBox(height: 12),
 
-          // Bluetooth Scale Stub Button
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
+          // Hybrid BLE Scale Connection Section
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _isScaleConnected
+                  ? AppTheme.greenGoEarn.withValues(alpha: 0.08)
+                  : AppTheme.backgroundLight,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
                 color: _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.borderColor,
-                width: 2,
+                width: 1.5,
               ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
-            onPressed: () {
-              HapticService.selectionClick();
+            child: Row(
+              children: [
+                Icon(
+                  _isScaleConnected ? Icons.bluetooth_connected_rounded : Icons.bluetooth_searching_rounded,
+                  color: _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.greenGoEarn,
+                  size: 26,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _isScaleConnected
+                            ? (locale == 'en'
+                                ? 'Scale Connected (${_scaleService.connectedDeviceName ?? "BLE"})'
+                                : (locale == 'hi'
+                                    ? 'तराजू कनेक्टेड (${_scaleService.connectedDeviceName ?? "BLE"})'
+                                    : 'काटा जोडला (${_scaleService.connectedDeviceName ?? "BLE"})'))
+                            : (_scaleStatus == ScaleConnectionStatus.scanning
+                                ? (locale == 'en'
+                                    ? 'Searching for scale...'
+                                    : (locale == 'hi' ? 'तराजू खोज रहे हैं...' : 'काटा शोधत आहे...'))
+                                : (_scaleStatus == ScaleConnectionStatus.connecting
+                                    ? (locale == 'en'
+                                        ? 'Connecting to scale...'
+                                        : (locale == 'hi' ? 'कनेक्ट हो रहा है...' : 'जोडत आहे...'))
+                                    : (locale == 'en'
+                                        ? 'Connect Bluetooth Scale'
+                                        : (locale == 'hi' ? 'ब्लूटूथ तराजू कनेक्ट करें' : 'ब्लूटूथ काटा जोडा')))),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.textHighContrast,
+                        ),
+                      ),
+                      Text(
+                        _isScaleConnected
+                            ? (locale == 'en'
+                                ? 'Live weight streaming via GATT UART (0xFFE0)'
+                                : (locale == 'hi'
+                                    ? 'सीधा डिजिटल वजन दर्ज हो रहा है'
+                                    : 'थेट डिजिटल वजन नोंदवले जात आहे'))
+                            : (locale == 'en'
+                                ? 'Auto-syncs weight from BLE scale'
+                                : (locale == 'hi'
+                                    ? 'कांटे से वजन अपने आप आ जाएगा'
+                                    : 'काट्यावरून वजन आपोआप येईल')),
+                        style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_scaleStatus == ScaleConnectionStatus.scanning || _scaleStatus == ScaleConnectionStatus.connecting)
+                  const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  )
+                else
+                  ElevatedButton(
+                    key: const Key('connect_scale_button'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isScaleConnected
+                          ? AppTheme.dangerRed.withValues(alpha: 0.12)
+                          : AppTheme.greenGoEarn,
+                      foregroundColor: _isScaleConnected ? AppTheme.dangerRed : Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    ),
+                    onPressed: () async {
+                      await HapticService.selectionClick();
+                      if (_isScaleConnected) {
+                        await _scaleService.disconnect();
+                      } else {
+                        await _scaleService.startScan();
+                      }
+                    },
+                    child: Text(
+                      _isScaleConnected
+                          ? (locale == 'en' ? 'Disconnect' : (locale == 'hi' ? 'हटाएं' : 'तोडा'))
+                          : (locale == 'en' ? 'Connect' : (locale == 'hi' ? 'जोड़ें' : 'जोडा')),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Manual Entry Fallback TextField
+          TextFormField(
+            key: const Key('manual_weight_field'),
+            controller: _manualWeightController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            decoration: InputDecoration(
+              labelText: locale == 'en'
+                  ? 'Manual Weight Entry (Fallback)'
+                  : (locale == 'hi' ? 'हाथ से वजन दर्ज करें (वैकल्पिक)' : 'हाताने वजन टाका (पर्याय)'),
+              helperText: locale == 'en'
+                  ? 'Type weight manually if scale is offline or during testing'
+                  : (locale == 'hi'
+                      ? 'यदि तराजू बंद या अनुपलब्ध है तो यहाँ वजन टाइप करें'
+                      : 'काटा बंद असल्यास किंवा चाचणीसाठी येथे वजन टाइप करा'),
+              prefixIcon: const Icon(Icons.edit_note_rounded, color: AppTheme.greenGoEarn),
+              suffixText: _weightUnit,
+              suffixStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              filled: true,
+              fillColor: AppTheme.backgroundLight,
+            ),
+            onChanged: (val) {
               setState(() {
-                _isScaleConnected = !_isScaleConnected;
-                if (_isScaleConnected) {
-                  _scaleService.connect('SCALE-01');
-                  _weightInputString = '12.5';
-                } else {
-                  _scaleService.disconnect();
-                }
+                _weightInputString = val.trim().isEmpty ? '0' : val.trim();
               });
             },
-            icon: Icon(
-              Icons.scale_rounded,
-              color: _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.textMuted,
-            ),
-            label: Text(
-              _isScaleConnected
-                  ? (locale == 'en' ? 'Bluetooth Scale Connected (12.5 kg)' : (locale == 'hi' ? 'ब्लूटूथ कांटा कनेक्टेड (12.5 kg)' : 'ब्लूटूथ वजन काटा जोडला (12.5 kg)'))
-                  : (locale == 'en' ? 'Connect Bluetooth Scale' : (locale == 'hi' ? 'ब्लूटूथ तराजू कनेक्ट करें' : 'ब्लूटूथ वजन काटा जोडा')),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.textHighContrast,
-              ),
-            ),
           ),
           const SizedBox(height: 14),
 
@@ -1087,6 +1276,7 @@ class _AddLotScreenState extends State<AddLotScreen> {
               setState(() {
                 _weightUnit = 'kg';
                 _weightInputString = w.toStringAsFixed(w.truncateToDouble() == w ? 0 : 1);
+                _manualWeightController.text = _weightInputString;
               });
             },
             locale: locale,

@@ -1,6 +1,7 @@
 """Tests for Collector Cash Ledger, Summary Totals, Cash Marking, Disputes, and Statements."""
 
 from datetime import UTC, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
 from httpx import AsyncClient
@@ -249,3 +250,142 @@ async def test_optional_upi_intent(async_client: AsyncClient, test_collector):
     assert upi_data["upi_uri"].startswith("upi://pay?")
     assert "am=1250.00" in upi_data["upi_uri"]
     assert "cu=INR" in upi_data["upi_uri"]
+
+
+# ---------------------------------------------------------------------------
+# Regression: ledger balance bugs (expected to FAIL on current code)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_balance_with_identical_timestamps(async_client: AsyncClient, test_collector):
+    """BUG REPRODUCTION: credit and debit posted with the *same* recorded_at.
+
+    Current code orders the balance snapshot by (recorded_at DESC, created_at DESC).
+    When both entries share the same recorded_at, the tie-break falls to created_at,
+    which may or may not be the credit depending on DB insert order.  More importantly,
+    get_summary also uses that ordering to pick current_balance_inr, so if the debit
+    row happens to sort first the balance will be returned as 0.0 instead of 3000.0.
+
+    Expected to FAIL with: AssertionError: assert <wrong_value> == 3000.0
+    """
+    _, token = test_collector
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Use a single explicit timestamp for both entries
+    shared_ts = datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC).isoformat()
+
+    credit_resp = await async_client.post(
+        "/api/v1/ledger/entries",
+        headers=headers,
+        json={
+            "client_entry_id": "dup-ts-credit-001",
+            "entry_type": "credit",
+            "amount": 3500.0,
+            "payment_mode": "cash_received",
+            "description": "Credit with shared timestamp",
+            "recorded_at": shared_ts,
+        },
+    )
+    assert credit_resp.status_code == 201, credit_resp.text
+
+    debit_resp = await async_client.post(
+        "/api/v1/ledger/entries",
+        headers=headers,
+        json={
+            "client_entry_id": "dup-ts-debit-001",
+            "entry_type": "debit",
+            "amount": 500.0,
+            "payment_mode": "cash_received",
+            "description": "Debit with shared timestamp",
+            "recorded_at": shared_ts,
+        },
+    )
+    assert debit_resp.status_code == 201, debit_resp.text
+
+    sum_resp = await async_client.get("/api/v1/ledger/summary", headers=headers)
+    assert sum_resp.status_code == 200
+    summary = sum_resp.json()
+    # This assertion is expected to FAIL on the current implementation
+    assert summary["current_balance_inr"] == 3000.0, (
+        f"Balance wrong with identical timestamps: got {summary['current_balance_inr']}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_balance_with_late_offline_entry(async_client: AsyncClient, test_collector):
+    """BUG REPRODUCTION: debit arrives from an offline phone with an earlier recorded_at.
+
+    Scenario:
+      - Credit of 3500 at 10:00 posted first (server receives at t1).
+      - Debit of 500 arrives later from an offline phone but carries recorded_at=09:00.
+
+    Because create_entry reads the running balance ordered by recorded_at DESC, when the
+    debit (09:00) is inserted it finds the credit (10:00) as the latest — correct so far.
+    But get_summary then calls the same query to derive current_balance_inr, and the debit
+    at 09:00 sorts *earlier* than the credit at 10:00, so it returns the credit's
+    balance_after (3500) instead of the debit's (3000).
+
+    Additionally the entries list must reflect server receive order (credit first, debit
+    second) rather than recorded_at order.
+
+    Expected to FAIL with: AssertionError: assert 3500.0 == 3000.0
+    """
+    _, token = test_collector
+    headers = {"Authorization": f"Bearer {token}"}
+
+    credit_ts = datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC).isoformat()  # 10:00
+    debit_ts = datetime(2026, 1, 15, 9, 0, 0, tzinfo=UTC).isoformat()   # 09:00  (earlier!)
+
+    # Step 1: post credit at 10:00
+    credit_resp = await async_client.post(
+        "/api/v1/ledger/entries",
+        headers=headers,
+        json={
+            "client_entry_id": "late-credit-001",
+            "entry_type": "credit",
+            "amount": 3500.0,
+            "payment_mode": "cash_received",
+            "description": "Online credit at 10:00",
+            "recorded_at": credit_ts,
+        },
+    )
+    assert credit_resp.status_code == 201, credit_resp.text
+    assert credit_resp.json()["balance_after"] == 3500.0
+
+    # Step 2: post debit at 09:00 (late offline sync, earlier client timestamp)
+    debit_resp = await async_client.post(
+        "/api/v1/ledger/entries",
+        headers=headers,
+        json={
+            "client_entry_id": "late-debit-001",
+            "entry_type": "debit",
+            "amount": 500.0,
+            "payment_mode": "cash_received",
+            "description": "Offline debit synced late, recorded_at=09:00",
+            "recorded_at": debit_ts,
+        },
+    )
+    assert debit_resp.status_code == 201, debit_resp.text
+
+    # The summary balance must be 3000 (credit 3500 − debit 500)
+    sum_resp = await async_client.get("/api/v1/ledger/summary", headers=headers)
+    assert sum_resp.status_code == 200
+    summary = sum_resp.json()
+    # Expected to FAIL: current code returns 3500.0 because it picks the credit row
+    # (recorded_at 10:00 > 09:00) as the "latest" balance snapshot
+    assert summary["current_balance_inr"] == 3000.0, (
+        f"Balance wrong after late offline entry: got {summary['current_balance_inr']}"
+    )
+
+    # Entries list must be in server-receive order: credit first, debit second
+    list_resp = await async_client.get("/api/v1/ledger/entries", headers=headers)
+    assert list_resp.status_code == 200
+    entries = list_resp.json()
+    assert len(entries) == 2
+    # Current code orders by recorded_at DESC, so it would put debit (09:00) last
+    # and credit (10:00) first — this part may pass, but the balance is still wrong.
+    entry_types = [e["entry_type"] for e in entries]
+    assert entry_types == ["credit", "debit"], (
+        f"Entry order should be server-receive order (credit then debit), got: {entry_types}"
+    )

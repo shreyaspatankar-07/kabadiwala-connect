@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/hardware/image_processor.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
+import 'image_preview_dialog.dart';
 
 class CameraCaptureCard extends StatelessWidget {
   const CameraCaptureCard({
@@ -63,7 +64,7 @@ class CameraCaptureCard extends StatelessWidget {
           // Photos Row or Empty State
           if (photos.isNotEmpty) ...[
             SizedBox(
-              height: 110,
+              height: 118,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: photos.length,
@@ -73,38 +74,100 @@ class CameraCaptureCard extends StatelessWidget {
                   final shortHash = photo.sha256Hash.substring(0, 8);
                   return Stack(
                     children: [
-                      Container(
-                        width: 90,
-                        height: 110,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppTheme.borderColor),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.image_rounded, size: 36, color: AppTheme.greenGoEarn),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${photo.sizeInKb.toStringAsFixed(0)} KB',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.greenGoEarn,
+                      InkWell(
+                        key: Key('btn_preview_photo_$index'),
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          HapticService.selectionClick();
+                          ImagePreviewDialog.show(
+                            context: context,
+                            imageBytes: photo.bytes,
+                            title: locale == 'hi'
+                                ? 'फोटो #${index + 1} पूर्वावलोकन'
+                                : (locale == 'en'
+                                    ? 'Photo #${index + 1} Preview'
+                                    : 'फोटो #${index + 1} पूर्वावलोकन'),
+                            sizeInKb: photo.sizeInKb,
+                            sha256Hash: photo.sha256Hash,
+                            latitude: photo.latitude,
+                            longitude: photo.longitude,
+                            locationString: photo.locationString,
+                            locale: locale,
+                          );
+                        },
+                        child: Container(
+                          width: 94,
+                          height: 118,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: AppTheme.borderColor, width: 1.5),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Image icon / thumbnail preview with zoom indicator
+                              Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.memory(
+                                      photo.bytes,
+                                      width: 48,
+                                      height: 48,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Container(
+                                        width: 48,
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.greenGoEarnLight,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Icon(
+                                          Icons.image_rounded,
+                                          size: 32,
+                                          color: AppTheme.greenGoEarn,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black87,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.zoom_in_rounded,
+                                      size: 13,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                              '#$shortHash',
-                              style: const TextStyle(fontSize: 9, color: AppTheme.textMuted),
-                            ),
-                          ],
+                              const SizedBox(height: 5),
+                              Text(
+                                '${photo.sizeInKb.toStringAsFixed(0)} KB',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.greenGoEarn,
+                                ),
+                              ),
+                              Text(
+                                '#$shortHash',
+                                style: const TextStyle(fontSize: 9, color: AppTheme.textMuted),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       PositionedDirectional(
                         top: 2,
                         end: 2,
                         child: GestureDetector(
+                          key: Key('btn_remove_photo_$index'),
                           onTap: () {
                             HapticService.selectionClick();
                             onRemovePhoto(index);

@@ -10,6 +10,7 @@ class ProcessedPhoto {
     required this.capturedAt,
     this.latitude,
     this.longitude,
+    this.locationString,
     this.localFilePath,
   });
 
@@ -20,6 +21,7 @@ class ProcessedPhoto {
   final DateTime capturedAt;
   final double? latitude;
   final double? longitude;
+  final String? locationString;
   final String? localFilePath;
 
   bool get isWithinSizeLimit => sizeBytes <= 200 * 1024; // <= 200 KB per AGENTS.md
@@ -42,6 +44,7 @@ class ImageProcessor {
     String? photoId,
     double? latitude,
     double? longitude,
+    String? locationString,
   }) async {
     final id = photoId ?? 'IMG_${DateTime.now().millisecondsSinceEpoch}';
     final now = DateTime.now();
@@ -64,6 +67,7 @@ class ImageProcessor {
       capturedAt: now,
       latitude: latitude,
       longitude: longitude,
+      locationString: locationString,
     );
   }
 
@@ -72,6 +76,7 @@ class ImageProcessor {
     required String photoId,
     double? latitude,
     double? longitude,
+    String? locationString,
   }) {
     // 50 KB dummy image bytes (well within 200 KB limit)
     final bytes = Uint8List(50 * 1024);
@@ -88,6 +93,8 @@ class ImageProcessor {
       capturedAt: DateTime.now(),
       latitude: latitude ?? 19.6967,
       longitude: longitude ?? 72.7699,
+      locationString: locationString ??
+          'Lat: ${(latitude ?? 19.6967).toStringAsFixed(6)}, Lng: ${(longitude ?? 72.7699).toStringAsFixed(6)}',
     );
   }
 

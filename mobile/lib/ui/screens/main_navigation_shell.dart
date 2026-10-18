@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
+import '../../core/auth/session_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
@@ -16,6 +17,8 @@ import 'earnings_screen.dart';
 import 'price_board_screen.dart';
 import 'privacy_screen.dart';
 import 'safety_screen.dart';
+import '../../data/models/pickup_request_model.dart';
+import '../widgets/pickup_alert_dialog.dart';
 
 
 /// Bottom Navigation Shell with 4 tabs:
@@ -50,6 +53,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
   bool _isOnline = false; // offline-first default
   int _pendingCount = 2; // offline queue count
+  String _activeCollectorId = 'KC-C-COLLECTOR';
 
   late final AppDatabase _db;
   late final bool _ownsDb;
@@ -68,6 +72,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   @override
   void initState() {
     super.initState();
+    _initCollectorId();
     if (widget.db != null) {
       _db = widget.db!;
       _ownsDb = false;
@@ -99,6 +104,15 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.audioService.speakPrompt(_tabPromptKeys[_currentIndex]);
     });
+  }
+
+  Future<void> _initCollectorId() async {
+    final id = await SessionService.getOrCreateCollectorId();
+    if (mounted) {
+      setState(() {
+        _activeCollectorId = id;
+      });
+    }
   }
 
   @override
@@ -202,6 +216,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             style: const TextStyle(fontWeight: FontWeight.w900),
           ),
           actions: [
+            IconButton(
+              key: const Key('btn_doorstep_pickups'),
+              tooltip: locale == 'mr' ? 'घरपोच पिकअप विनंत्या' : (locale == 'hi' ? 'घर से पिकअप' : 'Doorstep Pickups'),
+              icon: const Icon(Icons.two_wheeler_rounded, color: AppTheme.greenGoEarn, size: 28),
+              onPressed: () => _checkDoorstepPickups(context, locale),
+            ),
             IconButton(
               key: const Key('btn_open_privacy_screen'),
               tooltip: locale == 'mr' ? 'गोपनीयता व सुरक्षा' : (locale == 'hi' ? 'गोपनीयता एवं सुरक्षा' : 'Privacy & Security'),
@@ -313,6 +333,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       audioService: widget.audioService,
       lotRepository: widget.lotRepository ?? LotRepository(_db),
       priceRepository: _priceRepo,
+      collectorId: _activeCollectorId,
       locale: locale,
     );
   }
@@ -337,6 +358,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       db: _db,
       audioService: widget.audioService,
       ledgerRepository: _ledgerRepo,
+      collectorId: _activeCollectorId,
       locale: locale,
     );
   }
@@ -348,4 +370,89 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     return SafetyScreen(locale: locale);
   }
 
+  // ---------------------------------------------------------------------------
+  // Doorstep Citizen Pickup Workflow
+  // ---------------------------------------------------------------------------
+  PickupRequestDto? _activePickup;
+
+  Future<void> _checkDoorstepPickups(BuildContext context, String locale) async {
+    final pickup = _activePickup ??
+        PickupRequestDto(
+          id: 'demo-pickup-01',
+          publicCode: 'PR-MH-2026-A1B2C',
+          status: 'CREATED',
+          categories: const ['CABLES', 'BATTERIES'],
+          photoUrls: const [],
+          addressText: locale == 'mr' ? 'कॅम्प रोड, अमरावती (1.2 किमी दूर)' : 'Camp Road, Amravati (1.2 km away)',
+          latitude: 20.9320,
+          longitude: 77.7523,
+          estimatedDistanceKm: 1.2,
+          createdAt: DateTime.now(),
+        );
+
+    await showDialog(
+      context: context,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          return PickupAlertDialog(
+            pickup: _activePickup ?? pickup,
+            audioService: widget.audioService,
+            locale: locale,
+            onAccept: () {
+              setDialogState(() {
+                _activePickup = PickupRequestDto(
+                  id: pickup.id,
+                  publicCode: pickup.publicCode,
+                  status: 'ACCEPTED',
+                  categories: pickup.categories,
+                  photoUrls: pickup.photoUrls,
+                  addressText: pickup.addressText,
+                  latitude: pickup.latitude,
+                  longitude: pickup.longitude,
+                  estimatedDistanceKm: pickup.estimatedDistanceKm,
+                  assignedCollectorId: _activeCollectorId,
+                  createdAt: pickup.createdAt,
+                );
+              });
+              setState(() {});
+            },
+            onDecline: () {
+              Navigator.pop(dialogCtx);
+              widget.audioService.speak(
+                locale == 'mr' ? 'पिकअप नाकारले आहे.' : 'Pickup declined.',
+                localeOverride: locale,
+              );
+            },
+            onArrived: () {
+              Navigator.pop(dialogCtx);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    appBar: AppBar(
+                      title: Text(locale == 'mr' ? 'घरपोच संकलन' : 'Doorstep Collection'),
+                    ),
+                    body: AddLotScreen(
+                      audioService: widget.audioService,
+                      lotRepository: widget.lotRepository ?? LotRepository(_db),
+                      priceRepository: _priceRepo,
+                      locale: locale,
+                      initialCategory: pickup.categories.isNotEmpty ? pickup.categories.first : 'CABLES',
+                      initialPublicCode: pickup.publicCode,
+                      onLotSaved: (tx) {
+                        setState(() {
+                          _activePickup = null;
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
 }

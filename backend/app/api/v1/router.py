@@ -10,6 +10,7 @@ from app.api.v1.lots import router as lots_router
 from app.api.v1.matching import router as matching_router
 from app.api.v1.materials import router as materials_router
 from app.api.v1.ml import router as ml_router
+from app.api.v1.pickup import router as pickup_router
 from app.api.v1.prices import router as prices_router
 from app.api.v1.recyclers import router as recyclers_router
 from app.api.v1.safety import router as safety_router
@@ -31,3 +32,4 @@ api_v1_router.include_router(verify_router)
 api_v1_router.include_router(ml_router)
 api_v1_router.include_router(safety_router)
 api_v1_router.include_router(collectors_router)
+api_v1_router.include_router(pickup_router)

@@ -52,7 +52,7 @@ class LedgerService:
         query = (
             select(LedgerEntry)
             .where(LedgerEntry.collector_id == collector_id)
-            .order_by(LedgerEntry.recorded_at.desc())
+            .order_by(LedgerEntry.created_at.asc(), LedgerEntry.recorded_at.asc())
             .limit(limit)
         )
         result = await db.execute(query)
@@ -67,7 +67,7 @@ class LedgerService:
         stmt = (
             select(LedgerEntry.balance_after)
             .where(LedgerEntry.collector_id == collector_id)
-            .order_by(LedgerEntry.recorded_at.desc(), LedgerEntry.created_at.desc())
+            .order_by(LedgerEntry.created_at.desc(), LedgerEntry.recorded_at.desc())
             .limit(1)
         )
         res = await db.execute(stmt)
@@ -120,7 +120,7 @@ class LedgerService:
         stmt_latest = (
             select(LedgerEntry.balance_after)
             .where(LedgerEntry.collector_id == collector_id)
-            .order_by(LedgerEntry.recorded_at.desc(), LedgerEntry.created_at.desc())
+            .order_by(LedgerEntry.created_at.desc(), LedgerEntry.recorded_at.desc())
             .limit(1)
         )
         current_bal = (await db.execute(stmt_latest)).scalar_one_or_none() or 0.0

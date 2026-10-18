@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/audio/audio_service.dart';
+import '../../core/auth/session_service.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/pdf/pdf_statement_generator.dart';
 import '../../core/sharing/share_service.dart';
@@ -19,7 +20,7 @@ class EarningsScreen extends StatefulWidget {
     super.key,
     required this.db,
     required this.audioService,
-    this.collectorId = 'KC-C-7821',
+    this.collectorId,
     this.locale = 'mr',
     this.ledgerRepository,
     this.onPdfExported,
@@ -27,7 +28,7 @@ class EarningsScreen extends StatefulWidget {
 
   final AppDatabase db;
   final AudioFeedbackService audioService;
-  final String collectorId;
+  final String? collectorId;
   final String locale;
   final LedgerRepository? ledgerRepository;
   final ValueChanged<String>? onPdfExported;
@@ -46,13 +47,28 @@ class _EarningsScreenState extends State<EarningsScreen> {
   double _selectedUpiAmount = 0.0;
   StreamSubscription<EarningsOverviewData>? _overviewSub;
   StreamSubscription<List<LocalTransaction>>? _lotsSub;
+  String _activeCollectorId = 'KC-C-COLLECTOR';
 
   @override
   void initState() {
     super.initState();
+    if (widget.collectorId != null && widget.collectorId!.isNotEmpty) {
+      _activeCollectorId = widget.collectorId!;
+    } else {
+      _initCollectorId();
+    }
     _ledgerRepo = widget.ledgerRepository ?? LedgerRepository(widget.db);
     _loadOverview();
     _subscribeStreams();
+  }
+
+  Future<void> _initCollectorId() async {
+    final id = await SessionService.getOrCreateCollectorId();
+    if (mounted) {
+      setState(() {
+        _activeCollectorId = id;
+      });
+    }
   }
 
   @override
@@ -66,7 +82,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
     if (WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
       return;
     }
-    _overviewSub = _ledgerRepo.watchDetailedOverview(widget.collectorId).listen((data) {
+    _overviewSub = _ledgerRepo.watchDetailedOverview(_activeCollectorId).listen((data) {
       if (mounted) {
         setState(() {
           _overview = data;
@@ -76,7 +92,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
     });
 
     _lotsSub = (widget.db.select(widget.db.localTransactions)
-          ..where((t) => t.collectorId.equals(widget.collectorId))
+          ..where((t) => t.collectorId.equals(_activeCollectorId))
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .watch()
         .listen((lots) {
@@ -89,9 +105,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   Future<void> _loadOverview() async {
-    final data = await _ledgerRepo.getDetailedOverview(widget.collectorId);
+    final data = await _ledgerRepo.getDetailedOverview(_activeCollectorId);
     final lots = await (widget.db.select(widget.db.localTransactions)
-          ..where((t) => t.collectorId.equals(widget.collectorId))
+          ..where((t) => t.collectorId.equals(_activeCollectorId))
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
 
@@ -108,7 +124,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
     await HapticService.heavyImpact();
     await _ledgerRepo.markCashReceivedOffline(
       entryId: item.entryId,
-      collectorId: widget.collectorId,
+      collectorId: _activeCollectorId,
       lotId: item.lotId,
     );
 
@@ -146,7 +162,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
 
     try {
       final file = await PdfStatementGenerator.generateEarningsStatementPdf(
-        collectorId: widget.collectorId,
+        collectorId: _activeCollectorId,
         statementRefNo: refNo,
         fromDate: fromDate,
         toDate: now,
@@ -226,7 +242,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${isMr ? 'कलेक्टर आयडी' : (isHi ? 'कलेक्टर आईडी' : 'Collector ID')}: ${widget.collectorId}',
+                      '${isMr ? 'कलेक्टर आयडी' : (isHi ? 'कलेक्टर आईडी' : 'Collector ID')}: $_activeCollectorId',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     const SizedBox(height: 4),

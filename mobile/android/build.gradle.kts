@@ -15,21 +15,32 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
+// 1. REGISTER THE FIXES BEFORE EVALUATION
 subprojects {
-    project.evaluationDependsOn(":app")
+    // Intercept plugins after their own scripts run, but before AGP locks them, and force compileSdk 36
+    afterEvaluate {
+        pluginManager.withPlugin("com.android.library") {
+            extensions.configure<com.android.build.api.dsl.LibraryExtension>("android") {
+                compileSdk = 36
+            }
+        }
+    }
+
+    // Force Java 17 across all plugins natively (outside afterEvaluate to prevent finalizing errors)
+    tasks.withType<JavaCompile>().configureEach {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
 
-// ---------------------------------------------------------------------------
-// Force compileSdk=36 on ALL Android sub-projects (Flutter plugins).
-// gradle.afterProject fires AFTER each project finishes its own evaluation,
-// so our value wins over the plugin's own hardcoded compileSdkVersion(33).
-// This is the Gradle 9-compatible replacement for afterEvaluate.
-// ---------------------------------------------------------------------------
-gradle.afterProject {
-    extensions.findByType<com.android.build.gradle.BaseExtension>()?.apply {
-        compileSdkVersion(36)
-        ndkVersion = "28.2.13676358"
-    }
+// 2. NOW TRIGGER EVALUATION (Our fixes above will now correctly intercept the plugins)
+subprojects {
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {

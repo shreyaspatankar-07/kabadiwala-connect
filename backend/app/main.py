@@ -11,9 +11,16 @@ Integrates:
 """
 
 import logging
+import os
+import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
+
+# Ensure repository root is on sys.path for monorepo ml imports
+repo_root = Path(__file__).resolve().parent.parent.parent
+if str(repo_root) not in sys.path:
+    sys.path.insert(0, str(repo_root))
 
 import joblib
 import lightgbm as lgb
@@ -22,6 +29,11 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from sqlalchemy import select
+
+from app.core.database import AsyncSessionLocal
+from app.models.system_config import SystemConfig
+from ml.src.anomaly.anomaly_detector import FraudAnomalyDetector
 
 from app.api.v1.collectors import router as collectors_router
 from app.api.v1.handover import router as handover_router
@@ -197,16 +209,53 @@ def load_ml_models(target_state: Any) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan context manager: loads LightGBM and Isolation Forest models on startup.
+    """Lifespan context manager: loads ML models and dynamic fraud thresholds from database.
 
     Stores model handles on app.state to avoid reloading on each request.
-    Handles missing binaries gracefully with informative logging.
+    Handles missing binaries and connection fallbacks gracefully with informative logging.
     """
     load_ml_models(app.state)
+
+    # Dynamic ML Engine Configuration: Fetch fraud_thresholds from system_configs
+    fraud_config: dict[str, Any] = {}
+    try:
+        async with AsyncSessionLocal() as session:
+            stmt = select(SystemConfig).where(SystemConfig.key == "fraud_thresholds")
+            result = await session.execute(stmt)
+            config_entry = result.scalar_one_or_none()
+            if config_entry and config_entry.value:
+                fraud_config = config_entry.value
+                logger.info("Loaded dynamic fraud thresholds from system_configs: %s", fraud_config)
+            else:
+                logger.info("No system_configs record for 'fraud_thresholds'; using default thresholds.")
+    except Exception as exc:
+        logger.warning(
+            "Could not load dynamic fraud thresholds from system_configs (%s); falling back to defaults.",
+            exc,
+        )
+
+    # Initialize global FraudAnomalyDetector instance with live thresholds
+    models_dir = _resolve_ml_models_dir()
+    fraud_detector = FraudAnomalyDetector(
+        model_path=models_dir / "anomaly_detector.joblib",
+        config=fraud_config,
+    )
+    app.state.fraud_detector = fraud_detector
+
+    # Connect to MLService singleton for live application requests
+    try:
+        from app.services.ml_service import ml_service
+
+        ml_service.anomaly_detector = fraud_detector
+    except Exception as exc:
+        logger.debug("Could not attach dynamic detector to ml_service: %s", exc)
+
     yield
+
     # Teardown logic
     app.state.valuation_model = None
     app.state.fraud_model = None
+    app.state.fraud_detector = None
     logger.info("ML model resources released.")
 
 
@@ -230,10 +279,22 @@ load_ml_models(app.state)
 # Structured JSON logging middleware
 app.add_middleware(StructuredLoggingMiddleware)
 
-# CORS configuration
+# CORS configuration: allows localhost, 127.0.0.1, and any Vercel production/preview deployment domain
+cors_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+]
+if os.getenv("ADDITIONAL_CORS_ORIGINS"):
+    cors_origins.extend(
+        [o.strip() for o in os.getenv("ADDITIONAL_CORS_ORIGINS", "").split(",") if o.strip()]
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

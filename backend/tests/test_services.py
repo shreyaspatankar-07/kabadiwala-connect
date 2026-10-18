@@ -447,6 +447,110 @@ async def test_ledger_service(db_session: AsyncSession, test_collector):
     assert summary.total_transactions == 2
 
 
+# ---------------------------------------------------------------------------
+# Regression: ledger balance bugs (expected to FAIL on current code)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_balance_with_identical_timestamps_service(
+    db_session: AsyncSession, test_collector
+):
+    """BUG REPRODUCTION (service layer): identical recorded_at on credit and debit.
+
+    LedgerService.get_summary picks current_balance_inr by ordering on
+    (recorded_at DESC, created_at DESC).  When both rows share the same recorded_at,
+    the tie-break on created_at is non-deterministic for in-memory SQLite; the debit
+    row (balance_after=0) can sort ahead of the credit row (balance_after=3000).
+
+    Expected to FAIL with: AssertionError: assert <wrong_value> == 3000.0
+    """
+    col, _ = test_collector
+    collector_id = col.collector_id
+
+    shared_ts = datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC)
+
+    credit_dto = LedgerEntryCreate(
+        entry_type="credit",
+        amount=3500.0,
+        payment_mode="cash_received",
+        description="Credit with shared timestamp",
+        recorded_at=shared_ts,
+    )
+    await LedgerService.create_entry(collector_id, credit_dto, db_session)
+
+    debit_dto = LedgerEntryCreate(
+        entry_type="debit",
+        amount=500.0,
+        payment_mode="cash_received",
+        description="Debit with shared timestamp",
+        recorded_at=shared_ts,
+    )
+    await LedgerService.create_entry(collector_id, debit_dto, db_session)
+
+    summary = await LedgerService.get_summary(collector_id, db_session)
+    # Expected to FAIL on current code — wrong balance returned due to tie-break ambiguity
+    assert summary.current_balance_inr == 3000.0, (
+        f"Balance wrong with identical timestamps: got {summary.current_balance_inr}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_balance_with_late_offline_entry_service(
+    db_session: AsyncSession, test_collector
+):
+    """BUG REPRODUCTION (service layer): offline debit arrives with earlier recorded_at.
+
+    Scenario:
+      - Credit of 3500 posted with recorded_at=10:00 (server inserts first).
+      - Debit of 500 posted with recorded_at=09:00 (offline phone, synced later).
+
+    create_entry reads current balance ordered by (recorded_at DESC, created_at DESC).
+    When the debit is inserted, recorded_at=09:00 < credit's 10:00, so the query
+    correctly finds the credit row as latest and subtracts: 3500-500=3000. ✓
+
+    But get_summary derives current_balance_inr using the *same* ordering.  The credit
+    (10:00) sorts BEFORE the debit (09:00), so it returns the credit's balance_after
+    (3500) instead of the debit's balance_after (3000). ✗
+
+    Expected to FAIL with: AssertionError: assert 3500.0 == 3000.0
+    """
+    col, _ = test_collector
+    collector_id = col.collector_id
+
+    credit_ts = datetime(2026, 1, 15, 10, 0, 0, tzinfo=UTC)  # 10:00 — posted first
+    debit_ts = datetime(2026, 1, 15, 9, 0, 0, tzinfo=UTC)    # 09:00 — earlier client time
+
+    credit_dto = LedgerEntryCreate(
+        entry_type="credit",
+        amount=3500.0,
+        payment_mode="cash_received",
+        description="Online credit at 10:00",
+        recorded_at=credit_ts,
+    )
+    entry1 = await LedgerService.create_entry(collector_id, credit_dto, db_session)
+    assert entry1.balance_after == 3500.0, "Credit balance_after should be 3500"
+
+    debit_dto = LedgerEntryCreate(
+        entry_type="debit",
+        amount=500.0,
+        payment_mode="cash_received",
+        description="Offline debit synced late, recorded_at=09:00",
+        recorded_at=debit_ts,
+    )
+    entry2 = await LedgerService.create_entry(collector_id, debit_dto, db_session)
+    # create_entry sees credit (10:00) as latest → balance 3500−500=3000 ← correct at insert
+    assert entry2.balance_after == 3000.0, (
+        f"Debit balance_after should be 3000, got {entry2.balance_after}"
+    )
+
+    summary = await LedgerService.get_summary(collector_id, db_session)
+    # Expected to FAIL: get_summary picks credit row (10:00) as "latest" → returns 3500
+    assert summary.current_balance_inr == 3000.0, (
+        f"Balance wrong after late offline entry: got {summary.current_balance_inr}"
+    )
+
+
 # ============================================================================
 # SyncService Tests
 # ============================================================================

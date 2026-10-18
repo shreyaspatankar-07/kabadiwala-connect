@@ -4,9 +4,70 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 14 (ML Model Serving: LightGBM Valuation & Isolation Forest Fraud Detection)
+## Current Status: Phase 17 (Production Deployments & Edge Hardware Integration)
 
 ### Completed Items
+- [x] **Production Upgrade Step 5: Dynamic Identity & Fraud Settings (Flutter, Supabase & ML Lifespan)**:
+  - **Dynamic Zero-PII Mobile Identity ([`AuthService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/auth/auth_service.dart))**:
+    - Generates cryptographically secure `KC-C-<UUIDv4>` identifier on first launch, persisting to Android KeyStore via `FlutterSecureStorage`.
+    - Integrated with [`SessionService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/auth/session_service.dart) with deterministic in-memory testing isolation.
+    - Completely removed hardcoded `KC-C-7821` across onboarding PIN setup, Add Lot, Cash Ledger, Main Shell, and Offline Handover.
+    - All 95 mobile tests pass (`flutter test`).
+  - **Supabase / PostgreSQL `system_configs` Table**:
+    - Created [`SystemConfig`](file:///c:/dev/kabadiwala-connect/backend/app/models/system_config.py) SQLAlchemy model (`key` String PK, `value` JSONB, `description` Text) and exported in `app.models`.
+    - Added Alembic migration [`0004_system_configs.py`](file:///c:/dev/kabadiwala-connect/backend/alembic/versions/0004_system_configs.py) seeding initial fraud thresholds (`velocity_burst_seconds: 120`, `max_gps_jump_km: 50.0`, `weight_tolerance_percent: 10.0`).
+    - Added seed script [`backend/scripts/seed_system_configs.py`](file:///c:/dev/kabadiwala-connect/backend/scripts/seed_system_configs.py).
+  - **Dynamic ML Engine Configuration ([`FraudAnomalyDetector`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py))**:
+    - Refactored `AnomalyDetector` / `FraudAnomalyDetector` `__init__` to accept dynamic `config: dict` with safe fallbacks (120s, 50km, 10%).
+    - Dynamic rules for `VELOCITY_BURST`, `GPS_JUMP_SUSPICIOUS`, and `WEIGHT_TOLERANCE_EXCEEDED`.
+  - **FastAPI Lifespan Memory Caching ([`backend/app/main.py`](file:///c:/dev/kabadiwala-connect/backend/app/main.py))**:
+    - Queries `system_configs` for `fraud_thresholds` on startup using `AsyncSessionLocal`, instantiating the global detector on `app.state.fraud_detector` and linking to `ml_service`.
+  - **Test Verification**: Added [`backend/tests/test_system_config.py`](file:///c:/dev/kabadiwala-connect/backend/tests/test_system_config.py); all 91 backend tests and 10 ML tests pass (`py -3.11 -m pytest backend/tests` and `py -3.11 -m pytest ml/tests`).
+
+- [x] **Production Upgrade Step 4: Physical Scale Hardware Integration (`flutter_blue_plus`)**:
+  - **GATT UART BLE Service**: Implemented [`BleScaleService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/hardware/scale_service.dart) targeting GATT UART Service UUID `0xFFE0` (`0000ffe0-0000-1000-8000-00805f9b34fb`) and Characteristic `0xFFE1`.
+  - **Flexible Byte Stream Parser**: Built `parseWeightFromBytes` supporting standard ASCII weighing indicator streams (`"ST,GS,+  12.50kg\r\n"`, clean numeric strings) and raw 16-bit little-endian binary packets.
+  - **Hybrid Weight Entry UI**: Updated [`AddLotScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/add_lot_screen.dart) removing hardcoded `SCALE-01` and `12.5 kg` mocks; added real-time scanning/connecting card alongside a manual numeric `TextFormField` fallback that recalculates the LightGBM fair valuation model instantly upon weight changes.
+  - **Android 12+ BLE Permissions**: Added `BLUETOOTH_SCAN` (`neverForLocation`), `BLUETOOTH_CONNECT`, `BLUETOOTH_ADMIN`, and `android.hardware.bluetooth_le` to [`AndroidManifest.xml`](file:///c:/dev/kabadiwala-connect/mobile/android/app/src/main/AndroidManifest.xml).
+  - **Automated Test Coverage**: Added [`mobile/test/scale_service_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/scale_service_test.dart) (6 tests passing) and verified [`mobile/test/add_lot_flow_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/add_lot_flow_test.dart) (5 tests passing).
+
+- [x] **Doorstep Citizen Pickup & On-Demand Dispatching Module**:
+  - **Backend PostGIS Spatial Schema & Migrations**:
+    - Created [`PickupRequest`](file:///c:/dev/kabadiwala-connect/backend/app/models/pickup.py) SQLAlchemy model with PostGIS `Geometry(Point, srid=4326)`, GiST index, `PickupStatus` enum (`CREATED`, `DISPATCHED`, `ACCEPTED`, `ARRIVED`, `COMPLETED`, `CANCELLED`), and `JSONCompatible` arrays.
+    - Added Alembic migration [`0003_pickup_requests.py`](file:///c:/dev/kabadiwala-connect/backend/alembic/versions/0003_pickup_requests.py) and verified head revision in [`test_migrations.py`](file:///c:/dev/kabadiwala-connect/backend/tests/test_migrations.py).
+    - Added Pydantic v2 schemas in [`backend/app/schemas/pickup.py`](file:///c:/dev/kabadiwala-connect/backend/app/schemas/pickup.py).
+    - Implemented API routes in [`backend/app/api/v1/pickup.py`](file:///c:/dev/kabadiwala-connect/backend/app/api/v1/pickup.py):
+      - `POST /api/v1/pickup/create`: Zero-registration public endpoint generating `PR-MH-YYYY-XXXXX` codes and PostGIS points.
+      - `GET /api/v1/pickup/track/{public_code}`: Public tracking endpoint with collector assignment and arrival ETA.
+      - `GET /api/v1/pickup/nearby`: PostGIS spatial proximity search using `ST_DWithin` within 2.5 km radius.
+      - `POST /api/v1/pickup/{id}/accept`: Atomically locks request row with `with_for_update` and assigns collector.
+      - `POST /api/v1/pickup/{id}/arrived`: Collector arrival confirmation.
+      - `POST /api/v1/pickup/{id}/complete`: Handover closure linking offline lot ID.
+    - Added test suite in [`backend/tests/test_pickup_api.py`](file:///c:/dev/kabadiwala-connect/backend/tests/test_pickup_api.py); all 87 backend tests pass (`py -3.11 -m pytest backend/tests`).
+  - **Citizen Web Portal (Next.js 14 App Router)**:
+    - Built zero-registration booking page at [`portal/src/app/pickup/page.tsx`](file:///c:/dev/kabadiwala-connect/portal/src/app/pickup/page.tsx) with HTML5 Geolocation (`navigator.geolocation.getCurrentPosition`), quick city presets, photo drag-and-drop, category picture cards, time slots, and OTP verification.
+    - Built live tracking page at [`portal/src/app/pickup/track/[code]/page.tsx`](file:///c:/dev/kabadiwala-connect/portal/src/app/pickup/track/[code]/page.tsx) with real-time 4-stage visual stepper and collector ETA badge.
+    - Added API helpers in [`portal/src/lib/api.ts`](file:///c:/dev/kabadiwala-connect/portal/src/lib/api.ts). Production build passes with 0 errors (`npm run build`).
+  - **Collector Mobile Integration (Flutter / Riverpod / Android)**:
+    - Added [`PickupRequestDto`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/models/pickup_request_model.dart).
+    - Added [`NavigationService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/hardware/navigation_service.dart) triggering native Android turn-by-turn Map Intents (`google.navigation:q=lat,lng`), preserving battery/RAM on 1-2GB devices.
+    - Added [`PickupDispatchNotifier`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/providers/pickup_provider.dart) with spoken Marathi voice alerts (*"नवीन पिकअप उपलब्ध — 1.5 किमी दूर, ..."*).
+    - Added [`PickupAlertDialog`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/pickup_alert_dialog.dart) with 56dp touch targets, Accept/Decline, navigation trigger, and "I Have Arrived" action.
+    - Integrated with [`AddLotScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/add_lot_screen.dart) for auto-populating categories and public code into the offline Drift SQLite outbox.
+    - Added top navigation button in [`MainNavigationShell`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/main_navigation_shell.dart).
+    - Added widget & unit test suite in [`mobile/test/pickup_flow_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/pickup_flow_test.dart); all 85 mobile tests pass (`flutter test`).
+
+- [x] **Strict Model Loading & Fallback Safeguards**:
+  - Updated [`AnomalyDetector._load_model`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py) to log failed loads at ERROR level with exact file path.
+  - Added `model_source` property recording `"trained"` vs `"synthetic_fallback"`.
+  - Added strict enforcement via `KABADIWALA_REQUIRE_TRAINED_MODELS="1"`, raising an exception instead of silently replacing models.
+- [x] **Encoding & Asset Verification**:
+  - Verified and confirmed UTF-8 encoding integrity and Rupee sign (`₹` / `\u20b9`) in [`ml/src/anomaly/anomaly_detector.py`](file:///c:/dev/kabadiwala-connect/ml/src/anomaly/anomaly_detector.py).
+  - Verified [`EdgeMaterialClassifier`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/ml/edge_material_classifier.dart) contains clean UTF-8 Devanagari characters with 0 mojibake markers; preserved original category strings pending native-speaker review.
+- [x] **Cross-Stack ML Architectural Investigation**:
+  - Detailed feature matrix comparison for Isolation Forest anomaly detection (3-feature runtime vs 8-feature scratch training pipeline).
+  - Audited legacy `/api/v1/fraud-check` and `/api/v1/valuate` endpoints vs `ValuationService` and mobile offline evaluation.
+  - Audited TFLite INT8 inference pipeline in `EdgeMaterialClassifier` vs Float16 compatibility.
 - [x] **LightGBM Valuation & Isolation Forest Fraud Detection Serving**:
   - Implemented modern FastAPI lifespan caching in [`backend/app/main.py`](file:///c:/dev/kabadiwala-connect/backend/app/main.py) to load `valuation_lightgbm.txt` and `anomaly_detector.joblib` into memory on startup via `lightgbm.Booster` and `joblib.load`.
   - Added Pydantic schemas: `ValuationRequest` (`weight_kg`, `condition_score`, `region_index`, `market_demand_index`, `category`), `ValuationResponse`, `TransactionRequest` (`user_history_score`, `transaction_frequency`, `weight_anomaly_score`, `price_variance`), and `FraudCheckResponse`.
@@ -25,7 +86,19 @@ Living record of project deliverables, milestones completed, and pending roadmap
   - Fallback logic: if confidence < 0.55, triggers fallback state displaying warning banner: *"Low Confidence: Please select item manually from the grid."* and opens interactive manual selection grid; otherwise displays predicted category and confidence percentage.
   - Added [`MaterialScanScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/material_scan_screen.dart) featuring live camera preview (`CameraPreview`), 224x224 viewfinder targeting box, 72dp tactile capture shutter button, flash toggle, camera flip, vernacular audio TTS guidance, and lifecycle pause/resume management.
   - Added `tflite_flutter` and `image` to `mobile/pubspec.yaml` (alongside `camera`).
-  - Added full test suite in [`edge_material_classifier_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/edge_material_classifier_test.dart) and [`material_scan_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/material_scan_screen_test.dart). All 69 tests pass with 0 errors.
+  - Added full test suite in [`edge_material_classifier_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/edge_material_classifier_test.dart) and [`material_scan_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/material_scan_screen_test.dart).
+
+- [x] **Edge AI Model Accuracy & Tensor Preprocessing Enhancements**:
+  - **Aspect-Ratio Center Crop**: Added `EdgeMaterialClassifier.centerCropAndResize()` to crop rectangular camera frames (16:9 / 4:3) into a 1:1 square before downscaling to 224x224, preventing geometric stretching and distortion of e-waste parts (PCBs, cables, monitors).
+  - **Model Domain Normalization**: Added `quantizeNormalizedPixelToInt8()` preventing INT8 input tensor saturation (where raw 0-255 pixels divided by tiny quantization scales like `0.00784` pegged all channels to `127`). Dynamically identifies normalized domain (`[-1.0, 1.0]` vs `[0.0, 1.0]` vs raw `[0, 255]`) and ensures well-distributed inputs across the entire `[-128, 127]` INT8 spectrum.
+  - **Tensor Validation Diagnostics**: Added [`TensorDiagnostics`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/ml/edge_material_classifier.dart) calculating tensor `min`, `max`, `mean`, `stdDev`, `saturationRatio`, and `isSaturated` flag. Alerts in debug mode if tensor saturation occurs and attaches telemetry to `MaterialClassificationResult.tensorDiagnostics`.
+  - Expanded unit test coverage in [`edge_material_classifier_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/edge_material_classifier_test.dart) with 4 new tests. All 73 mobile tests pass with 0 errors.
+
+- [x] **Interactive High-Resolution Image Preview Feature**:
+  - Created [`ImagePreviewDialog`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/image_preview_dialog.dart) featuring full interactive pinch-to-zoom (`InteractiveViewer`), metadata display (file size in KB, SHA-256 cryptographic audit hash, GPS coordinates), vernacular Marathi/Hindi/English titles, and large 56dp tactile close button.
+  - Integrated into [`CameraCaptureCard`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/widgets/camera_capture_card.dart): clicking any captured photo thumbnail or image icon (`btn_preview_photo_$index`) instantly launches the interactive preview modal.
+  - Integrated into [`MaterialScanScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/material_scan_screen.dart): clicking the scanned photo preview thumbnail or image icon button (`btn_preview_scanned_image` / `btn_preview_scanned_image_icon`) opens the full photo preview modal.
+  - Added dedicated unit & widget test suite in [`image_preview_dialog_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/image_preview_dialog_test.dart) and updated [`material_scan_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/material_scan_screen_test.dart). All 76 mobile tests pass with 0 errors.
 
 - [x] **Online/Offline System UI & Interactive Diagnostics Dialog**:
   - Added modern, high-contrast, pulsating connectivity badge in `SyncStatusBadge` with multilingual support (`mr`, `hi`, `en`).
