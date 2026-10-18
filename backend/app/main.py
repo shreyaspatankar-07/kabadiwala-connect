@@ -279,12 +279,20 @@ load_ml_models(app.state)
 # Structured JSON logging middleware
 app.add_middleware(StructuredLoggingMiddleware)
 
-# CORS configuration: allows localhost, 127.0.0.1, and any Vercel production/preview deployment domain
+# CORS configuration:
+# - Vercel portal (any .vercel.app subdomain via regex)
+# - Render backend self-requests
+# - Local dev (localhost variants)
+# - Flutter mobile app: Android/iOS clients send no Origin header at all;
+#   FastAPI's CORSMiddleware only blocks preflight OPTIONS (which Flutter
+#   doesn't send for non-complex requests), so plain GET/POST from Flutter
+#   are passed through. For browser-based access, the Vercel regex covers it.
 cors_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
+    "https://kabadiwala-backend.onrender.com",
 ]
 if os.getenv("ADDITIONAL_CORS_ORIGINS"):
     cors_origins.extend(
@@ -295,7 +303,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
     allow_origin_regex=r"https://.*\.vercel\.app",
-    allow_credentials=True,
+    allow_credentials=False,  # Must be False when allow_origins includes wildcard-style patterns
     allow_methods=["*"],
     allow_headers=["*"],
 )
