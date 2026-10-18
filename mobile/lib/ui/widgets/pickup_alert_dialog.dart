@@ -10,7 +10,7 @@ import 'speaker_button.dart';
 class PickupAlertDialog extends StatelessWidget {
   final PickupRequestDto pickup;
   final AudioFeedbackService audioService;
-  final NavigationService navigationService;
+  final NavigationService? navigationService;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
   final VoidCallback? onArrived;
@@ -20,7 +20,7 @@ class PickupAlertDialog extends StatelessWidget {
     super.key,
     required this.pickup,
     required this.audioService,
-    this.navigationService = const NavigationService(),
+    this.navigationService,
     required this.onAccept,
     required this.onDecline,
     this.onArrived,
@@ -225,11 +225,29 @@ class PickupAlertDialog extends StatelessWidget {
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  onPressed: () {
-                    navigationService.launchTurnByTurnNavigation(
+                  onPressed: () async {
+                    final nav = navigationService ?? NavigationService();
+                    final launched = await nav.launchTurnByTurnNavigation(
                       latitude: pickup.latitude,
                       longitude: pickup.longitude,
                     );
+                    if (!launched) {
+                      // Offline or no maps app — show a graceful localized warning
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            locale == 'mr'
+                                ? 'थेट नेव्हिगेशनसाठी इंटरनेट आवश्यक आहे.'
+                                : (locale == 'hi'
+                                    ? 'नेविगेशन के लिए इंटरनेट आवश्यक है।'
+                                    : 'Turn-by-turn navigation needs an internet connection.'),
+                          ),
+                          backgroundColor: Colors.orange.shade800,
+                          duration: const Duration(seconds: 4),
+                        ),
+                      );
+                    }
                   },
                   icon: const Icon(Icons.navigation, size: 24),
                   label: Text(

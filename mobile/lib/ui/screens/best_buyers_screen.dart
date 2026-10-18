@@ -229,7 +229,9 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: isRankOne ? goldBorderColor.withValues(alpha: 0.18) : Colors.black.withValues(alpha: 0.04),
+            color: isRankOne
+                ? goldBorderColor.withValues(alpha: 0.18)
+                : Colors.black.withValues(alpha: 0.04),
             blurRadius: isRankOne ? 12 : 6,
             offset: const Offset(0, 4),
           ),
@@ -250,16 +252,22 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                 children: [
                   const Icon(Icons.workspace_premium_rounded, color: Color(0xFFD97706), size: 22),
                   const SizedBox(width: 8),
-                  Text(
-                    locale == 'hi'
-                        ? '★ रैंक #1 : सर्वोत्तम खरीदार (Best Choice)'
-                        : (locale == 'en'
-                            ? '★ Rank #1 : Best Choice Buyer'
-                            : '★ क्रमांक १ : सर्वोत्तम पर्याय (Best Choice)'),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF92400E),
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        locale == 'hi'
+                            ? '★ क्रम #1 : सर्वोत्तम खरीदार'
+                            : (locale == 'en'
+                                ? '★ Rank #1 : Best Choice'
+                                : '★ क्रमांक १ : सर्वोत्तम पर्याय'),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF92400E),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -300,7 +308,8 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.verified_rounded, size: 16, color: Color(0xFF16A34A)),
+                                const Icon(Icons.verified_rounded,
+                                    size: 16, color: Color(0xFF16A34A)),
                                 const SizedBox(width: 5),
                                 Text(
                                   locale == 'hi'
@@ -348,8 +357,13 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            locale == 'en' ? 'Offered Rate' : (locale == 'hi' ? 'प्रस्तावित दर' : 'दिला जाणारा भाव'),
-                            style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                            locale == 'en'
+                                ? 'Offered Rate'
+                                : (locale == 'hi' ? 'प्रस्तावित दर' : 'दिला जाणारा भाव'),
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: AppTheme.textMuted,
+                                fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 2),
                           Row(
@@ -364,7 +378,10 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                               ),
                               const Text(
                                 ' / kg',
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.textMuted),
                               ),
                             ],
                           ),
@@ -397,7 +414,8 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                       key: Key(buyer.pickupAvailable
                           ? 'pickup_icon_${buyer.recyclerId}'
                           : 'dropoff_icon_${buyer.recyclerId}'),
-                      color: buyer.pickupAvailable ? const Color(0xFF0284C7) : const Color(0xFFD97706),
+                      color:
+                          buyer.pickupAvailable ? const Color(0xFF0284C7) : const Color(0xFFD97706),
                       size: 24,
                     ),
                     const SizedBox(width: 8),
@@ -411,11 +429,15 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                                     : 'घरी येऊन उचलणार (${buyer.estimatedPickupTime})'))
                             : (locale == 'en'
                                 ? 'Self Drop-off'
-                                : (locale == 'hi' ? 'स्वयं ले जाएं (ड्रॉप-ऑफ)' : 'स्वतः केंद्रावर घेऊन जा (ड्रॉप-ऑफ)')),
+                                : (locale == 'hi'
+                                    ? 'स्वयं ले जाएं (ड्रॉप-ऑफ)'
+                                    : 'स्वतः केंद्रावर घेऊन जा (ड्रॉप-ऑफ)')),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
-                          color: buyer.pickupAvailable ? const Color(0xFF0284C7) : const Color(0xFFD97706),
+                          color: buyer.pickupAvailable
+                              ? const Color(0xFF0284C7)
+                              : const Color(0xFFD97706),
                         ),
                       ),
                     ),
@@ -441,12 +463,15 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                           HapticService.selectionClick();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(locale == 'en' ? 'Calling: ${buyer.phone}' : 'कॉल करत आहे: ${buyer.phone}'),
+                              content: Text(locale == 'en'
+                                  ? 'Calling: ${buyer.phone}'
+                                  : 'कॉल करत आहे: ${buyer.phone}'),
                               duration: const Duration(seconds: 2),
                             ),
                           );
                         },
-                        child: const Icon(Icons.phone_in_talk_rounded, color: Color(0xFF0284C7), size: 28),
+                        child: const Icon(Icons.phone_in_talk_rounded,
+                            color: Color(0xFF0284C7), size: 28),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -481,7 +506,8 @@ class _BestBuyersScreenState extends State<BestBuyersScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => HandoverInitiateScreen(
-                                  lotId: widget.lot.lotId ?? 'LOT-${DateTime.now().millisecondsSinceEpoch}',
+                                  lotId: widget.lot.lotId ??
+                                      'LOT-${DateTime.now().millisecondsSinceEpoch}',
                                   initialWeightKg: widget.lot.weightKg,
                                   category: widget.lot.category,
                                   recyclerName: buyer.name,

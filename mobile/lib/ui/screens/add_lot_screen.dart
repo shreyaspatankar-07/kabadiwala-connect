@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/audio/audio_service.dart';
@@ -25,7 +26,6 @@ import '../widgets/speaker_button.dart';
 import '../widgets/value_estimate_card.dart';
 import 'best_buyers_screen.dart';
 import 'safety_card_detail_screen.dart';
-
 
 class AddLotScreen extends StatefulWidget {
   const AddLotScreen({
@@ -115,7 +115,8 @@ class _AddLotScreenState extends State<AddLotScreen> {
     }
     _classifier = widget.materialClassifier ?? MaterialClassifier();
     _locationService = widget.locationService ?? LocationService();
-    _scaleService = widget.scaleService ?? (_isTestEnvironment ? StubBluetoothScaleService() : BleScaleService());
+    _scaleService = widget.scaleService ??
+        (_isTestEnvironment ? StubBluetoothScaleService() : BleScaleService());
     _manualWeightController = TextEditingController(text: _weightInputString);
 
     _scaleStatus = _scaleService.currentStatus;
@@ -174,7 +175,8 @@ class _AddLotScreenState extends State<AddLotScreen> {
     }
 
     try {
-      final prices = await widget.priceRepository.db.select(widget.priceRepository.db.cachedPrices).get();
+      final prices =
+          await widget.priceRepository.db.select(widget.priceRepository.db.cachedPrices).get();
       if (prices.isNotEmpty && mounted) {
         setState(() {
           for (final p in prices) {
@@ -285,7 +287,8 @@ class _AddLotScreenState extends State<AddLotScreen> {
           );
         } else {
           photo = ImageProcessor.createMockPhoto(
-            photoId: 'IMG_DEMO_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
+            photoId:
+                'IMG_DEMO_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
             latitude: currentLat,
             longitude: currentLng,
             locationString: locationStr,
@@ -293,7 +296,8 @@ class _AddLotScreenState extends State<AddLotScreen> {
         }
       } catch (_) {
         photo = ImageProcessor.createMockPhoto(
-          photoId: 'IMG_FALLBACK_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
+          photoId:
+              'IMG_FALLBACK_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
           latitude: currentLat,
           longitude: currentLng,
           locationString: locationStr,
@@ -422,9 +426,10 @@ class _AddLotScreenState extends State<AddLotScreen> {
 
       final totalWeight = _draftItems.fold(0.0, (acc, item) => acc + item.weightKg);
       final totalQuotedPrice = _draftItems.fold(0.0, (acc, item) => acc + item.estimatedTotalValue);
-      final primaryCategory = _draftItems.isNotEmpty ? _draftItems.first.category : _selectedCategory;
-      final effectiveCondition = _draftItems.isNotEmpty ? _draftItems.first.condition.dbValue : _selectedCondition.dbValue;
-
+      final primaryCategory =
+          _draftItems.isNotEmpty ? _draftItems.first.category : _selectedCategory;
+      final effectiveCondition =
+          _draftItems.isNotEmpty ? _draftItems.first.condition.dbValue : _selectedCondition.dbValue;
 
       // Check contextual safety nudge (CRT, Batteries, Burnt condition)
       final nudgeCard = SafetyRepository().getContextualNudge(
@@ -460,14 +465,15 @@ class _AddLotScreenState extends State<AddLotScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(nudgeCard.summary, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                Text(nudgeCard.summary,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 10),
                 ...nudgeCard.instructions.take(2).map(
-                  (inst) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0),
-                    child: Text('• $inst', style: const TextStyle(fontSize: 12)),
-                  ),
-                ),
+                      (inst) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: Text('• $inst', style: const TextStyle(fontSize: 12)),
+                      ),
+                    ),
               ],
             ),
             actions: [
@@ -485,7 +491,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
                     ),
                   );
                 },
-                child: Text(widget.locale == 'hi' ? 'पूरा नियम पढ़ें' : (widget.locale == 'en' ? 'Read Full' : 'पूर्ण नियम वाचा')),
+                child: Text(widget.locale == 'hi'
+                    ? 'पूरा नियम पढ़ें'
+                    : (widget.locale == 'en' ? 'Read Full' : 'पूर्ण नियम वाचा')),
               ),
               ElevatedButton(
                 key: const Key('btn_acknowledge_nudge_proceed'),
@@ -494,7 +502,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
                   SafetyRepository().acknowledgeCard(nudgeCard.topicId);
                   Navigator.pop(ctx, true);
                 },
-                child: Text(widget.locale == 'hi' ? 'समझ गया, आगे बढ़ें' : (widget.locale == 'en' ? 'Understood' : 'समजले, पुढे चला')),
+                child: Text(widget.locale == 'hi'
+                    ? 'समझ गया, आगे बढ़ें'
+                    : (widget.locale == 'en' ? 'Understood' : 'समजले, पुढे चला')),
               ),
             ],
           ),
@@ -509,7 +519,6 @@ class _AddLotScreenState extends State<AddLotScreen> {
       for (final item in _draftItems) {
         allPhotoHashes.addAll(item.photoHashes);
       }
-
 
       final lat = _currentLocation?.latitude ?? 19.6967;
       final lng = _currentLocation?.longitude ?? 72.7699;
@@ -595,7 +604,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          locale == 'hi' ? 'नया माल जोड़ें' : (locale == 'en' ? 'Add E-Waste Lot' : 'नवीन माल जोडा'),
+          locale == 'hi'
+              ? 'नया माल जोड़ें'
+              : (locale == 'en' ? 'Add E-Waste Lot' : 'नवीन माल जोडा'),
           style: const TextStyle(fontWeight: FontWeight.w900),
         ),
         actions: [
@@ -665,8 +676,12 @@ class _AddLotScreenState extends State<AddLotScreen> {
   Widget _buildGeotagSection(String locale) {
     final isMr = locale == 'mr';
     final isHi = locale == 'hi';
-    final latStr = _currentLocation != null ? '${_currentLocation!.latitude.toStringAsFixed(4)}° N' : '19.0760° N';
-    final lngStr = _currentLocation != null ? '${_currentLocation!.longitude.toStringAsFixed(4)}° E' : '72.8777° E';
+    final latStr = _currentLocation != null
+        ? '${_currentLocation!.latitude.toStringAsFixed(4)}° N'
+        : '19.0760° N';
+    final lngStr = _currentLocation != null
+        ? '${_currentLocation!.longitude.toStringAsFixed(4)}° E'
+        : '72.8777° E';
     final district = _currentLocation?.district ?? 'Mumbai';
     final isGpsLive = _currentLocation?.source == 'gps';
 
@@ -702,8 +717,11 @@ class _AddLotScreenState extends State<AddLotScreen> {
                       runSpacing: 4,
                       children: [
                         Text(
-                          isMr ? 'स्वयंचलित GPS स्थान टॅग' : (isHi ? 'ऑटो GPS जियोटैग' : 'Auto GPS Geotag'),
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Color(0xFF14532D)),
+                          isMr
+                              ? 'स्वयंचलित GPS स्थान टॅग'
+                              : (isHi ? 'ऑटो GPS जियोटैग' : 'Auto GPS Geotag'),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w900, fontSize: 15, color: Color(0xFF14532D)),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -746,7 +764,8 @@ class _AddLotScreenState extends State<AddLotScreen> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.greenGoEarn),
+                        child:
+                            CircularProgressIndicator(strokeWidth: 2, color: AppTheme.greenGoEarn),
                       )
                     : const Icon(Icons.my_location_rounded, color: AppTheme.greenGoEarn),
                 tooltip: isMr ? 'स्थान रिफ्रेश करा' : (isHi ? 'स्थान रिफ्रेश करें' : 'Refresh GPS'),
@@ -754,30 +773,37 @@ class _AddLotScreenState extends State<AddLotScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: LocationService.districtCoordinates.keys.map((d) {
-                final isSelected = district == d;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6.0),
-                  child: ChoiceChip(
-                    label: Text(d, style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600)),
-                    selected: isSelected,
-                    selectedColor: AppTheme.greenGoEarnLight,
-                    onSelected: (val) {
-                      if (val) {
-                        setState(() {
-                          _currentLocation = _locationService.selectManualDistrict(d);
-                        });
-                      }
-                    },
-                  ),
-                );
-              }).toList(),
+          // DEBUG-ONLY: district override chips for QA GPS spoofing.
+          // Completely absent in release builds via tree-shaking.
+          if (kDebugMode) ...[
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: LocationService.districtCoordinates.keys.map((d) {
+                  final isSelected = district == d;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6.0),
+                    child: ChoiceChip(
+                      label: Text(d,
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600)),
+                      selected: isSelected,
+                      selectedColor: AppTheme.greenGoEarnLight,
+                      onSelected: (val) {
+                        if (val) {
+                          setState(() {
+                            _currentLocation = _locationService.selectManualDistrict(d);
+                          });
+                        }
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -804,7 +830,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
                 child: Text(
                   locale == 'hi'
                       ? 'AI सुझाई गई श्रेणियां (Top 3):'
-                      : (locale == 'en' ? 'AI Suggested Categories:' : 'कॅमेरा सुचवलेले प्रकार (Top 3):'),
+                      : (locale == 'en'
+                          ? 'AI Suggested Categories:'
+                          : 'कॅमेरा सुचवलेले प्रकार (Top 3):'),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                 ),
               ),
@@ -835,7 +863,11 @@ class _AddLotScreenState extends State<AddLotScreen> {
                 child: BigTile(
                   key: Key('category_tile_${pred.categoryId}'),
                   title: pred.categoryId,
-                  subtitle: '${pred.confidencePercent}% खात्री (Confidence)',
+                  subtitle: locale == 'hi'
+                      ? '${pred.confidencePercent}% विश्वसनीयता'
+                      : (locale == 'en'
+                          ? '${pred.confidencePercent}% Confidence'
+                          : '${pred.confidencePercent}% खात्री'),
                   icon: pred.icon,
                   isSelected: isSelected,
                   primaryColor: pred.color,
@@ -1004,7 +1036,6 @@ class _AddLotScreenState extends State<AddLotScreen> {
                     color: AppTheme.textHighContrast,
                   ),
                 ),
-
               ],
             ),
           ),
@@ -1040,7 +1071,6 @@ class _AddLotScreenState extends State<AddLotScreen> {
     );
   }
 
-
   List<String> _getSubcategoriesForActiveCategory(String locale) {
     final isMr = locale == 'mr';
     final isHi = locale == 'hi';
@@ -1055,7 +1085,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
       case 'Batteries':
         return [
           isMr ? 'Li-ion (लिथियम)' : (isHi ? 'Li-ion (लिथियम)' : 'Lithium-Ion (Li-ion)'),
-          isMr ? 'Lead-Acid (लेड-अ‍ॅसिड)' : (isHi ? 'Lead-Acid (लेड-एसिड)' : 'Lead-Acid (Inverter)'),
+          isMr
+              ? 'Lead-Acid (लेड-अ‍ॅसिड)'
+              : (isHi ? 'Lead-Acid (लेड-एसिड)' : 'Lead-Acid (Inverter)'),
         ];
       case 'Cables':
         return [
@@ -1151,7 +1183,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
             child: Row(
               children: [
                 Icon(
-                  _isScaleConnected ? Icons.bluetooth_connected_rounded : Icons.bluetooth_searching_rounded,
+                  _isScaleConnected
+                      ? Icons.bluetooth_connected_rounded
+                      : Icons.bluetooth_searching_rounded,
                   color: _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.greenGoEarn,
                   size: 26,
                 ),
@@ -1170,18 +1204,23 @@ class _AddLotScreenState extends State<AddLotScreen> {
                             : (_scaleStatus == ScaleConnectionStatus.scanning
                                 ? (locale == 'en'
                                     ? 'Searching for scale...'
-                                    : (locale == 'hi' ? 'तराजू खोज रहे हैं...' : 'काटा शोधत आहे...'))
+                                    : (locale == 'hi'
+                                        ? 'तराजू खोज रहे हैं...'
+                                        : 'काटा शोधत आहे...'))
                                 : (_scaleStatus == ScaleConnectionStatus.connecting
                                     ? (locale == 'en'
                                         ? 'Connecting to scale...'
                                         : (locale == 'hi' ? 'कनेक्ट हो रहा है...' : 'जोडत आहे...'))
                                     : (locale == 'en'
                                         ? 'Connect Bluetooth Scale'
-                                        : (locale == 'hi' ? 'ब्लूटूथ तराजू कनेक्ट करें' : 'ब्लूटूथ काटा जोडा')))),
+                                        : (locale == 'hi'
+                                            ? 'ब्लूटूथ तराजू कनेक्ट करें'
+                                            : 'ब्लूटूथ काटा जोडा')))),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.textHighContrast,
+                          color:
+                              _isScaleConnected ? AppTheme.greenGoEarn : AppTheme.textHighContrast,
                         ),
                       ),
                       Text(
@@ -1201,7 +1240,8 @@ class _AddLotScreenState extends State<AddLotScreen> {
                     ],
                   ),
                 ),
-                if (_scaleStatus == ScaleConnectionStatus.scanning || _scaleStatus == ScaleConnectionStatus.connecting)
+                if (_scaleStatus == ScaleConnectionStatus.scanning ||
+                    _scaleStatus == ScaleConnectionStatus.connecting)
                   const SizedBox(
                     width: 24,
                     height: 24,
@@ -1248,7 +1288,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
             decoration: InputDecoration(
               labelText: locale == 'en'
                   ? 'Manual Weight Entry (Fallback)'
-                  : (locale == 'hi' ? 'हाथ से वजन दर्ज करें (वैकल्पिक)' : 'हाताने वजन टाका (पर्याय)'),
+                  : (locale == 'hi'
+                      ? 'हाथ से वजन दर्ज करें (वैकल्पिक)'
+                      : 'हाताने वजन टाका (पर्याय)'),
               helperText: locale == 'en'
                   ? 'Type weight manually if scale is offline or during testing'
                   : (locale == 'hi'
@@ -1317,7 +1359,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
             label: Text(
               locale == 'hi'
                   ? 'इस लॉट में और माल जोड़ें (+)'
-                  : (locale == 'en' ? 'Add More Items to Lot (+)' : 'या लॉटमध्ये अजून माल जोडा (+)'),
+                  : (locale == 'en'
+                      ? 'Add More Items to Lot (+)'
+                      : 'या लॉटमध्ये अजून माल जोडा (+)'),
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
@@ -1350,7 +1394,9 @@ class _AddLotScreenState extends State<AddLotScreen> {
                       : (locale == 'en' ? 'Save Lot Offline' : 'माल सुरक्षित जतन करा'))
                   : (locale == 'hi'
                       ? 'लॉट पूर्ण करें (${_draftItems.length} सामान)'
-                      : (locale == 'en' ? 'Complete Lot (${_draftItems.length} Items)' : 'लॉट पूर्ण करा (${_draftItems.length} वस्तू)')),
+                      : (locale == 'en'
+                          ? 'Complete Lot (${_draftItems.length} Items)'
+                          : 'लॉट पूर्ण करा (${_draftItems.length} वस्तू)')),
               style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
             ),
           ),

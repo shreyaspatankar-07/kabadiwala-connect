@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/auth/session_service.dart';
@@ -49,7 +50,9 @@ class PrivacyScreen extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                isMr ? 'खात्री करा: सर्व डेटा नष्ट करायचा?' : (isHi ? 'पुष्टि करें: क्या सारा डेटा हटाना है?' : 'Confirm Data Deletion'),
+                isMr
+                    ? 'खात्री करा: सर्व डेटा नष्ट करायचा?'
+                    : (isHi ? 'पुष्टि करें: क्या सारा डेटा हटाना है?' : 'Confirm Data Deletion'),
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
               ),
             ),
@@ -100,7 +103,9 @@ class PrivacyScreen extends StatelessWidget {
         messenger.showSnackBar(
           SnackBar(
             content: Text(
-              isMr ? 'सर्व डेटा यशस्वीरीत्या नष्ट करण्यात आला' : (isHi ? 'सारा डेटा सफलतापूर्वक हटा दिया गया' : 'All data erased successfully'),
+              isMr
+                  ? 'सर्व डेटा यशस्वीरीत्या नष्ट करण्यात आला'
+                  : (isHi ? 'सारा डेटा सफलतापूर्वक हटा दिया गया' : 'All data erased successfully'),
             ),
             backgroundColor: AppTheme.dangerRed,
           ),
@@ -132,7 +137,9 @@ class PrivacyScreen extends StatelessWidget {
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: Text(
-          isMr ? 'गोपनीयता व डेटा सुरक्षा' : (isHi ? 'गोपनीयता और डेटा सुरक्षा' : 'Privacy & Data Security'),
+          isMr
+              ? 'गोपनीयता व डेटा सुरक्षा'
+              : (isHi ? 'गोपनीयता और डेटा सुरक्षा' : 'Privacy & Data Security'),
           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
         ),
         actions: [
@@ -187,8 +194,15 @@ class PrivacyScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      isMr ? 'तुमची माहिती १००% सुरक्षित आहे' : (isHi ? 'आपकी जानकारी १००% सुरक्षित है' : 'Your Data is 100% Protected'),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.textHighContrast),
+                      isMr
+                          ? 'तुमची माहिती १००% सुरक्षित आहे'
+                          : (isHi
+                              ? 'आपकी जानकारी १००% सुरक्षित है'
+                              : 'Your Data is 100% Protected'),
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.textHighContrast),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
@@ -209,147 +223,198 @@ class PrivacyScreen extends StatelessWidget {
               // 2. Pictorial 4-Point Guarantee List
               _buildGuaranteeItem(
                 icon: Icons.credit_card_off_rounded,
-                title: isMr ? '१. आधार किंवा ओळखपत्राची गरज नाही' : (isHi ? '१. आधार या पहचान पत्र की कोई आवश्यकता नहीं' : '1. No Aadhaar Card Required'),
-                subtitle: isMr ? 'कोणतेही सरकारी ओळखपत्र अपलोड करावे लागत नाही.' : (isHi ? 'कोई भी सरकारी आईडी अपलोड नहीं करनी होगी।' : 'Zero personal identity documents collected.'),
+                title: isMr
+                    ? '१. आधार किंवा ओळखपत्राची गरज नाही'
+                    : (isHi
+                        ? '१. आधार या पहचान पत्र की कोई आवश्यकता नहीं'
+                        : '1. No Aadhaar Card Required'),
+                subtitle: isMr
+                    ? 'कोणतेही सरकारी ओळखपत्र अपलोड करावे लागत नाही.'
+                    : (isHi
+                        ? 'कोई भी सरकारी आईडी अपलोड नहीं करनी होगी।'
+                        : 'Zero personal identity documents collected.'),
               ),
               const SizedBox(height: 10),
               _buildGuaranteeItem(
                 icon: Icons.pin_outlined,
-                title: isMr ? '२. गुप्त पिन किंवा मोबाईल ओटीपी' : (isHi ? '२. गुप्त पिन या मोबाइल ओटीपी' : '2. PIN or Phone OTP Only'),
-                subtitle: isMr ? 'फक्त ४ अंकांचा सोपा पिन टाकून अ‍ॅप चालते.' : (isHi ? 'सिर्फ ४ अंकों का पिन डालकर ऐप काम करता है।' : 'Anonymous generated ID linked to 4-digit PIN.'),
+                title: isMr
+                    ? '२. गुप्त पिन किंवा मोबाईल ओटीपी'
+                    : (isHi ? '२. गुप्त पिन या मोबाइल ओटीपी' : '2. PIN or Phone OTP Only'),
+                subtitle: isMr
+                    ? 'फक्त ४ अंकांचा सोपा पिन टाकून अ‍ॅप चालते.'
+                    : (isHi
+                        ? 'सिर्फ ४ अंकों का पिन डालकर ऐप काम करता है।'
+                        : 'Anonymous generated ID linked to 4-digit PIN.'),
               ),
               const SizedBox(height: 10),
               _buildGuaranteeItem(
                 icon: Icons.cloud_off_rounded,
-                title: isMr ? '३. सर्व माहिती आधी फोनमध्ये ऑफलाइन' : (isHi ? '३. सारा डेटा पहले फोन में ऑफलाइन' : '3. Offline-First Local Storage'),
-                subtitle: isMr ? 'इंटरनेट नसतानाही तुमचा हिशोब पूर्णपणे सुरक्षित राहतो.' : (isHi ? 'बिना इंटरनेट के भी आपका हिसाब पूरी तरह सुरक्षित रहता है।' : 'Stored locally in encrypted SQLite on device.'),
+                title: isMr
+                    ? '३. सर्व माहिती आधी फोनमध्ये ऑफलाइन'
+                    : (isHi
+                        ? '३. सारा डेटा पहले फोन में ऑफलाइन'
+                        : '3. Offline-First Local Storage'),
+                subtitle: isMr
+                    ? 'इंटरनेट नसतानाही तुमचा हिशोब पूर्णपणे सुरक्षित राहतो.'
+                    : (isHi
+                        ? 'बिना इंटरनेट के भी आपका हिसाब पूरी तरह सुरक्षित रहता है।'
+                        : 'Stored locally in encrypted SQLite on device.'),
               ),
               const SizedBox(height: 10),
               _buildGuaranteeItem(
                 icon: Icons.delete_outline_rounded,
-                title: isMr ? '४. तुम्ही कधीही डेटा नष्ट करू शकता' : (isHi ? '४. कभी भी डेटा मिटाने का अधिकार' : '4. Complete Right to be Forgotten'),
-                subtitle: isMr ? 'एका दाबात फोन व सर्व्हरवरून सर्व नोंदी पुसल्या जातात.' : (isHi ? 'एक टैप में फोन और सर्वर से रिकॉर्ड हटा सकते हैं।' : 'One-tap total data purge anytime.'),
+                title: isMr
+                    ? '४. तुम्ही कधीही डेटा नष्ट करू शकता'
+                    : (isHi
+                        ? '४. कभी भी डेटा मिटाने का अधिकार'
+                        : '4. Complete Right to be Forgotten'),
+                subtitle: isMr
+                    ? 'एका दाबात फोन व सर्व्हरवरून सर्व नोंदी पुसल्या जातात.'
+                    : (isHi
+                        ? 'एक टैप में फोन और सर्वर से रिकॉर्ड हटा सकते हैं।'
+                        : 'One-tap total data purge anytime.'),
               ),
               const SizedBox(height: 20),
 
-              // 3. Demo Mode Settings for Judges
-              ListenableBuilder(
-                listenable: DemoModeService.instance,
-                builder: (context, _) {
-                  final isDemo = DemoModeService.instance.isDemoMode;
-                  final isSimOffline = DemoModeService.instance.isSimulatedOffline;
+              // 3. Demo Mode Settings — STRIPPED from release builds
+              if (kDebugMode)
+                ListenableBuilder(
+                  listenable: DemoModeService.instance,
+                  builder: (context, _) {
+                    final isDemo = DemoModeService.instance.isDemoMode;
+                    final isSimOffline = DemoModeService.instance.isSimulatedOffline;
 
-                  return Container(
-                    key: const Key('demo_mode_settings_card'),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDemo ? Colors.amber.shade50 : Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: isDemo ? Colors.amber.shade600 : AppTheme.borderColor,
-                        width: isDemo ? 2.0 : 1.5,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.science_rounded,
-                              color: isDemo ? Colors.amber.shade800 : AppTheme.textMuted,
-                              size: 26,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    isMr ? 'परीक्षक डेमो मोड (Demo Mode)' : (isHi ? 'जज डेमो मोड (Demo Mode)' : 'Judges Demo Mode'),
-                                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
-                                  ),
-                                  Text(
-                                    isMr
-                                        ? 'ऑफलाइन चाचणी व नमुना डेटा चालू करा'
-                                        : (isHi ? 'ऑफलाइन टेस्टिंग और नमूना डेटा चालू करें' : 'Pre-seed offline database for testing'),
-                                    style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Switch.adaptive(
-                              key: const Key('switch_demo_mode'),
-                              value: isDemo,
-                              activeThumbColor: Colors.amber.shade800,
-                              onChanged: (val) {
-                                HapticService.mediumImpact();
-                                DemoModeService.instance.setDemoMode(val, db);
-                              },
-                            ),
-                          ],
+                    return Container(
+                      key: const Key('demo_mode_settings_card'),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDemo ? Colors.amber.shade50 : Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: isDemo ? Colors.amber.shade600 : AppTheme.borderColor,
+                          width: isDemo ? 2.0 : 1.5,
                         ),
-                        if (isDemo) ...[
-                          const Divider(height: 20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Row(
                             children: [
+                              Icon(
+                                Icons.science_rounded,
+                                color: isDemo ? Colors.amber.shade800 : AppTheme.textMuted,
+                                size: 26,
+                              ),
+                              const SizedBox(width: 10),
                               Expanded(
-                                child: Text(
-                                  isMr
-                                      ? 'नेटवर्क खंडित सिम्युलेशन:'
-                                      : (isHi ? 'नेटवर्क कट सिमुलेशन:' : 'Simulate Offline Mode:'),
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      isMr
+                                          ? 'परीक्षक डेमो मोड (Demo Mode)'
+                                          : (isHi ? 'जज डेमो मोड (Demo Mode)' : 'Judges Demo Mode'),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w900, fontSize: 15),
+                                    ),
+                                    Text(
+                                      isMr
+                                          ? 'ऑफलाइन चाचणी व नमुना डेटा चालू करा'
+                                          : (isHi
+                                              ? 'ऑफलाइन टेस्टिंग और नमूना डेटा चालू करें'
+                                              : 'Pre-seed offline database for testing'),
+                                      style:
+                                          const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              ElevatedButton.icon(
-                                key: const Key('btn_simulate_offline_toggle'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isSimOffline ? AppTheme.dangerRed : AppTheme.greenGoEarn,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                ),
-                                onPressed: () {
+                              Switch.adaptive(
+                                key: const Key('switch_demo_mode'),
+                                value: isDemo,
+                                activeThumbColor: Colors.amber.shade800,
+                                onChanged: (val) {
                                   HapticService.mediumImpact();
-                                  DemoModeService.instance.toggleSimulatedOffline();
+                                  DemoModeService.instance.setDemoMode(val, db);
                                 },
-                                icon: Icon(
-                                  isSimOffline ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
-                                  size: 16,
-                                ),
-                                label: Text(
-                                  isSimOffline
-                                      ? (isMr ? 'ऑफलाइन मोड' : (isHi ? 'ऑफलाइन' : 'Offline'))
-                                      : (isMr ? 'ऑनलाइन' : (isHi ? 'ऑनलाइन' : 'Online')),
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                ),
                               ),
                             ],
                           ),
+                          if (isDemo) ...[
+                            const Divider(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    isMr
+                                        ? 'नेटवर्क खंडित सिम्युलेशन:'
+                                        : (isHi
+                                            ? 'नेटवर्क कट सिमुलेशन:'
+                                            : 'Simulate Offline Mode:'),
+                                    style:
+                                        const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                                ElevatedButton.icon(
+                                  key: const Key('btn_simulate_offline_toggle'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        isSimOffline ? AppTheme.dangerRed : AppTheme.greenGoEarn,
+                                    foregroundColor: Colors.white,
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  onPressed: () {
+                                    HapticService.mediumImpact();
+                                    DemoModeService.instance.toggleSimulatedOffline();
+                                  },
+                                  icon: Icon(
+                                    isSimOffline
+                                        ? Icons.cloud_off_rounded
+                                        : Icons.cloud_done_rounded,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    isSimOffline
+                                        ? (isMr ? 'ऑफलाइन मोड' : (isHi ? 'ऑफलाइन' : 'Offline'))
+                                        : (isMr ? 'ऑनलाइन' : (isHi ? 'ऑनलाइन' : 'Online')),
+                                    style:
+                                        const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      ),
+                    );
+                  },
+                ),
               const SizedBox(height: 20),
 
-              // 4. One-Tap Delete My Data Button
-              ElevatedButton.icon(
-                key: const Key('btn_delete_my_data'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.dangerRed,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              // 4. One-Tap Delete My Data Button — STRIPPED from release builds
+              if (kDebugMode)
+                ElevatedButton.icon(
+                  key: const Key('btn_delete_my_data'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.dangerRed,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onPressed: () => _handleDeleteMyData(context),
+                  icon: const Icon(Icons.delete_forever_rounded, size: 28),
+                  label: Text(
+                    isMr
+                        ? 'माझा सर्व डेटा नष्ट करा (Delete)'
+                        : (isHi
+                            ? 'मेरा सारा डेटा हटाएं (Delete Data)'
+                            : 'Delete My Data Permanently'),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  ),
                 ),
-                onPressed: () => _handleDeleteMyData(context),
-                icon: const Icon(Icons.delete_forever_rounded, size: 28),
-                label: Text(
-                  isMr ? 'माझा सर्व डेटा नष्ट करा (Delete)' : (isHi ? 'मेरा सारा डेटा हटाएं (Delete Data)' : 'Delete My Data Permanently'),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
-                ),
-              ),
               const SizedBox(height: 16),
             ],
           ),
@@ -389,7 +454,8 @@ class PrivacyScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textHighContrast),
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textHighContrast),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -398,7 +464,7 @@ class PrivacyScreen extends StatelessWidget {
                 ),
               ],
             ),
-            ),
+          ),
         ],
       ),
     );
