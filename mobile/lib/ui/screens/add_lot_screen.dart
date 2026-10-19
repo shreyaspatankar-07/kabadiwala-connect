@@ -100,6 +100,7 @@ class _AddLotScreenState extends State<AddLotScreen> {
   };
 
   bool _isRefreshingLocation = false;
+  bool _isSavingLot = false;
 
   @override
   void initState() {
@@ -276,32 +277,34 @@ class _AddLotScreenState extends State<AddLotScreen> {
           imageQuality: 75,
         );
 
-        if (pickedFile != null) {
-          final rawBytes = await pickedFile.readAsBytes();
-          photo = await ImageProcessor.processImage(
-            rawBytes: rawBytes,
-            photoId: 'IMG_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-            latitude: currentLat,
-            longitude: currentLng,
-            locationString: locationStr,
-          );
-        } else {
-          photo = ImageProcessor.createMockPhoto(
-            photoId:
-                'IMG_DEMO_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
-            latitude: currentLat,
-            longitude: currentLng,
-            locationString: locationStr,
-          );
+        if (pickedFile == null) {
+          // User cancelled or exited camera. Never insert a mock photo in real usage.
+          return;
         }
-      } catch (_) {
-        photo = ImageProcessor.createMockPhoto(
-          photoId:
-              'IMG_FALLBACK_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
+
+        final rawBytes = await pickedFile.readAsBytes();
+        photo = await ImageProcessor.processImage(
+          rawBytes: rawBytes,
+          photoId: 'IMG_${DateTime.now().millisecondsSinceEpoch}_${_currentPhotos.length + 1}',
           latitude: currentLat,
           longitude: currentLng,
           locationString: locationStr,
         );
+      } catch (e) {
+        debugPrint('[AddLotScreen] Camera capture error: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                widget.locale == 'hi'
+                    ? 'फोटो लेने में त्रुटि हुई। कृपया पुनः प्रयास करें।'
+                    : 'फोटो काढण्यात त्रुटी आली. कृपया पुन्हा प्रयत्न करा.',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
       }
     }
 
@@ -418,6 +421,11 @@ class _AddLotScreenState extends State<AddLotScreen> {
   // Save Full Offline Lot
   // ---------------------------------------------------------------------------
   Future<void> _saveOfflineLot() async {
+    if (_isSavingLot) return;
+    setState(() {
+      _isSavingLot = true;
+    });
+
     try {
       // If current inputs have weight, include current item as well
       if (_currentWeightKg > 0 && _draftItems.isEmpty) {
@@ -594,6 +602,12 @@ class _AddLotScreenState extends State<AddLotScreen> {
     } catch (e, st) {
       // ignore: avoid_print
       print('[AddLotScreen] Error saving offline lot: $e\n$st');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSavingLot = false;
+        });
+      }
     }
   }
 

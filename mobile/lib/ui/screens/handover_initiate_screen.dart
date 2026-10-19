@@ -186,17 +186,21 @@ class _HandoverInitiateScreenState extends State<HandoverInitiateScreen> {
                     ),
                     child: const Text(
                       'जुळलेला (Matched)',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFFB45309)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFFB45309)),
                     ),
                   ),
                 ],
               ),
               const Divider(height: 20),
-              _buildSummaryRow(locale == 'hi' ? 'सामग्री प्रकार' : 'मालाचा प्रकार', widget.category),
+              _buildSummaryRow(
+                  locale == 'hi' ? 'सामग्री प्रकार' : 'मालाचा प्रकार', widget.category),
               const SizedBox(height: 6),
-              _buildSummaryRow(locale == 'hi' ? 'खरीदार रीसायकलर' : 'खरेदीदार रीसायकलर', widget.recyclerName),
+              _buildSummaryRow(
+                  locale == 'hi' ? 'खरीदार रीसायकलर' : 'खरेदीदार रीसायकलर', widget.recyclerName),
               const SizedBox(height: 6),
-              _buildSummaryRow(locale == 'hi' ? 'अनुमानित मूल्य' : 'अंदाजे किंमत', '₹${widget.quotedPrice.toStringAsFixed(0)}'),
+              _buildSummaryRow(locale == 'hi' ? 'अनुमानित मूल्य' : 'अंदाजे किंमत',
+                  '₹${widget.quotedPrice.toStringAsFixed(0)}'),
             ],
           ),
         ),
@@ -214,7 +218,8 @@ class _HandoverInitiateScreenState extends State<HandoverInitiateScreen> {
             children: [
               Text(
                 locale == 'hi' ? 'अंतिम वजन दर्ज करें' : 'हस्तांतरण वजन तपासा',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                style: const TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
               ),
               const SizedBox(height: 6),
               Row(
@@ -327,7 +332,8 @@ class _HandoverInitiateScreenState extends State<HandoverInitiateScreen> {
                 locale == 'hi'
                     ? 'या 6-अंकों का संदर्भ कोड बताएं:'
                     : 'किंवा खालील ६-अक्षरी कोड सांगा:',
-                style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
 
@@ -363,7 +369,8 @@ class _HandoverInitiateScreenState extends State<HandoverInitiateScreen> {
                     locale == 'hi'
                         ? 'ऑफलाइन सुरक्षित (HMAC-SHA256 डिजिटल स्वाक्षरी)'
                         : 'ऑफलाइन सुरक्षित (HMAC-SHA256 डिजिटल सही)',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.greenGoEarn),
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.greenGoEarn),
                   ),
                 ],
               ),
@@ -394,9 +401,9 @@ class _HandoverInitiateScreenState extends State<HandoverInitiateScreen> {
               side: const BorderSide(color: Color(0xFF047857), width: 2),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            onPressed: () {
-              HapticService.selectionClick();
-              Navigator.of(context).push(
+            onPressed: () async {
+              await HapticService.selectionClick();
+              final confirmed = await Navigator.of(context).push<bool>(
                 MaterialPageRoute(
                   builder: (_) => RecyclerConfirmScreen(
                     handoverRefNo: result.handoverRefNo,
@@ -409,13 +416,17 @@ class _HandoverInitiateScreenState extends State<HandoverInitiateScreen> {
                   ),
                 ),
               );
+              if (confirmed == true && mounted) {
+                Navigator.of(context).pop(true);
+              }
             },
             icon: const Icon(Icons.storefront_rounded, color: AppTheme.greenGoEarn, size: 26),
             label: Text(
               locale == 'hi'
                   ? 'रीसायकलर पुष्टि स्क्रीन (Recycler Confirm)'
                   : 'रीसायकलर पावती पुष्टी (Recycler Confirm)',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn),
+              style: const TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn),
             ),
           ),
         ),

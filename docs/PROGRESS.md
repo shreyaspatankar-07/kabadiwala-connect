@@ -7,6 +7,39 @@ Living record of project deliverables, milestones completed, and pending roadmap
 ## Current Status: Phase 17 (Production Deployments & Edge Hardware Integration)
 
 ### Completed Items
+- [x] **Production Patch: Transaction Deduplication & Atomic Handover Ledger Sync**:
+  - **Self-Healing Financial Ledger Deduplication ([`LedgerRepository`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/repositories/ledger_repository.dart))**:
+    - Enhanced `getDetailedOverview()` with strict in-memory and database deduplication: detects multiple ledger entries sharing the same `lotId` or identical timestamp/amount fingerprints, retains only the canonical entry, recalculates totals accurately, and purges redundant SQLite rows.
+    - Updated auto-reconciliation to inspect all ledger rows across SQLite before inserting, ensuring missing handover records are reconciled idempotently.
+  - **Atomic Handover Database Transaction ([`OfflineHandoverService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/handover/offline_handover_service.dart))**:
+    - Wrapped `LocalTraceability`, `LocalTransactions`, `LocalLedger`, and `SyncQueueEntries` modifications in `confirmHandover()` within a single `_db.transaction(() async { ... })`, preventing stream race conditions between transaction status updates and ledger record inserts.
+  - **Double-Tap Debounce Guards ([`AddLotScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/add_lot_screen.dart), [`RecyclerConfirmScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/recycler_confirm_screen.dart))**:
+    - Added `_isSavingLot` and `_isConfirming` debounce locks to prevent rapid consecutive button taps from generating duplicate lots or confirmations.
+  - **Test Verification**: Added automated deduplication test in [`mobile/test/earnings_screen_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/earnings_screen_test.dart) verifying redundant rows are purged down to 1 entry and balance recalculated to ₹5000. All 19 tests pass across `earnings_screen_test.dart`, `handover_flow_test.dart`, and `add_lot_flow_test.dart`.
+- [x] **Production Patch: Camera Photo Flow & Real-Time Network Sync Engine**:
+  - **Removed Dummy Photo Insertion ([`AddLotScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/add_lot_screen.dart))**:
+    - Fixed `_handleCapturePhoto()` so when `picker.pickImage()` returns `null` (cancelled by user) or encounters a camera exception, it cleanly exits with a vernacular error SnackBar rather than calling `ImageProcessor.createMockPhoto()`.
+    - Eliminated accidental green placeholder cards (`#51db395d`) in the item photo list.
+  - **Dynamic Network & Sync Diagnostics ([`SyncEngine`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/sync/sync_engine.dart), [`MainNavigationShell`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/main_navigation_shell.dart))**:
+    - Replaced hardcoded `_isOnline = false` and `_pendingCount = 2` defaults in `MainNavigationShell` with active queries using `Connectivity().checkConnectivity()` and SQLite `SyncQueueEntries`.
+    - Integrated `AppConfig.apiBaseUrl` and `AppConfig.candidateUrls` into `SyncEngine` constructor, outbound FIFO push loop, and inbound price pull, removing the emulator-only `10.0.2.2:8000` fallback that failed on cellular 5G.
+    - Added `_checkNetworkAvailable()` with DNS lookup fallback so active cellular 5G connections never trigger false "Offline Mode" badges while syncing or waiting for server response.
+  - **Price Repository URL Unification ([`PriceRepository`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/repositories/price_repository.dart))**:
+    - Upgraded `fetchLatestPricesFromServer` to query `AppConfig.candidateUrls` seamlessly.
+  - **Automated Test Coverage**: Verified all tests pass across `bottom_navigation_shell_test.dart` (4 tests), `handover_flow_test.dart` (3 tests), `earnings_screen_test.dart` (6 tests), and `add_lot_flow_test.dart` (5 tests).
+
+- [x] **Real-Time Mobile Earnings & Financial Ledger Sync on Lot Handover**:
+  - **Handover Confirmation Financial Pipeline ([`OfflineHandoverService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/handover/offline_handover_service.dart))**:
+    - Fixed handover confirmation to retrieve associated `LocalTransaction`, update its `paymentStatus` (`cash_received` or `pending` if disputed), record the final agreed price, and write an immutable financial credit entry into `LocalLedger` with updated balance.
+    - Corrected `SyncQueueEntries` FIFO outbox payload and resolved collector ID accurately instead of storing lotId.
+  - **Auto-Reconciling Ledger Repository ([`LedgerRepository`](file:///c:/dev/kabadiwala-connect/mobile/lib/data/repositories/ledger_repository.dart))**:
+    - Implemented self-healing lot reconciliation in `getDetailedOverview` ensuring any lots completed offline immediately update the financial ledger.
+    - Upgraded `watchDetailedOverview` to reactively observe both `LocalLedger` and `LocalTransactions` tables simultaneously using dual SQLite streams.
+  - **Reactive Earnings UI Lifecycle ([`EarningsScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/earnings_screen.dart))**:
+    - Added `didUpdateWidget` and safe `_initCollectorId` lifecycle synchronization avoiding race conditions between session resolution and tab switches.
+    - Linked navigation pops from [`RecyclerConfirmScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/recycler_confirm_screen.dart) and [`HandoverInitiateScreen`](file:///c:/dev/kabadiwala-connect/mobile/lib/ui/screens/handover_initiate_screen.dart) for instant refresh.
+  - **Test Verification**: Added automated integration test in [`mobile/test/handover_flow_test.dart`](file:///c:/dev/kabadiwala-connect/mobile/test/handover_flow_test.dart) and verified all tests pass across `earnings_screen_test.dart`, `handover_flow_test.dart`, and `bottom_navigation_shell_test.dart`.
+
 - [x] **Production Upgrade Step 5: Dynamic Identity & Fraud Settings (Flutter, Supabase & ML Lifespan)**:
   - **Dynamic Zero-PII Mobile Identity ([`AuthService`](file:///c:/dev/kabadiwala-connect/mobile/lib/core/auth/auth_service.dart))**:
     - Generates cryptographically secure `KC-C-<UUIDv4>` identifier on first launch, persisting to Android KeyStore via `FlutterSecureStorage`.
@@ -449,9 +482,14 @@ Living record of project deliverables, milestones completed, and pending roadmap
     * Added Next.js `useLotFeed` hook with persistent WebSocket connection, automatic reconnect with exponential backoff, and REST polling fallback.
     * Resolved widget test key conflicts in `SpeakerButton`, restored buyer selection feedback snackbar, and added `autoGenerateQr` flag for seamless walkthrough and widget testing.
   - **Test Suite Verification**: **60 / 60 mobile widget tests** (`flutter test`), **76 / 76 backend pytest tests** (`py -3.11 -m pytest`), and Next.js production build passing with 100% success.
-
-
-
-
-
-
+  - **Avishkar Research Convention & Poster Milestone**:
+    * Generated publication-ready System Architecture & Empirical Research Report in [docs/AVISHKAR_RESEARCH_REPORT.md](file:///c:/dev/kabadiwala-connect/docs/AVISHKAR_RESEARCH_REPORT.md) adhering to strict Category 5 (Engineering & Technology) anonymity rules.
+    * Integrated comprehensive 4-tier system designs, PostGIS spatial dispatching algorithms, offline sync protocol, on-device MobileNetV3 INT8 & LightGBM pipelines, Vidarbha field study metrics (N=20), and detailed critical engineering limitations & production roadmap ("what can be done better").
+  - **Unified Single Web Portal & Role Separation Milestone**:
+    * Eliminated redundant collector web login — informal collectors exclusively use the low-literacy Flutter Android Mobile App with Devanagari voice assistance, on-device AI scrap valuation, and offline Drift SQLite.
+    * Unified the web platform into a single enterprise portal (`/portal`) with dedicated access for 3 key actors:
+      1. **Public / Citizen (नागरिक / घरगुती)**: Self-service registration (`POST /api/v1/auth/register`), doorstep pickup booking, live 4-stage tracking stepper (`PR-MH-YYYY-XXXXX`), official scrap price board, and green credit certificates.
+      2. **Authorized Recycler (अधिकृत पुनर्चक्रणकर्ता)**: Dedicated login with hardcoded credentials banner (`recycler@ecorecycle.in` / `recycler123`), 1-click demo login, matched lots inbox, handover verification, and downstream lifecycle tracking.
+      3. **Government Admin (शासकीय प्रशासन — JNARDDC / SPCB)**: Dedicated login with hardcoded credentials banner (`admin@jnarddc.gov.in` / `admin123`), 1-click demo login, SPCB license verification queue, expiry alerts, price board management, and Isolation Forest anomaly review.
+    * Backend updates: Added `PUBLIC = "public"` to `UserRole` enum and `User` model, updated `auth.py` with public registration, hardcoded account auto-provisioning, and added `/api/v1/pickup/my-requests` endpoint for citizen bookings.
+    * Quality verification: 92 / 92 backend pytest tests passing, Next.js 16 production build passing with 100% success.

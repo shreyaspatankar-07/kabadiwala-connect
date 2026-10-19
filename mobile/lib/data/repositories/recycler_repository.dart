@@ -83,8 +83,10 @@ class RecyclerRepository {
     if (results.isEmpty && candidates.isNotEmpty) {
       // Return top candidates with direct rates if strict distance was too narrow
       return candidates.take(3).map((c) {
-        final rate = c.offeredRates[lot.category] ?? (c.offeredRates.values.isNotEmpty ? c.offeredRates.values.first : 150.0);
-        final dist = OfflineMatchingEngine.haversineDistanceKm(lot.collectionLat, lot.collectionLng, c.latitude, c.longitude);
+        final rate = c.offeredRates[lot.category] ??
+            (c.offeredRates.values.isNotEmpty ? c.offeredRates.values.first : 150.0);
+        final dist = OfflineMatchingEngine.haversineDistanceKm(
+            lot.collectionLat, lot.collectionLng, c.latitude, c.longitude);
         return RankedRecyclerResult(
           recyclerId: c.id,
           name: c.name,
@@ -118,12 +120,30 @@ class RecyclerRepository {
       name: 'Maharashtra Green E-Solutions',
       latitude: 19.0760,
       longitude: 72.8777,
-      materialsAccepted: const ['PCB', 'PCB (mid grade)', 'PCB (high grade)', 'Cables', 'Batteries', 'CRT', 'LCD', 'Motors_Magnets', 'Mixed_Plastics'],
+      materialsAccepted: const [
+        'PCB',
+        'PCB (mid grade)',
+        'PCB (high grade)',
+        'Cables',
+        'Batteries',
+        'CRT',
+        'LCD',
+        'Motors_Magnets',
+        'Mixed_Plastics'
+      ],
       authorizationNumber: 'CPCB/EPR/2026/001',
       authorizationStatus: 'verified',
       authorizationValidTill: DateTime(2030, 12, 31),
       phone: '+91-98200-11111',
-      offeredRates: const {'PCB': 420.0, 'Cables': 680.0, 'Batteries': 140.0, 'LCD': 48.0, 'CRT': 18.0, 'Motors_Magnets': 85.0, 'Mixed_Plastics': 12.0},
+      offeredRates: const {
+        'PCB': 420.0,
+        'Cables': 680.0,
+        'Batteries': 140.0,
+        'LCD': 48.0,
+        'CRT': 18.0,
+        'Motors_Magnets': 85.0,
+        'Mixed_Plastics': 12.0
+      },
       pickupAvailable: true,
       pickupRadiusKm: 100.0,
       serviceArea: const {'state': 'Maharashtra', 'all': true},
@@ -139,10 +159,20 @@ class RecyclerRepository {
       authorizationStatus: 'verified',
       authorizationValidTill: DateTime(2030, 12, 31),
       phone: '+91-98200-22222',
-      offeredRates: const {'PCB': 410.0, 'Cables': 675.0, 'Batteries': 138.0, 'LCD': 46.0, 'CRT': 17.5, 'Motors_Magnets': 82.0},
+      offeredRates: const {
+        'PCB': 410.0,
+        'Cables': 675.0,
+        'Batteries': 138.0,
+        'LCD': 46.0,
+        'CRT': 17.5,
+        'Motors_Magnets': 82.0
+      },
       pickupAvailable: true,
       pickupRadiusKm: 80.0,
-      serviceArea: const {'districts': ['Palghar', 'Thane', 'Mumbai'], 'all': true},
+      serviceArea: const {
+        'districts': ['Palghar', 'Thane', 'Mumbai'],
+        'all': true
+      },
       rating: 4.7,
     ),
     RecyclerCandidateData(
@@ -150,12 +180,28 @@ class RecyclerRepository {
       name: 'JNARDDC Certified Circular Metals',
       latitude: 19.2183,
       longitude: 72.9781,
-      materialsAccepted: const ['PCB', 'Cables', 'Batteries', 'CRT', 'LCD', 'Motors_Magnets', 'Mixed_Plastics'],
+      materialsAccepted: const [
+        'PCB',
+        'Cables',
+        'Batteries',
+        'CRT',
+        'LCD',
+        'Motors_Magnets',
+        'Mixed_Plastics'
+      ],
       authorizationNumber: 'CPCB/JNARDDC/2026/003',
       authorizationStatus: 'verified',
       authorizationValidTill: DateTime(2030, 12, 31),
       phone: '+91-98200-33333',
-      offeredRates: const {'PCB': 430.0, 'Cables': 710.0, 'Batteries': 145.0, 'LCD': 50.0, 'CRT': 19.0, 'Motors_Magnets': 88.0, 'Mixed_Plastics': 14.0},
+      offeredRates: const {
+        'PCB': 430.0,
+        'Cables': 710.0,
+        'Batteries': 145.0,
+        'LCD': 50.0,
+        'CRT': 19.0,
+        'Motors_Magnets': 88.0,
+        'Mixed_Plastics': 14.0
+      },
       pickupAvailable: true,
       pickupRadiusKm: 120.0,
       serviceArea: const {'state': 'Maharashtra', 'all': true},

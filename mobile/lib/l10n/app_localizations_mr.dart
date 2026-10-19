@@ -57,10 +57,10 @@ class AppLocalizationsMr extends AppLocalizations {
   String get clearAction => 'खोडा';
 
   @override
-  String get unlockPrompt => 'अ‍ॅप उघडण्यासाठी पिन टाका';
+  String get unlockPrompt => 'अॅप उघडण्यासाठी पिन टाका';
 
   @override
-  String get tabAddLot => 'माल जोडा';
+  String get tabAddLot => 'नवीन माल जोडा';
 
   @override
   String get tabPriceBoard => 'दर फलक';
@@ -78,13 +78,19 @@ class AppLocalizationsMr extends AppLocalizations {
   String get takePhoto => 'फोटो काढा';
 
   @override
+  String get takePhotoHint => 'कॅमेरा उघडण्यासाठी दाबा';
+
+  @override
   String get photoCaptured => 'फोटो घेतला';
 
   @override
   String get selectCategory => 'प्रकार निवडा';
 
   @override
-  String get weightKg => 'वजन (किलो)';
+  String get weightKg => 'वजन नोंदवा (किलो)';
+
+  @override
+  String get enterWeight => 'वजन नोंदवा';
 
   @override
   String get estimatedPrice => 'अंदाजे सरकारी भाव';
@@ -94,6 +100,21 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get lotSavedSuccess => 'माल यशस्वीरीत्या नोंदवला गेला';
+
+  @override
+  String get aiConfidenceLabel => '% खात्री';
+
+  @override
+  String get aiSuggestedCategories => 'कॅमेरा सुचवलेले प्रकार:';
+
+  @override
+  String get showAllCategories => 'सर्व पहा';
+
+  @override
+  String get showLessCategories => 'कमी दाखवा';
+
+  @override
+  String get otherCategories => 'इतर सर्व प्रकार:';
 
   @override
   String get catCrt => 'सीआरटी / जुना टीव्ही';
@@ -183,6 +204,13 @@ class AppLocalizationsMr extends AppLocalizations {
   String get syncNow => 'आता सिंक करा';
 
   @override
+  String get navigationOfflineTitle => 'नेव्हिगेशन उपलब्ध नाही';
+
+  @override
+  String get navigationOfflineMessage =>
+      'थेट नेव्हिगेशनसाठी इंटरनेट आवश्यक आहे. कनेक्शन मिळाल्यावर पुन्हा प्रयत्न करा.';
+
+  @override
   String get privacyTitle => 'गोपनीयता व डेटा सुरक्षा';
 
   @override
@@ -205,7 +233,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get privacyPoint4 => '४. तुम्ही कधीही तुमची माहिती नष्ट करू शकता';
 
   @override
-  String get deleteMyData => 'माझा सर्व डेटा नष्ट करा (Delete)';
+  String get deleteMyData => 'माझा सर्व डेटा नष्ट करा';
 
   @override
   String get deleteConfirmTitle => 'खात्री करा: सर्व डेटा नष्ट करायचा?';

@@ -6,6 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../../core/config/app_config.dart';
 import '../local_database.dart';
 import '../repositories/price_repository.dart';
 
@@ -36,18 +37,28 @@ class SyncEngine {
     required AppDatabase db,
     http.Client? httpClient,
     Connectivity? connectivity,
-    this.serverBaseUrl = 'http://10.0.2.2:8000/api/v1', // default Android emulator host to FastAPI backend
+    String? serverBaseUrl,
   })  : _db = db,
         _http = httpClient ?? http.Client(),
-        _connectivity = connectivity ?? Connectivity() {
+        _connectivity = connectivity ?? Connectivity(),
+        serverBaseUrl = serverBaseUrl ?? AppConfig.apiBaseUrl {
     _initConnectivityListener();
   }
-
 
   final AppDatabase _db;
   final http.Client _http;
   final Connectivity _connectivity;
   final String serverBaseUrl;
+
+  List<String> get _candidateUrls {
+    final list = <String>[serverBaseUrl];
+    for (final url in AppConfig.candidateUrls) {
+      if (!list.contains(url)) {
+        list.add(url);
+      }
+    }
+    return list;
+  }
 
   final _stateController = StreamController<SyncEngineState>.broadcast();
   Stream<SyncEngineState> get stateStream => _stateController.stream;
@@ -63,19 +74,51 @@ class SyncEngine {
   int _consecutiveFailures = 0;
   bool _isDisposed = false;
 
+  Future<bool> _checkNetworkAvailable() async {
+    try {
+      final connectivityResult = await _connectivity.checkConnectivity();
+      if (connectivityResult != ConnectivityResult.none) {
+        return true;
+      }
+    } catch (_) {}
+    try {
+      final lookup = await InternetAddress.lookup('google.com')
+          .timeout(const Duration(seconds: 2));
+      if (lookup.isNotEmpty && lookup[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
   void _initConnectivityListener() {
     try {
       if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     } catch (_) {}
+    _checkInitialConnectivity();
     _connectivitySub = _connectivity.onConnectivityChanged.listen((result) {
-      final isConnected = result != ConnectivityResult.none;
-      if (!isConnected) {
-        _updateState(SyncStatus.offline);
-      } else {
-        _updateState(SyncStatus.onlineIdle);
-        triggerSync();
-      }
+      _handleConnectivityResult(result);
     });
+  }
+
+  Future<void> _checkInitialConnectivity() async {
+    final hasNet = await _checkNetworkAvailable();
+    if (!hasNet) {
+      _updateState(SyncStatus.offline);
+    } else {
+      _updateState(SyncStatus.onlineIdle);
+      unawaited(triggerSync());
+    }
+  }
+
+  void _handleConnectivityResult(ConnectivityResult result) async {
+    final isConnected = result != ConnectivityResult.none || await _checkNetworkAvailable();
+    if (!isConnected) {
+      _updateState(SyncStatus.offline);
+    } else {
+      _updateState(SyncStatus.onlineIdle);
+      triggerSync();
+    }
   }
 
   void _updateState(
@@ -108,8 +151,8 @@ class SyncEngine {
   Future<void> triggerSync() async {
     if (_currentState.status == SyncStatus.syncing) return;
 
-    final connectivityResult = await _connectivity.checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
+    final hasNet = await _checkNetworkAvailable();
+    if (!hasNet) {
       _updateState(SyncStatus.offline);
       return;
     }
@@ -151,106 +194,123 @@ class SyncEngine {
       };
     }).toList();
 
-    try {
-      final response = await _http.post(
-        Uri.parse('$serverBaseUrl/sync/push'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'operations': operations}),
-      ).timeout(const Duration(seconds: 15));
+    bool pushSucceeded = false;
+    Exception? lastException;
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint('[SyncEngine] Push succeeded: ${pendingEntries.length} ops sent to $serverBaseUrl/sync/push');
-        // Mark all pushed entries completed
-        for (final entry in pendingEntries) {
-          await (_db.update(_db.syncQueueEntries)
-                ..where((e) => e.clientTxId.equals(entry.clientTxId)))
-              .write(const SyncQueueEntriesCompanion(
-                status: Value('completed'),
-              ));
+    for (final base in _candidateUrls) {
+      try {
+        final response = await _http
+            .post(
+              Uri.parse('$base/sync/push'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({'operations': operations}),
+            )
+            .timeout(const Duration(seconds: 8));
 
-          // FIX: localTransactions is keyed by clientLotUuid, not clientTxId.
-          // These are the same UUID value for create_lot operations, but we must
-          // match on the correct column or the update silently touches 0 rows.
-          await (_db.update(_db.localTransactions)
-                ..where((t) => t.clientLotUuid.equals(entry.clientTxId)))
-              .write(LocalTransactionsCompanion(
-                isSynced: const Value(true),
-                syncedAt: Value(DateTime.now()),
-              ));
-          debugPrint('[SyncEngine] Marked synced: clientLotUuid=${entry.clientTxId}');
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          debugPrint(
+              '[SyncEngine] Push succeeded: ${pendingEntries.length} ops sent to $base/sync/push');
+          // Mark all pushed entries completed
+          for (final entry in pendingEntries) {
+            await (_db.update(_db.syncQueueEntries)
+                  ..where((e) => e.clientTxId.equals(entry.clientTxId)))
+                .write(const SyncQueueEntriesCompanion(
+              status: Value('completed'),
+            ));
+
+            // FIX: localTransactions is keyed by clientLotUuid, not clientTxId.
+            // These are the same UUID value for create_lot operations, but we must
+            // match on the correct column or the update silently touches 0 rows.
+            await (_db.update(_db.localTransactions)
+                  ..where((t) => t.clientLotUuid.equals(entry.clientTxId)))
+                .write(LocalTransactionsCompanion(
+              isSynced: const Value(true),
+              syncedAt: Value(DateTime.now()),
+            ));
+            debugPrint('[SyncEngine] Marked synced: clientLotUuid=${entry.clientTxId}');
+          }
+          pushSucceeded = true;
+          break;
+        } else {
+          debugPrint('[SyncEngine] Push non-200 from $base: status=${response.statusCode}');
         }
-      } else {
-        debugPrint('[SyncEngine] Push failed: status=${response.statusCode} body=${response.body}');
-        throw HttpException('Push failed with status ${response.statusCode}: ${response.body}');
+      } catch (e) {
+        debugPrint('[SyncEngine] Push failed on $base: $e');
+        lastException = e is Exception ? e : Exception(e.toString());
       }
-    } catch (e) {
-      debugPrint('[SyncEngine] Push error: $e');
-      rethrow;
+    }
+
+    if (!pushSucceeded && lastException != null) {
+      throw lastException;
     }
   }
 
   Future<void> _pullServerUpdates() async {
-    try {
-      final response = await _http.get(
-        Uri.parse('$serverBaseUrl/sync/pull?since=2026-01-01T00:00:00Z'),
-      ).timeout(const Duration(seconds: 10));
+    for (final base in _candidateUrls) {
+      try {
+        final response = await _http
+            .get(
+              Uri.parse('$base/sync/pull?since=2026-01-01T00:00:00Z'),
+            )
+            .timeout(const Duration(seconds: 8));
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final prices = data['prices'] as List<dynamic>? ?? [];
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final prices = data['prices'] as List<dynamic>? ?? [];
 
-        for (final p in prices) {
-          final id = p['id'].toString();
-          final rawCat = p['category'] as String;
-          final category = PriceRepository.normalizeCategory(rawCat);
-          final buyingPrice = (p['buying_price'] as num).toDouble();
-          final district = p['district'] as String? ?? 'Palghar';
-          final recordedAt = DateTime.tryParse(p['recorded_at'] ?? '') ?? DateTime.now();
-          final sellingQuoted = (p['selling_quoted_price'] as num? ?? buyingPrice).toDouble();
-          final marketMin = (p['market_min'] as num? ?? buyingPrice * 0.9).toDouble();
-          final marketMax = (p['market_max'] as num? ?? buyingPrice * 1.1).toDouble();
+          for (final p in prices) {
+            final id = p['id'].toString();
+            final rawCat = p['category'] as String;
+            final category = PriceRepository.normalizeCategory(rawCat);
+            final buyingPrice = (p['buying_price'] as num).toDouble();
+            final district = p['district'] as String? ?? 'Palghar';
+            final recordedAt = DateTime.tryParse(p['recorded_at'] ?? '') ?? DateTime.now();
+            final sellingQuoted = (p['selling_quoted_price'] as num? ?? buyingPrice).toDouble();
+            final marketMin = (p['market_min'] as num? ?? buyingPrice * 0.9).toDouble();
+            final marketMax = (p['market_max'] as num? ?? buyingPrice * 1.1).toDouble();
 
-          final cacheKey = 'PRICE-${district.toUpperCase()}-$category';
-          await _db.into(_db.cachedPrices).insertOnConflictUpdate(
-            CachedPricesCompanion.insert(
-              id: cacheKey,
-              category: category,
-              subCategory: Value(p['sub_category'] as String?),
-              district: district,
-              latitude: 19.6967,
-              longitude: 72.7699,
-              recordedAt: recordedAt,
-              buyingPrice: buyingPrice,
-              sellingQuotedPrice: sellingQuoted,
-              marketMin: marketMin,
-              marketMax: marketMax,
-              createdAt: DateTime.now(),
-            ),
-          );
-
-          if (id != cacheKey) {
+            final cacheKey = 'PRICE-${district.toUpperCase()}-$category';
             await _db.into(_db.cachedPrices).insertOnConflictUpdate(
-              CachedPricesCompanion.insert(
-                id: id,
-                category: category,
-                subCategory: Value(p['sub_category'] as String?),
-                district: district,
-                latitude: 19.6967,
-                longitude: 72.7699,
-                recordedAt: recordedAt,
-                buyingPrice: buyingPrice,
-                sellingQuotedPrice: sellingQuoted,
-                marketMin: marketMin,
-                marketMax: marketMax,
-                createdAt: DateTime.now(),
-              ),
-            );
+                  CachedPricesCompanion.insert(
+                    id: cacheKey,
+                    category: category,
+                    subCategory: Value(p['sub_category'] as String?),
+                    district: district,
+                    latitude: 19.6967,
+                    longitude: 72.7699,
+                    recordedAt: recordedAt,
+                    buyingPrice: buyingPrice,
+                    sellingQuotedPrice: sellingQuoted,
+                    marketMin: marketMin,
+                    marketMax: marketMax,
+                    createdAt: DateTime.now(),
+                  ),
+                );
+
+            if (id != cacheKey) {
+              await _db.into(_db.cachedPrices).insertOnConflictUpdate(
+                    CachedPricesCompanion.insert(
+                      id: id,
+                      category: category,
+                      subCategory: Value(p['sub_category'] as String?),
+                      district: district,
+                      latitude: 19.6967,
+                      longitude: 72.7699,
+                      recordedAt: recordedAt,
+                      buyingPrice: buyingPrice,
+                      sellingQuotedPrice: sellingQuoted,
+                      marketMin: marketMin,
+                      marketMax: marketMax,
+                      createdAt: DateTime.now(),
+                    ),
+                  );
+            }
           }
+          break; // Pull succeeded on this URL
         }
+      } catch (e) {
+        debugPrint('[SyncEngine] Pull failed on $base (using offline cache): $e');
       }
-    } catch (e) {
-      // Pull failure shouldn't throw if push succeeded
-      debugPrint('[SyncEngine] Pull failed (using offline cache): $e');
     }
   }
 
@@ -266,7 +326,8 @@ class SyncEngine {
     final jitter = Random().nextInt(3);
     final duration = Duration(seconds: delaySeconds + jitter);
 
-    debugPrint('[SyncEngine] Backoff retry scheduled in ${duration.inSeconds}s (attempt $_consecutiveFailures)');
+    debugPrint(
+        '[SyncEngine] Backoff retry scheduled in ${duration.inSeconds}s (attempt $_consecutiveFailures)');
     _backoffTimer = Timer(duration, () {
       triggerSync();
     });

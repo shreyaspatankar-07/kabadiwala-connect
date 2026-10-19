@@ -38,7 +38,9 @@ class CameraCaptureCard extends StatelessWidget {
               Text(
                 locale == 'hi'
                     ? 'सामान का फोटो (${photos.length}/4)'
-                    : (locale == 'en' ? 'Item Photos (${photos.length}/4)' : 'मालाचा फोटो (${photos.length}/4)'),
+                    : (locale == 'en'
+                        ? 'Item Photos (${photos.length}/4)'
+                        : 'मालाचा फोटो (${photos.length}/4)'),
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
               ),
               if (photos.isNotEmpty)
@@ -209,10 +211,14 @@ class CameraCaptureCard extends StatelessWidget {
                   photos.isEmpty
                       ? (locale == 'hi'
                           ? 'कॅमेरा सुरू करा (फोटो लें)'
-                          : (locale == 'en' ? 'Open Camera (Take Photo)' : 'कॅमेरा सुरू करा (फोटो काढा)'))
+                          : (locale == 'en'
+                              ? 'Open Camera (Take Photo)'
+                              : 'कॅमेरा सुरू करा (फोटो काढा)'))
                       : (locale == 'hi'
                           ? 'अतिरिक्त फोटो जोड़ें (${photos.length}/4)'
-                          : (locale == 'en' ? 'Add Another Photo' : 'अजून फोटो जोडा (${photos.length}/4)')),
+                          : (locale == 'en'
+                              ? 'Add Another Photo'
+                              : 'अजून फोटो जोडा (${photos.length}/4)')),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,

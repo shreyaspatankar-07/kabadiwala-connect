@@ -150,6 +150,26 @@ async def track_pickup_status(
 
 
 @router.get(
+    "/my-requests",
+    response_model=list[PickupResponseSchema],
+    summary="List pickup requests created by citizen or current user",
+)
+async def get_my_pickup_requests(
+    phone: str | None = Query(None, description="Citizen phone number"),
+    db: Annotated[AsyncSession, Depends(get_db)] = None,
+    current_user: Annotated[User | None, Depends(get_optional_current_user)] = None,
+) -> list[PickupResponseSchema]:
+    """Retrieve pickup requests for citizen dashboard by phone or logged-in user."""
+    user_phone = phone or (current_user.phone if current_user else None)
+    stmt = select(PickupRequest).order_by(PickupRequest.created_at.desc())
+    if user_phone:
+        stmt = stmt.where(PickupRequest.citizen_phone == user_phone)
+    result = await db.execute(stmt)
+    pickups = result.scalars().all()
+    return [_to_response_dto(p) for p in pickups]
+
+
+@router.get(
     "/nearby",
     response_model=list[PickupResponseSchema],
     summary="Get nearby pickup requests for collectors using PostGIS ST_DWithin",

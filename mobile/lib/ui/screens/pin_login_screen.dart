@@ -180,12 +180,10 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
     final isHi = _currentLocale == 'hi';
 
     final title = isMr ? 'कबाडीवाला कनेक्ट' : (isHi ? 'कबाडीवाला कनेक्ट' : 'Kabadiwala Connect');
-    final enterPinText = isMr
-        ? 'आपला ४-अंकी पिन टाका'
-        : (isHi ? 'अपना ४-अंकीय पिन दर्ज करें' : 'Enter 4-Digit PIN');
-    final collectorBadgeText = isMr
-        ? 'नोंदणीकृत कबाडीवाला'
-        : (isHi ? 'पंजीकृत कबाड़ीवाला' : 'Registered Collector');
+    final enterPinText =
+        isMr ? 'आपला ४-अंकी पिन टाका' : (isHi ? 'अपना ४-अंकीय पिन दर्ज करें' : 'Enter 4-Digit PIN');
+    final collectorBadgeText =
+        isMr ? 'नोंदणीकृत कबाडीवाला' : (isHi ? 'पंजीकृत कबाड़ीवाला' : 'Registered Collector');
     final resetPinText = isMr
         ? 'पिन विसरलात का? नवीन पिन बनवा'
         : (isHi ? 'पिन भूल गए? नया पिन बनाएं' : 'Forgot PIN? Reset PIN');
@@ -236,7 +234,8 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.verified_user_rounded, color: AppTheme.greenGoEarn, size: 20),
+                          const Icon(Icons.verified_user_rounded,
+                              color: AppTheme.greenGoEarn, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             '$collectorBadgeText: ${widget.profile.collectorId}',

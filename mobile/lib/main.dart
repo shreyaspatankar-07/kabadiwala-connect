@@ -116,9 +116,7 @@ class _KabadiwalaCollectorAppState extends ConsumerState<KabadiwalaCollectorApp>
     final audioService = ref.watch(audioServiceProvider);
     final db = ref.watch(databaseProvider);
 
-    final appTitle = activeLocale.languageCode == 'en'
-        ? 'Kabadiwala Connect'
-        : 'कबाडीवाला कनेक्ट';
+    final appTitle = activeLocale.languageCode == 'en' ? 'Kabadiwala Connect' : 'कबाडीवाला कनेक्ट';
 
     Widget homeWidget;
     if (_isCheckingProfile) {

@@ -72,7 +72,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           SpeakerButton(
             promptKey: 'languagePrompt',
             audioService: widget.audioService,
-            tooltip: isMr ? 'भाषा निवडण्यासाठी सूचना ऐका' : (isHi ? 'भाषा चुनने के लिए सूचना सुनें' : 'Listen Instructions'),
+            tooltip: isMr
+                ? 'भाषा निवडण्यासाठी सूचना ऐका'
+                : (isHi ? 'भाषा चुनने के लिए सूचना सुनें' : 'Listen Instructions'),
           ),
           const SizedBox(width: 12),
         ],

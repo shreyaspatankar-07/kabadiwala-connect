@@ -97,11 +97,16 @@ class _SafetyCardDetailScreenState extends State<SafetyCardDetailScreen> {
     final isMr = widget.locale == 'mr';
     final isHi = widget.locale == 'hi';
 
-    final dosLabel = isMr ? 'काय करावे (योग्य पद्धत)' : (isHi ? 'क्या करें (सही तरीका)' : 'DOs (Recommended)');
-    final dontsLabel = isMr ? 'काय करू नये (धोकादायक)' : (isHi ? 'क्या न करें (खतरनाक)' : 'DONTs (Hazardous)');
-    final instructionsLabel = isMr ? 'सुरक्षित पायऱ्या' : (isHi ? 'सुरक्षित चरण' : 'Step-by-Step Guidance');
-    final understoodLabel = isMr ? 'मला नियम समजला' : (isHi ? 'मुझे नियम समझ आ गया' : 'I Understood');
-    final acknowledgedLabel = isMr ? 'नियम समजला आहे' : (isHi ? 'नियम स्वीकृत है' : 'Understood & Acknowledged');
+    final dosLabel =
+        isMr ? 'काय करावे (योग्य पद्धत)' : (isHi ? 'क्या करें (सही तरीका)' : 'DOs (Recommended)');
+    final dontsLabel =
+        isMr ? 'काय करू नये (धोकादायक)' : (isHi ? 'क्या न करें (खतरनाक)' : 'DONTs (Hazardous)');
+    final instructionsLabel =
+        isMr ? 'सुरक्षित पायऱ्या' : (isHi ? 'सुरक्षित चरण' : 'Step-by-Step Guidance');
+    final understoodLabel =
+        isMr ? 'मला नियम समजला' : (isHi ? 'मुझे नियम समझ आ गया' : 'I Understood');
+    final acknowledgedLabel =
+        isMr ? 'नियम समजला आहे' : (isHi ? 'नियम स्वीकृत है' : 'Understood & Acknowledged');
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
@@ -271,7 +276,8 @@ class _SafetyCardDetailScreenState extends State<SafetyCardDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.check_circle_rounded, color: AppTheme.greenGoEarn, size: 24),
+                        const Icon(Icons.check_circle_rounded,
+                            color: AppTheme.greenGoEarn, size: 24),
                         const SizedBox(width: 8),
                         Text(
                           dosLabel,
@@ -290,7 +296,9 @@ class _SafetyCardDetailScreenState extends State<SafetyCardDetailScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("  ✔  ", style: TextStyle(color: AppTheme.greenGoEarn, fontWeight: FontWeight.bold)),
+                            const Text("  ✔  ",
+                                style: TextStyle(
+                                    color: AppTheme.greenGoEarn, fontWeight: FontWeight.bold)),
                             Expanded(
                               child: Text(
                                 item,
@@ -343,7 +351,9 @@ class _SafetyCardDetailScreenState extends State<SafetyCardDetailScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("  ✖  ", style: TextStyle(color: AppTheme.dangerRed, fontWeight: FontWeight.bold)),
+                            const Text("  ✖  ",
+                                style: TextStyle(
+                                    color: AppTheme.dangerRed, fontWeight: FontWeight.bold)),
                             Expanded(
                               child: Text(
                                 item,

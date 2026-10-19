@@ -4,10 +4,10 @@ import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { Locale } from "../lib/i18n";
-import { ShieldCheck, LogOut, Globe, UserCheck, RefreshCw } from "lucide-react";
+import { LogOut, Globe } from "lucide-react";
 
 export function Navbar() {
-  const { user, switchRole, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { locale, setLocale, t } = useLanguage();
 
   return (
@@ -53,24 +53,6 @@ export function Navbar() {
               </button>
             ))}
           </div>
-
-          {/* Role Switcher */}
-          {user && (
-            <div className="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
-              <button
-                data-testid="btn-role-switcher"
-                onClick={() => switchRole(user.role === "recycler" ? "admin" : "recycler")}
-                className="flex items-center space-x-1.5 text-xs font-semibold px-2.5 py-1 rounded-md text-amber-300 hover:bg-slate-700 transition"
-                title="Switch Role for Demo testing"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Role:</span>
-                <span className="capitalize font-bold text-white">
-                  {user.role === "admin" ? t.roleAdmin : t.roleRecycler}
-                </span>
-              </button>
-            </div>
-          )}
 
           {/* User Profile / Logout */}
           {user ? (

@@ -38,7 +38,8 @@ class CachedPrices extends Table {
   RealColumn get marketMin => real()();
   RealColumn get marketMax => real()();
   TextColumn get recyclerId => text().nullable()();
-  TextColumn get source => text().withDefault(const Constant('synthetic'))(); // recycler_quote | field_survey | synthetic
+  TextColumn get source => text()
+      .withDefault(const Constant('synthetic'))(); // recycler_quote | field_survey | synthetic
   DateTimeColumn get createdAt => dateTime()();
 
   @override
@@ -70,7 +71,8 @@ class CachedRecyclers extends Table {
 
 /// 4. Transactions / E-Waste Lots (Offline-first created and synced lots)
 class LocalTransactions extends Table {
-  TextColumn get lotId => text().withLength(min: 5, max: 40)(); // Human-friendly e.g. KC-MH-2609-00123
+  TextColumn get lotId =>
+      text().withLength(min: 5, max: 40)(); // Human-friendly e.g. KC-MH-2609-00123
   TextColumn get clientLotUuid => text()(); // Local client UUID for deduplication
   TextColumn get collectorId => text()();
   TextColumn get category => text()();
@@ -84,8 +86,10 @@ class LocalTransactions extends Table {
   RealColumn get handoverLng => real().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get handoverAt => dateTime().nullable()();
-  TextColumn get paymentStatus => text().withDefault(const Constant('pending'))(); // cash_received | pending | digital_paid
-  TextColumn get transactionStatus => text().withDefault(const Constant('draft'))(); // draft | listed | matched | handover_pending | handed_over | confirmed | disputed | cancelled
+  TextColumn get paymentStatus =>
+      text().withDefault(const Constant('pending'))(); // cash_received | pending | digital_paid
+  TextColumn get transactionStatus => text().withDefault(const Constant(
+      'draft'))(); // draft | listed | matched | handover_pending | handed_over | confirmed | disputed | cancelled
   BoolColumn get anomalyFlag => boolean().withDefault(const Constant(false))();
   TextColumn get anomalyReason => text().nullable()();
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
@@ -109,7 +113,8 @@ class LocalTraceability extends Table {
   BoolColumn get recyclerConfirmation => boolean().withDefault(const Constant(false))();
   DateTimeColumn get confirmedAt => dateTime().nullable()();
   TextColumn get confirmedBy => text().nullable()();
-  TextColumn get downstreamStatus => text().withDefault(const Constant('received'))(); // received | dismantled | processed | certificate_issued
+  TextColumn get downstreamStatus => text().withDefault(
+      const Constant('received'))(); // received | dismantled | processed | certificate_issued
   TextColumn get recordHash => text()(); // SHA-256 of this record
   TextColumn get prevHash => text()(); // Previous block/handover record SHA-256
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
@@ -138,7 +143,8 @@ class LocalLedger extends Table {
   TextColumn get lotId => text().nullable()();
   TextColumn get entryType => text()(); // credit | debit
   RealColumn get amount => real()();
-  TextColumn get paymentMode => text().withDefault(const Constant('cash_received'))(); // cash_received | pending | digital_paid
+  TextColumn get paymentMode => text()
+      .withDefault(const Constant('cash_received'))(); // cash_received | pending | digital_paid
   TextColumn get description => text()();
   RealColumn get balanceAfter => real()();
   DateTimeColumn get recordedAt => dateTime()();
@@ -152,7 +158,8 @@ class LocalLedger extends Table {
 class CachedSafetyContent extends Table {
   TextColumn get id => text()(); // e.g. SAFE-BATT-01
   TextColumn get category => text()();
-  TextColumn get hazardLevel => text().withDefault(const Constant('info'))(); // info | warning | danger
+  TextColumn get hazardLevel =>
+      text().withDefault(const Constant('info'))(); // info | warning | danger
   TextColumn get pictogramAssetPath => text()();
   TextColumn get audioAssetPath => text()();
   TextColumn get titleVernacular => text()();
@@ -171,7 +178,8 @@ class SyncQueueEntries extends Table {
   TextColumn get collectorId => text()();
   TextColumn get action => text()(); // create_lot | record_handover | record_cash_payment
   TextColumn get payloadJson => text()();
-  TextColumn get status => text().withDefault(const Constant('pending'))(); // pending | processing | completed | failed
+  TextColumn get status =>
+      text().withDefault(const Constant('pending'))(); // pending | processing | completed | failed
   IntColumn get retryAttempts => integer().withDefault(const Constant(0))();
   TextColumn get lastError => text().nullable()();
   DateTimeColumn get clientTimestamp => dateTime()();
@@ -190,7 +198,8 @@ class LocalMLSamples extends Table {
   RealColumn get price => real().nullable()();
   RealColumn get latitude => real().nullable()();
   RealColumn get longitude => real().nullable()();
-  TextColumn get source => text().withDefault(const Constant('field'))(); // synthetic | field | scraped_public
+  TextColumn get source =>
+      text().withDefault(const Constant('field'))(); // synthetic | field | scraped_public
   RealColumn get qualityScore => real().withDefault(const Constant(1.0))();
   BoolColumn get isUploaded => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();

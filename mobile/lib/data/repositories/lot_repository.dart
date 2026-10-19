@@ -9,8 +9,7 @@ import '../local_database.dart';
 import '../models/lot_item_draft.dart';
 
 class LotRepository {
-  LotRepository(this._db, {String? apiBaseUrl})
-      : apiBaseUrl = apiBaseUrl ?? AppConfig.apiBaseUrl;
+  LotRepository(this._db, {String? apiBaseUrl}) : apiBaseUrl = apiBaseUrl ?? AppConfig.apiBaseUrl;
 
   final AppDatabase _db;
   AppDatabase get db => _db;
@@ -57,16 +56,17 @@ class LotRepository {
     await _db.into(_db.localTransactions).insert(entry);
 
     final resolvedPhotoHashes = photoHashes ?? (photoHash != null ? [photoHash] : <String>[]);
-    final itemsPayload = items?.map((i) => i.toJson()).toList() ?? [
-      {
-        'category': category,
-        'sub_category': subCategory,
-        'condition': condition ?? 'broken',
-        'weight_kg': weightKg,
-        'quoted_price': quotedPrice,
-        'photo_hashes': resolvedPhotoHashes,
-      }
-    ];
+    final itemsPayload = items?.map((i) => i.toJson()).toList() ??
+        [
+          {
+            'category': category,
+            'sub_category': subCategory,
+            'condition': condition ?? 'broken',
+            'weight_kg': weightKg,
+            'quoted_price': quotedPrice,
+            'photo_hashes': resolvedPhotoHashes,
+          }
+        ];
 
     // Queue operation in sync engine FIFO queue
     final queuePayloadMap = {
@@ -105,8 +105,7 @@ class LotRepository {
     // Fire non-blocking immediate live sync push
     unawaited(_tryLiveServerPush(clientUuid, queuePayloadMap));
 
-    return (await (_db.select(_db.localTransactions)
-          ..where((t) => t.lotId.equals(lotId)))
+    return (await (_db.select(_db.localTransactions)..where((t) => t.lotId.equals(lotId)))
         .getSingle());
   }
 
@@ -146,19 +145,19 @@ class LotRepository {
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           debugPrint('[LotRepository] Live sync succeeded → $base lot=$clientUuid');
-          await (_db.update(_db.syncQueueEntries)
-                ..where((e) => e.clientTxId.equals(clientUuid)))
+          await (_db.update(_db.syncQueueEntries)..where((e) => e.clientTxId.equals(clientUuid)))
               .write(const SyncQueueEntriesCompanion(status: Value('completed')));
 
           await (_db.update(_db.localTransactions)
                 ..where((t) => t.clientLotUuid.equals(clientUuid)))
               .write(LocalTransactionsCompanion(
-                isSynced: const Value(true),
-                syncedAt: Value(DateTime.now()),
-              ));
+            isSynced: const Value(true),
+            syncedAt: Value(DateTime.now()),
+          ));
           return; // success — stop trying other URLs
         } else {
-          debugPrint('[LotRepository] Live push non-2xx from $base: ${response.statusCode} ${response.body}');
+          debugPrint(
+              '[LotRepository] Live push non-2xx from $base: ${response.statusCode} ${response.body}');
         }
       } catch (e) {
         // Offline or server unreachable — fallback to background sync queue
@@ -167,7 +166,6 @@ class LotRepository {
     }
     debugPrint('[LotRepository] Live push exhausted all URLs; queued for background sync');
   }
-
 
   /// Watch local lots for collector
   Stream<List<LocalTransaction>> watchCollectorLots(String collectorId) {
@@ -185,8 +183,7 @@ class LotRepository {
             ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
           .get();
     }
-    return (_db.select(_db.localTransactions)
-          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+    return (_db.select(_db.localTransactions)..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
 

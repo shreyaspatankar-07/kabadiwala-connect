@@ -203,28 +203,23 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
     if (_currentStep == PinStep.enterInitial) {
       promptKey = 'enterPinPrompt';
-      titleText = isMr
-          ? '४ अंकी पिन टाका'
-          : (isHi ? '४ अंकों का पिन दर्ज करें' : 'Enter 4-Digit PIN');
+      titleText =
+          isMr ? '४ अंकी पिन टाका' : (isHi ? '४ अंकों का पिन दर्ज करें' : 'Enter 4-Digit PIN');
       subtitleText = isMr
           ? 'अ‍ॅप सुरक्षित ठेवण्यासाठी'
           : (isHi ? 'ऐप सुरक्षित रखने के लिए' : 'To keep your account secure');
     } else if (_currentStep == PinStep.confirmPin) {
       promptKey = 'confirmPinPrompt';
-      titleText = isMr
-          ? 'तोच पिन पुन्हा टाका'
-          : (isHi ? 'वही पिन दोबारा दर्ज करें' : 'Confirm your PIN');
-      subtitleText = isMr
-          ? 'खात्री करा'
-          : (isHi ? 'पुष्टि करें' : 'Verify matching PIN');
+      titleText =
+          isMr ? 'तोच पिन पुन्हा टाका' : (isHi ? 'वही पिन दोबारा दर्ज करें' : 'Confirm your PIN');
+      subtitleText = isMr ? 'खात्री करा' : (isHi ? 'पुष्टि करें' : 'Verify matching PIN');
     } else {
       promptKey = 'pinSuccess';
       titleText = isMr
           ? 'मोबाईल नंबर (ऐच्छिक)'
           : (isHi ? 'मोबाइल नंबर (वैकल्पिक)' : 'Mobile Number (Optional)');
-      subtitleText = isMr
-          ? 'नाही टाकला तरी चालेल'
-          : (isHi ? 'छोड़ भी सकते हैं' : 'Can skip this step');
+      subtitleText =
+          isMr ? 'नाही टाकला तरी चालेल' : (isHi ? 'छोड़ भी सकते हैं' : 'Can skip this step');
     }
 
     return Scaffold(
@@ -286,7 +281,9 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                   ),
                   child: Text(
                     _phoneNumber.isEmpty
-                        ? (isMr ? '१० अंकी मोबाईल नंबर' : (isHi ? '१० अंकों का मोबाइल नंबर' : '10-Digit Mobile Number'))
+                        ? (isMr
+                            ? '१० अंकी मोबाईल नंबर'
+                            : (isHi ? '१० अंकों का मोबाइल नंबर' : '10-Digit Mobile Number'))
                         : _phoneNumber,
                     textAlign: TextAlign.center,
                     style: TextStyle(

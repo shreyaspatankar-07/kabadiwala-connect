@@ -24,7 +24,8 @@ final ledgerRepositoryProvider = Provider<LedgerRepository>((ref) {
 });
 
 /// StreamProvider listening reactively to all created lots for a collector from SQLite
-final collectorLotsStreamProvider = StreamProvider.family<List<LocalTransaction>, String>((ref, collectorId) {
+final collectorLotsStreamProvider =
+    StreamProvider.family<List<LocalTransaction>, String>((ref, collectorId) {
   final db = ref.watch(databaseProvider);
   return db.watchCollectorLots(collectorId);
 });
@@ -42,7 +43,8 @@ final cachedPricesStreamProvider = StreamProvider<List<CachedPrice>>((ref) {
 });
 
 /// StreamProvider listening reactively to earnings overview from SQLite
-final collectorEarningsStreamProvider = StreamProvider.family<EarningsOverviewData, String>((ref, collectorId) {
+final collectorEarningsStreamProvider =
+    StreamProvider.family<EarningsOverviewData, String>((ref, collectorId) {
   final repo = ref.watch(ledgerRepositoryProvider);
   return repo.watchDetailedOverview(collectorId);
 });

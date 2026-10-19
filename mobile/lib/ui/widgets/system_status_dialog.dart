@@ -217,10 +217,14 @@ class _SystemStatusDialogState extends State<SystemStatusDialog> {
                           _currentOnline
                               ? (isMr
                                   ? 'ऑनलाइन - सर्व्हरशी जोडले आहे'
-                                  : (isHi ? 'ऑनलाइन - सर्वर से कनेक्टेड' : 'Online - Connected to Server'))
+                                  : (isHi
+                                      ? 'ऑनलाइन - सर्वर से कनेक्टेड'
+                                      : 'Online - Connected to Server'))
                               : (isMr
                                   ? 'ऑफलाइन - स्थानिक मोड सक्रिय'
-                                  : (isHi ? 'ऑफलाइन - स्थानीय मोड सक्रिय' : 'Offline - Local Mode Active')),
+                                  : (isHi
+                                      ? 'ऑफलाइन - स्थानीय मोड सक्रिय'
+                                      : 'Offline - Local Mode Active')),
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w900,
@@ -267,17 +271,23 @@ class _SystemStatusDialogState extends State<SystemStatusDialog> {
             const SizedBox(height: 8),
             _buildCheckItem(
               icon: Icons.storage_rounded,
-              title: isMr ? 'स्थानिक Drift SQLite' : (isHi ? 'स्थानीय SQLite डेटाबेस' : 'Drift SQLite DB'),
+              title: isMr
+                  ? 'स्थानिक Drift SQLite'
+                  : (isHi ? 'स्थानीय SQLite डेटाबेस' : 'Drift SQLite DB'),
               status: isMr ? 'सक्रिय व सुरक्षित (100% Offline)' : 'सक्रिय (Active & Encrypted)',
               isSuccess: true,
             ),
             const SizedBox(height: 8),
             _buildCheckItem(
               icon: Icons.cloud_sync_rounded,
-              title: isMr ? 'JNARDDC क्लाउड सिंक' : (isHi ? 'JNARDDC क्लाउड सिंक' : 'JNARDDC Cloud Sync'),
+              title: isMr
+                  ? 'JNARDDC क्लाउड सिंक'
+                  : (isHi ? 'JNARDDC क्लाउड सिंक' : 'JNARDDC Cloud Sync'),
               status: _currentPending == 0
                   ? (isMr ? 'सर्व डेटा सिंक झाला आहे (० प्रलंबित)' : 'सब सिंक है (0 Pending)')
-                  : (isMr ? '$_currentPending व्यवहार सिंक होणे बाकी' : '$_currentPending लेन-देन बाकी'),
+                  : (isMr
+                      ? '$_currentPending व्यवहार सिंक होणे बाकी'
+                      : '$_currentPending लेन-देन बाकी'),
               isSuccess: _currentPending == 0,
             ),
 
@@ -304,7 +314,9 @@ class _SystemStatusDialogState extends State<SystemStatusDialog> {
                 label: Text(
                   _isChecking
                       ? (isMr ? 'तपासत आहे...' : 'जांच हो रही है...')
-                      : (isMr ? 'कनेक्शन तपासा व सिंक करा' : (isHi ? 'कनेक्शन जांचें व सिंक करें' : 'Check & Sync Now')),
+                      : (isMr
+                          ? 'कनेक्शन तपासा व सिंक करा'
+                          : (isHi ? 'कनेक्शन जांचें व सिंक करें' : 'Check & Sync Now')),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
                 ),
               ),
@@ -320,7 +332,8 @@ class _SystemStatusDialogState extends State<SystemStatusDialog> {
                 onPressed: () => Navigator.pop(context),
                 child: Text(
                   isMr ? 'समजले (बंद करा)' : (isHi ? 'समझ गया (बंद करें)' : 'Close'),
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textHighContrast),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: AppTheme.textHighContrast),
                 ),
               ),
             ),

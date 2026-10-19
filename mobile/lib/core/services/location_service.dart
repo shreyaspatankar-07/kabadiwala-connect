@@ -31,9 +31,7 @@ class LocationService {
     }
 
     // Fast return in headless Flutter test environment where native plugins are unmocked
-    if (WidgetsBinding.instance.runtimeType
-        .toString()
-        .contains('TestWidgetsFlutterBinding')) {
+    if (WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding')) {
       return 'Lat: 19.076000, Lng: 72.877700';
     }
 
@@ -82,9 +80,7 @@ class LocationService {
 
       // If running in headless flutter_test where plugins are unmocked
       if (kDebugMode &&
-          WidgetsBinding.instance.runtimeType
-              .toString()
-              .contains('TestWidgetsFlutterBinding')) {
+          WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding')) {
         return 'Lat: 19.076000, Lng: 72.877700';
       }
 

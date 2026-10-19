@@ -11,71 +11,58 @@ class $LocalMaterialsTable extends LocalMaterials
   $LocalMaterialsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _categoryMeta =
-      const VerificationMeta('category');
+  static const VerificationMeta _categoryMeta = const VerificationMeta('category');
   @override
   late final GeneratedColumn<String> category = GeneratedColumn<String>(
       'category', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 50),
+      additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 50),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
-  static const VerificationMeta _subCategoryMeta =
-      const VerificationMeta('subCategory');
+  static const VerificationMeta _subCategoryMeta = const VerificationMeta('subCategory');
   @override
   late final GeneratedColumn<String> subCategory = GeneratedColumn<String>(
       'sub_category', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 50),
+      additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 50),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
+  static const VerificationMeta _descriptionMeta = const VerificationMeta('description');
   @override
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _imageRefMeta =
-      const VerificationMeta('imageRef');
+  static const VerificationMeta _imageRefMeta = const VerificationMeta('imageRef');
   @override
   late final GeneratedColumn<String> imageRef = GeneratedColumn<String>(
       'image_ref', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _approxWeightKgMeta =
-      const VerificationMeta('approxWeightKg');
+  static const VerificationMeta _approxWeightKgMeta = const VerificationMeta('approxWeightKg');
   @override
   late final GeneratedColumn<double> approxWeightKg = GeneratedColumn<double>(
       'approx_weight_kg', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _conditionMeta =
-      const VerificationMeta('condition');
+  static const VerificationMeta _conditionMeta = const VerificationMeta('condition');
   @override
   late final GeneratedColumn<String> condition = GeneratedColumn<String>(
       'condition', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _sourceTypeMeta =
-      const VerificationMeta('sourceType');
+  static const VerificationMeta _sourceTypeMeta = const VerificationMeta('sourceType');
   @override
   late final GeneratedColumn<String> sourceType = GeneratedColumn<String>(
       'source_type', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _estimatedValueMeta =
-      const VerificationMeta('estimatedValue');
+  static const VerificationMeta _estimatedValueMeta = const VerificationMeta('estimatedValue');
   @override
   late final GeneratedColumn<double> estimatedValue = GeneratedColumn<double>(
       'estimated_value', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
@@ -110,70 +97,60 @@ class $LocalMaterialsTable extends LocalMaterials
       context.missing(_idMeta);
     }
     if (data.containsKey('category')) {
-      context.handle(_categoryMeta,
-          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+      context.handle(
+          _categoryMeta, category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
     } else if (isInserting) {
       context.missing(_categoryMeta);
     }
     if (data.containsKey('sub_category')) {
-      context.handle(
-          _subCategoryMeta,
-          subCategory.isAcceptableOrUnknown(
-              data['sub_category']!, _subCategoryMeta));
+      context.handle(_subCategoryMeta,
+          subCategory.isAcceptableOrUnknown(data['sub_category']!, _subCategoryMeta));
     } else if (isInserting) {
       context.missing(_subCategoryMeta);
     }
     if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
+      context.handle(_descriptionMeta,
+          description.isAcceptableOrUnknown(data['description']!, _descriptionMeta));
     } else if (isInserting) {
       context.missing(_descriptionMeta);
     }
     if (data.containsKey('image_ref')) {
-      context.handle(_imageRefMeta,
-          imageRef.isAcceptableOrUnknown(data['image_ref']!, _imageRefMeta));
+      context.handle(
+          _imageRefMeta, imageRef.isAcceptableOrUnknown(data['image_ref']!, _imageRefMeta));
     }
     if (data.containsKey('approx_weight_kg')) {
-      context.handle(
-          _approxWeightKgMeta,
-          approxWeightKg.isAcceptableOrUnknown(
-              data['approx_weight_kg']!, _approxWeightKgMeta));
+      context.handle(_approxWeightKgMeta,
+          approxWeightKg.isAcceptableOrUnknown(data['approx_weight_kg']!, _approxWeightKgMeta));
     } else if (isInserting) {
       context.missing(_approxWeightKgMeta);
     }
     if (data.containsKey('condition')) {
-      context.handle(_conditionMeta,
-          condition.isAcceptableOrUnknown(data['condition']!, _conditionMeta));
+      context.handle(
+          _conditionMeta, condition.isAcceptableOrUnknown(data['condition']!, _conditionMeta));
     } else if (isInserting) {
       context.missing(_conditionMeta);
     }
     if (data.containsKey('source_type')) {
       context.handle(
-          _sourceTypeMeta,
-          sourceType.isAcceptableOrUnknown(
-              data['source_type']!, _sourceTypeMeta));
+          _sourceTypeMeta, sourceType.isAcceptableOrUnknown(data['source_type']!, _sourceTypeMeta));
     } else if (isInserting) {
       context.missing(_sourceTypeMeta);
     }
     if (data.containsKey('estimated_value')) {
-      context.handle(
-          _estimatedValueMeta,
-          estimatedValue.isAcceptableOrUnknown(
-              data['estimated_value']!, _estimatedValueMeta));
+      context.handle(_estimatedValueMeta,
+          estimatedValue.isAcceptableOrUnknown(data['estimated_value']!, _estimatedValueMeta));
     } else if (isInserting) {
       context.missing(_estimatedValueMeta);
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+          _createdAtMeta, createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+          _updatedAtMeta, updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
@@ -186,8 +163,7 @@ class $LocalMaterialsTable extends LocalMaterials
   LocalMaterial map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalMaterial(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       category: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
       subCategory: attachedDatabase.typeMapping
@@ -196,14 +172,14 @@ class $LocalMaterialsTable extends LocalMaterials
           .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
       imageRef: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}image_ref']),
-      approxWeightKg: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}approx_weight_kg'])!,
+      approxWeightKg: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}approx_weight_kg'])!,
       condition: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}condition'])!,
       sourceType: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}source_type'])!,
-      estimatedValue: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}estimated_value'])!,
+      estimatedValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}estimated_value'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -266,9 +242,7 @@ class LocalMaterial extends DataClass implements Insertable<LocalMaterial> {
       category: Value(category),
       subCategory: Value(subCategory),
       description: Value(description),
-      imageRef: imageRef == null && nullToAbsent
-          ? const Value.absent()
-          : Value(imageRef),
+      imageRef: imageRef == null && nullToAbsent ? const Value.absent() : Value(imageRef),
       approxWeightKg: Value(approxWeightKg),
       condition: Value(condition),
       sourceType: Value(sourceType),
@@ -278,8 +252,7 @@ class LocalMaterial extends DataClass implements Insertable<LocalMaterial> {
     );
   }
 
-  factory LocalMaterial.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory LocalMaterial.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalMaterial(
       id: serializer.fromJson<String>(json['id']),
@@ -342,20 +315,13 @@ class LocalMaterial extends DataClass implements Insertable<LocalMaterial> {
     return LocalMaterial(
       id: data.id.present ? data.id.value : this.id,
       category: data.category.present ? data.category.value : this.category,
-      subCategory:
-          data.subCategory.present ? data.subCategory.value : this.subCategory,
-      description:
-          data.description.present ? data.description.value : this.description,
+      subCategory: data.subCategory.present ? data.subCategory.value : this.subCategory,
+      description: data.description.present ? data.description.value : this.description,
       imageRef: data.imageRef.present ? data.imageRef.value : this.imageRef,
-      approxWeightKg: data.approxWeightKg.present
-          ? data.approxWeightKg.value
-          : this.approxWeightKg,
+      approxWeightKg: data.approxWeightKg.present ? data.approxWeightKg.value : this.approxWeightKg,
       condition: data.condition.present ? data.condition.value : this.condition,
-      sourceType:
-          data.sourceType.present ? data.sourceType.value : this.sourceType,
-      estimatedValue: data.estimatedValue.present
-          ? data.estimatedValue.value
-          : this.estimatedValue,
+      sourceType: data.sourceType.present ? data.sourceType.value : this.sourceType,
+      estimatedValue: data.estimatedValue.present ? data.estimatedValue.value : this.estimatedValue,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -380,18 +346,8 @@ class LocalMaterial extends DataClass implements Insertable<LocalMaterial> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      id,
-      category,
-      subCategory,
-      description,
-      imageRef,
-      approxWeightKg,
-      condition,
-      sourceType,
-      estimatedValue,
-      createdAt,
-      updatedAt);
+  int get hashCode => Object.hash(id, category, subCategory, description, imageRef, approxWeightKg,
+      condition, sourceType, estimatedValue, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -580,66 +536,54 @@ class LocalMaterialsCompanion extends UpdateCompanion<LocalMaterial> {
   }
 }
 
-class $CachedPricesTable extends CachedPrices
-    with TableInfo<$CachedPricesTable, CachedPrice> {
+class $CachedPricesTable extends CachedPrices with TableInfo<$CachedPricesTable, CachedPrice> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $CachedPricesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _categoryMeta =
-      const VerificationMeta('category');
+  static const VerificationMeta _categoryMeta = const VerificationMeta('category');
   @override
   late final GeneratedColumn<String> category = GeneratedColumn<String>(
       'category', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 50),
+      additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 50),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
-  static const VerificationMeta _subCategoryMeta =
-      const VerificationMeta('subCategory');
+  static const VerificationMeta _subCategoryMeta = const VerificationMeta('subCategory');
   @override
   late final GeneratedColumn<String> subCategory = GeneratedColumn<String>(
       'sub_category', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _districtMeta =
-      const VerificationMeta('district');
+  static const VerificationMeta _districtMeta = const VerificationMeta('district');
   @override
   late final GeneratedColumn<String> district = GeneratedColumn<String>(
       'district', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
+      additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 100),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
   static const VerificationMeta _cityMeta = const VerificationMeta('city');
   @override
-  late final GeneratedColumn<String> city = GeneratedColumn<String>(
-      'city', aliasedName, true,
+  late final GeneratedColumn<String> city = GeneratedColumn<String>('city', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _latitudeMeta =
-      const VerificationMeta('latitude');
+  static const VerificationMeta _latitudeMeta = const VerificationMeta('latitude');
   @override
   late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
       'latitude', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _longitudeMeta =
-      const VerificationMeta('longitude');
+  static const VerificationMeta _longitudeMeta = const VerificationMeta('longitude');
   @override
   late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
       'longitude', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _recordedAtMeta =
-      const VerificationMeta('recordedAt');
+  static const VerificationMeta _recordedAtMeta = const VerificationMeta('recordedAt');
   @override
   late final GeneratedColumn<DateTime> recordedAt = GeneratedColumn<DateTime>(
       'recorded_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _buyingPriceMeta =
-      const VerificationMeta('buyingPrice');
+  static const VerificationMeta _buyingPriceMeta = const VerificationMeta('buyingPrice');
   @override
   late final GeneratedColumn<double> buyingPrice = GeneratedColumn<double>(
       'buying_price', aliasedName, false,
@@ -647,43 +591,35 @@ class $CachedPricesTable extends CachedPrices
   static const VerificationMeta _sellingQuotedPriceMeta =
       const VerificationMeta('sellingQuotedPrice');
   @override
-  late final GeneratedColumn<double> sellingQuotedPrice =
-      GeneratedColumn<double>('selling_quoted_price', aliasedName, false,
-          type: DriftSqlType.double, requiredDuringInsert: true);
+  late final GeneratedColumn<double> sellingQuotedPrice = GeneratedColumn<double>(
+      'selling_quoted_price', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
   static const VerificationMeta _unitMeta = const VerificationMeta('unit');
   @override
-  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
-      'unit', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      defaultValue: const Constant('kg'));
-  static const VerificationMeta _marketMinMeta =
-      const VerificationMeta('marketMin');
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>('unit', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: false, defaultValue: const Constant('kg'));
+  static const VerificationMeta _marketMinMeta = const VerificationMeta('marketMin');
   @override
   late final GeneratedColumn<double> marketMin = GeneratedColumn<double>(
       'market_min', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _marketMaxMeta =
-      const VerificationMeta('marketMax');
+  static const VerificationMeta _marketMaxMeta = const VerificationMeta('marketMax');
   @override
   late final GeneratedColumn<double> marketMax = GeneratedColumn<double>(
       'market_max', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _recyclerIdMeta =
-      const VerificationMeta('recyclerId');
+  static const VerificationMeta _recyclerIdMeta = const VerificationMeta('recyclerId');
   @override
   late final GeneratedColumn<String> recyclerId = GeneratedColumn<String>(
       'recycler_id', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
-  late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, false,
+  late final GeneratedColumn<String> source = GeneratedColumn<String>('source', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('synthetic'));
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
@@ -723,52 +659,45 @@ class $CachedPricesTable extends CachedPrices
       context.missing(_idMeta);
     }
     if (data.containsKey('category')) {
-      context.handle(_categoryMeta,
-          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+      context.handle(
+          _categoryMeta, category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
     } else if (isInserting) {
       context.missing(_categoryMeta);
     }
     if (data.containsKey('sub_category')) {
-      context.handle(
-          _subCategoryMeta,
-          subCategory.isAcceptableOrUnknown(
-              data['sub_category']!, _subCategoryMeta));
+      context.handle(_subCategoryMeta,
+          subCategory.isAcceptableOrUnknown(data['sub_category']!, _subCategoryMeta));
     }
     if (data.containsKey('district')) {
-      context.handle(_districtMeta,
-          district.isAcceptableOrUnknown(data['district']!, _districtMeta));
+      context.handle(
+          _districtMeta, district.isAcceptableOrUnknown(data['district']!, _districtMeta));
     } else if (isInserting) {
       context.missing(_districtMeta);
     }
     if (data.containsKey('city')) {
-      context.handle(
-          _cityMeta, city.isAcceptableOrUnknown(data['city']!, _cityMeta));
+      context.handle(_cityMeta, city.isAcceptableOrUnknown(data['city']!, _cityMeta));
     }
     if (data.containsKey('latitude')) {
-      context.handle(_latitudeMeta,
-          latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta));
+      context.handle(
+          _latitudeMeta, latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta));
     } else if (isInserting) {
       context.missing(_latitudeMeta);
     }
     if (data.containsKey('longitude')) {
-      context.handle(_longitudeMeta,
-          longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
+      context.handle(
+          _longitudeMeta, longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
     } else if (isInserting) {
       context.missing(_longitudeMeta);
     }
     if (data.containsKey('recorded_at')) {
       context.handle(
-          _recordedAtMeta,
-          recordedAt.isAcceptableOrUnknown(
-              data['recorded_at']!, _recordedAtMeta));
+          _recordedAtMeta, recordedAt.isAcceptableOrUnknown(data['recorded_at']!, _recordedAtMeta));
     } else if (isInserting) {
       context.missing(_recordedAtMeta);
     }
     if (data.containsKey('buying_price')) {
-      context.handle(
-          _buyingPriceMeta,
-          buyingPrice.isAcceptableOrUnknown(
-              data['buying_price']!, _buyingPriceMeta));
+      context.handle(_buyingPriceMeta,
+          buyingPrice.isAcceptableOrUnknown(data['buying_price']!, _buyingPriceMeta));
     } else if (isInserting) {
       context.missing(_buyingPriceMeta);
     }
@@ -781,34 +710,30 @@ class $CachedPricesTable extends CachedPrices
       context.missing(_sellingQuotedPriceMeta);
     }
     if (data.containsKey('unit')) {
-      context.handle(
-          _unitMeta, unit.isAcceptableOrUnknown(data['unit']!, _unitMeta));
+      context.handle(_unitMeta, unit.isAcceptableOrUnknown(data['unit']!, _unitMeta));
     }
     if (data.containsKey('market_min')) {
-      context.handle(_marketMinMeta,
-          marketMin.isAcceptableOrUnknown(data['market_min']!, _marketMinMeta));
+      context.handle(
+          _marketMinMeta, marketMin.isAcceptableOrUnknown(data['market_min']!, _marketMinMeta));
     } else if (isInserting) {
       context.missing(_marketMinMeta);
     }
     if (data.containsKey('market_max')) {
-      context.handle(_marketMaxMeta,
-          marketMax.isAcceptableOrUnknown(data['market_max']!, _marketMaxMeta));
+      context.handle(
+          _marketMaxMeta, marketMax.isAcceptableOrUnknown(data['market_max']!, _marketMaxMeta));
     } else if (isInserting) {
       context.missing(_marketMaxMeta);
     }
     if (data.containsKey('recycler_id')) {
       context.handle(
-          _recyclerIdMeta,
-          recyclerId.isAcceptableOrUnknown(
-              data['recycler_id']!, _recyclerIdMeta));
+          _recyclerIdMeta, recyclerId.isAcceptableOrUnknown(data['recycler_id']!, _recyclerIdMeta));
     }
     if (data.containsKey('source')) {
-      context.handle(_sourceMeta,
-          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+      context.handle(_sourceMeta, source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+          _createdAtMeta, createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
@@ -821,16 +746,14 @@ class $CachedPricesTable extends CachedPrices
   CachedPrice map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CachedPrice(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       category: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
       subCategory: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}sub_category']),
       district: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}district'])!,
-      city: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}city']),
+      city: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}city']),
       latitude: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}latitude'])!,
       longitude: attachedDatabase.typeMapping
@@ -839,18 +762,17 @@ class $CachedPricesTable extends CachedPrices
           .read(DriftSqlType.dateTime, data['${effectivePrefix}recorded_at'])!,
       buyingPrice: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}buying_price'])!,
-      sellingQuotedPrice: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}selling_quoted_price'])!,
-      unit: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}unit'])!,
+      sellingQuotedPrice: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}selling_quoted_price'])!,
+      unit: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}unit'])!,
       marketMin: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}market_min'])!,
       marketMax: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}market_max'])!,
       recyclerId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}recycler_id']),
-      source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+      source:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}source'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -928,9 +850,7 @@ class CachedPrice extends DataClass implements Insertable<CachedPrice> {
     return CachedPricesCompanion(
       id: Value(id),
       category: Value(category),
-      subCategory: subCategory == null && nullToAbsent
-          ? const Value.absent()
-          : Value(subCategory),
+      subCategory: subCategory == null && nullToAbsent ? const Value.absent() : Value(subCategory),
       district: Value(district),
       city: city == null && nullToAbsent ? const Value.absent() : Value(city),
       latitude: Value(latitude),
@@ -941,16 +861,13 @@ class CachedPrice extends DataClass implements Insertable<CachedPrice> {
       unit: Value(unit),
       marketMin: Value(marketMin),
       marketMax: Value(marketMax),
-      recyclerId: recyclerId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(recyclerId),
+      recyclerId: recyclerId == null && nullToAbsent ? const Value.absent() : Value(recyclerId),
       source: Value(source),
       createdAt: Value(createdAt),
     );
   }
 
-  factory CachedPrice.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory CachedPrice.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CachedPrice(
       id: serializer.fromJson<String>(json['id']),
@@ -962,8 +879,7 @@ class CachedPrice extends DataClass implements Insertable<CachedPrice> {
       longitude: serializer.fromJson<double>(json['longitude']),
       recordedAt: serializer.fromJson<DateTime>(json['recordedAt']),
       buyingPrice: serializer.fromJson<double>(json['buyingPrice']),
-      sellingQuotedPrice:
-          serializer.fromJson<double>(json['sellingQuotedPrice']),
+      sellingQuotedPrice: serializer.fromJson<double>(json['sellingQuotedPrice']),
       unit: serializer.fromJson<String>(json['unit']),
       marketMin: serializer.fromJson<double>(json['marketMin']),
       marketMax: serializer.fromJson<double>(json['marketMax']),
@@ -1034,24 +950,19 @@ class CachedPrice extends DataClass implements Insertable<CachedPrice> {
     return CachedPrice(
       id: data.id.present ? data.id.value : this.id,
       category: data.category.present ? data.category.value : this.category,
-      subCategory:
-          data.subCategory.present ? data.subCategory.value : this.subCategory,
+      subCategory: data.subCategory.present ? data.subCategory.value : this.subCategory,
       district: data.district.present ? data.district.value : this.district,
       city: data.city.present ? data.city.value : this.city,
       latitude: data.latitude.present ? data.latitude.value : this.latitude,
       longitude: data.longitude.present ? data.longitude.value : this.longitude,
-      recordedAt:
-          data.recordedAt.present ? data.recordedAt.value : this.recordedAt,
-      buyingPrice:
-          data.buyingPrice.present ? data.buyingPrice.value : this.buyingPrice,
-      sellingQuotedPrice: data.sellingQuotedPrice.present
-          ? data.sellingQuotedPrice.value
-          : this.sellingQuotedPrice,
+      recordedAt: data.recordedAt.present ? data.recordedAt.value : this.recordedAt,
+      buyingPrice: data.buyingPrice.present ? data.buyingPrice.value : this.buyingPrice,
+      sellingQuotedPrice:
+          data.sellingQuotedPrice.present ? data.sellingQuotedPrice.value : this.sellingQuotedPrice,
       unit: data.unit.present ? data.unit.value : this.unit,
       marketMin: data.marketMin.present ? data.marketMin.value : this.marketMin,
       marketMax: data.marketMax.present ? data.marketMax.value : this.marketMax,
-      recyclerId:
-          data.recyclerId.present ? data.recyclerId.value : this.recyclerId,
+      recyclerId: data.recyclerId.present ? data.recyclerId.value : this.recyclerId,
       source: data.source.present ? data.source.value : this.source,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
@@ -1215,8 +1126,7 @@ class CachedPricesCompanion extends UpdateCompanion<CachedPrice> {
       if (longitude != null) 'longitude': longitude,
       if (recordedAt != null) 'recorded_at': recordedAt,
       if (buyingPrice != null) 'buying_price': buyingPrice,
-      if (sellingQuotedPrice != null)
-        'selling_quoted_price': sellingQuotedPrice,
+      if (sellingQuotedPrice != null) 'selling_quoted_price': sellingQuotedPrice,
       if (unit != null) 'unit': unit,
       if (marketMin != null) 'market_min': marketMin,
       if (marketMax != null) 'market_max': marketMax,
@@ -1356,22 +1266,18 @@ class $CachedRecyclersTable extends CachedRecyclers
   $CachedRecyclersTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
+  late final GeneratedColumn<String> name = GeneratedColumn<String>('name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _latitudeMeta =
-      const VerificationMeta('latitude');
+  static const VerificationMeta _latitudeMeta = const VerificationMeta('latitude');
   @override
   late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
       'latitude', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _longitudeMeta =
-      const VerificationMeta('longitude');
+  static const VerificationMeta _longitudeMeta = const VerificationMeta('longitude');
   @override
   late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
       'longitude', aliasedName, false,
@@ -1379,79 +1285,68 @@ class $CachedRecyclersTable extends CachedRecyclers
   static const VerificationMeta _materialsAcceptedJsonMeta =
       const VerificationMeta('materialsAcceptedJson');
   @override
-  late final GeneratedColumn<String> materialsAcceptedJson =
-      GeneratedColumn<String>('materials_accepted_json', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> materialsAcceptedJson = GeneratedColumn<String>(
+      'materials_accepted_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _authorizationNumberMeta =
       const VerificationMeta('authorizationNumber');
   @override
-  late final GeneratedColumn<String> authorizationNumber =
-      GeneratedColumn<String>('authorization_number', aliasedName, false,
-          type: DriftSqlType.string,
-          requiredDuringInsert: true,
-          defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+  late final GeneratedColumn<String> authorizationNumber = GeneratedColumn<String>(
+      'authorization_number', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _authorizationBodyMeta =
       const VerificationMeta('authorizationBody');
   @override
-  late final GeneratedColumn<String> authorizationBody =
-      GeneratedColumn<String>('authorization_body', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> authorizationBody = GeneratedColumn<String>(
+      'authorization_body', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _authorizationStatusMeta =
       const VerificationMeta('authorizationStatus');
   @override
-  late final GeneratedColumn<String> authorizationStatus =
-      GeneratedColumn<String>('authorization_status', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> authorizationStatus = GeneratedColumn<String>(
+      'authorization_status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _authorizationValidTillMeta =
       const VerificationMeta('authorizationValidTill');
   @override
-  late final GeneratedColumn<DateTime> authorizationValidTill =
-      GeneratedColumn<DateTime>('authorization_valid_till', aliasedName, false,
-          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  late final GeneratedColumn<DateTime> authorizationValidTill = GeneratedColumn<DateTime>(
+      'authorization_valid_till', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
   static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
   @override
-  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
-      'phone', aliasedName, false,
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>('phone', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _offeredRatesJsonMeta =
-      const VerificationMeta('offeredRatesJson');
+  static const VerificationMeta _offeredRatesJsonMeta = const VerificationMeta('offeredRatesJson');
   @override
   late final GeneratedColumn<String> offeredRatesJson = GeneratedColumn<String>(
       'offered_rates_json', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _pickupAvailableMeta =
-      const VerificationMeta('pickupAvailable');
+  static const VerificationMeta _pickupAvailableMeta = const VerificationMeta('pickupAvailable');
   @override
   late final GeneratedColumn<bool> pickupAvailable = GeneratedColumn<bool>(
       'pickup_available', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("pickup_available" IN (0, 1))'),
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("pickup_available" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _pickupRadiusKmMeta =
-      const VerificationMeta('pickupRadiusKm');
+  static const VerificationMeta _pickupRadiusKmMeta = const VerificationMeta('pickupRadiusKm');
   @override
   late final GeneratedColumn<double> pickupRadiusKm = GeneratedColumn<double>(
       'pickup_radius_km', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
-  static const VerificationMeta _serviceAreaJsonMeta =
-      const VerificationMeta('serviceAreaJson');
+      type: DriftSqlType.double, requiredDuringInsert: false, defaultValue: const Constant(0.0));
+  static const VerificationMeta _serviceAreaJsonMeta = const VerificationMeta('serviceAreaJson');
   @override
   late final GeneratedColumn<String> serviceAreaJson = GeneratedColumn<String>(
       'service_area_json', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _ratingMeta = const VerificationMeta('rating');
   @override
-  late final GeneratedColumn<double> rating = GeneratedColumn<double>(
-      'rating', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0.0));
-  static const VerificationMeta _cachedAtMeta =
-      const VerificationMeta('cachedAt');
+  late final GeneratedColumn<double> rating = GeneratedColumn<double>('rating', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: false, defaultValue: const Constant(0.0));
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta('cachedAt');
   @override
   late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
       'cached_at', aliasedName, false,
@@ -1491,20 +1386,19 @@ class $CachedRecyclersTable extends CachedRecyclers
       context.missing(_idMeta);
     }
     if (data.containsKey('name')) {
-      context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+      context.handle(_nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('latitude')) {
-      context.handle(_latitudeMeta,
-          latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta));
+      context.handle(
+          _latitudeMeta, latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta));
     } else if (isInserting) {
       context.missing(_latitudeMeta);
     }
     if (data.containsKey('longitude')) {
-      context.handle(_longitudeMeta,
-          longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
+      context.handle(
+          _longitudeMeta, longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
     } else if (isInserting) {
       context.missing(_longitudeMeta);
     }
@@ -1549,8 +1443,7 @@ class $CachedRecyclersTable extends CachedRecyclers
       context.missing(_authorizationValidTillMeta);
     }
     if (data.containsKey('phone')) {
-      context.handle(
-          _phoneMeta, phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta));
+      context.handle(_phoneMeta, phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta));
     } else if (isInserting) {
       context.missing(_phoneMeta);
     }
@@ -1563,32 +1456,25 @@ class $CachedRecyclersTable extends CachedRecyclers
       context.missing(_offeredRatesJsonMeta);
     }
     if (data.containsKey('pickup_available')) {
-      context.handle(
-          _pickupAvailableMeta,
-          pickupAvailable.isAcceptableOrUnknown(
-              data['pickup_available']!, _pickupAvailableMeta));
+      context.handle(_pickupAvailableMeta,
+          pickupAvailable.isAcceptableOrUnknown(data['pickup_available']!, _pickupAvailableMeta));
     }
     if (data.containsKey('pickup_radius_km')) {
-      context.handle(
-          _pickupRadiusKmMeta,
-          pickupRadiusKm.isAcceptableOrUnknown(
-              data['pickup_radius_km']!, _pickupRadiusKmMeta));
+      context.handle(_pickupRadiusKmMeta,
+          pickupRadiusKm.isAcceptableOrUnknown(data['pickup_radius_km']!, _pickupRadiusKmMeta));
     }
     if (data.containsKey('service_area_json')) {
-      context.handle(
-          _serviceAreaJsonMeta,
-          serviceAreaJson.isAcceptableOrUnknown(
-              data['service_area_json']!, _serviceAreaJsonMeta));
+      context.handle(_serviceAreaJsonMeta,
+          serviceAreaJson.isAcceptableOrUnknown(data['service_area_json']!, _serviceAreaJsonMeta));
     } else if (isInserting) {
       context.missing(_serviceAreaJsonMeta);
     }
     if (data.containsKey('rating')) {
-      context.handle(_ratingMeta,
-          rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta));
+      context.handle(_ratingMeta, rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta));
     }
     if (data.containsKey('cached_at')) {
-      context.handle(_cachedAtMeta,
-          cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta));
+      context.handle(
+          _cachedAtMeta, cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta));
     } else if (isInserting) {
       context.missing(_cachedAtMeta);
     }
@@ -1601,38 +1487,34 @@ class $CachedRecyclersTable extends CachedRecyclers
   CachedRecycler map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CachedRecycler(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       latitude: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}latitude'])!,
       longitude: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}longitude'])!,
-      materialsAcceptedJson: attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}materials_accepted_json'])!,
-      authorizationNumber: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}authorization_number'])!,
-      authorizationBody: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}authorization_body'])!,
-      authorizationStatus: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}authorization_status'])!,
-      authorizationValidTill: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime,
-          data['${effectivePrefix}authorization_valid_till'])!,
-      phone: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}phone'])!,
-      offeredRatesJson: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}offered_rates_json'])!,
+      materialsAcceptedJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}materials_accepted_json'])!,
+      authorizationNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}authorization_number'])!,
+      authorizationBody: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}authorization_body'])!,
+      authorizationStatus: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}authorization_status'])!,
+      authorizationValidTill: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}authorization_valid_till'])!,
+      phone:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}phone'])!,
+      offeredRatesJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}offered_rates_json'])!,
       pickupAvailable: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}pickup_available'])!,
-      pickupRadiusKm: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}pickup_radius_km'])!,
-      serviceAreaJson: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}service_area_json'])!,
-      rating: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}rating'])!,
+      pickupRadiusKm: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}pickup_radius_km'])!,
+      serviceAreaJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}service_area_json'])!,
+      rating:
+          attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}rating'])!,
       cachedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}cached_at'])!,
     );
@@ -1689,8 +1571,7 @@ class CachedRecycler extends DataClass implements Insertable<CachedRecycler> {
     map['authorization_number'] = Variable<String>(authorizationNumber);
     map['authorization_body'] = Variable<String>(authorizationBody);
     map['authorization_status'] = Variable<String>(authorizationStatus);
-    map['authorization_valid_till'] =
-        Variable<DateTime>(authorizationValidTill);
+    map['authorization_valid_till'] = Variable<DateTime>(authorizationValidTill);
     map['phone'] = Variable<String>(phone);
     map['offered_rates_json'] = Variable<String>(offeredRatesJson);
     map['pickup_available'] = Variable<bool>(pickupAvailable);
@@ -1722,23 +1603,18 @@ class CachedRecycler extends DataClass implements Insertable<CachedRecycler> {
     );
   }
 
-  factory CachedRecycler.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory CachedRecycler.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CachedRecycler(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       latitude: serializer.fromJson<double>(json['latitude']),
       longitude: serializer.fromJson<double>(json['longitude']),
-      materialsAcceptedJson:
-          serializer.fromJson<String>(json['materialsAcceptedJson']),
-      authorizationNumber:
-          serializer.fromJson<String>(json['authorizationNumber']),
+      materialsAcceptedJson: serializer.fromJson<String>(json['materialsAcceptedJson']),
+      authorizationNumber: serializer.fromJson<String>(json['authorizationNumber']),
       authorizationBody: serializer.fromJson<String>(json['authorizationBody']),
-      authorizationStatus:
-          serializer.fromJson<String>(json['authorizationStatus']),
-      authorizationValidTill:
-          serializer.fromJson<DateTime>(json['authorizationValidTill']),
+      authorizationStatus: serializer.fromJson<String>(json['authorizationStatus']),
+      authorizationValidTill: serializer.fromJson<DateTime>(json['authorizationValidTill']),
       phone: serializer.fromJson<String>(json['phone']),
       offeredRatesJson: serializer.fromJson<String>(json['offeredRatesJson']),
       pickupAvailable: serializer.fromJson<bool>(json['pickupAvailable']),
@@ -1760,8 +1636,7 @@ class CachedRecycler extends DataClass implements Insertable<CachedRecycler> {
       'authorizationNumber': serializer.toJson<String>(authorizationNumber),
       'authorizationBody': serializer.toJson<String>(authorizationBody),
       'authorizationStatus': serializer.toJson<String>(authorizationStatus),
-      'authorizationValidTill':
-          serializer.toJson<DateTime>(authorizationValidTill),
+      'authorizationValidTill': serializer.toJson<DateTime>(authorizationValidTill),
       'phone': serializer.toJson<String>(phone),
       'offeredRatesJson': serializer.toJson<String>(offeredRatesJson),
       'pickupAvailable': serializer.toJson<bool>(pickupAvailable),
@@ -1794,13 +1669,11 @@ class CachedRecycler extends DataClass implements Insertable<CachedRecycler> {
         name: name ?? this.name,
         latitude: latitude ?? this.latitude,
         longitude: longitude ?? this.longitude,
-        materialsAcceptedJson:
-            materialsAcceptedJson ?? this.materialsAcceptedJson,
+        materialsAcceptedJson: materialsAcceptedJson ?? this.materialsAcceptedJson,
         authorizationNumber: authorizationNumber ?? this.authorizationNumber,
         authorizationBody: authorizationBody ?? this.authorizationBody,
         authorizationStatus: authorizationStatus ?? this.authorizationStatus,
-        authorizationValidTill:
-            authorizationValidTill ?? this.authorizationValidTill,
+        authorizationValidTill: authorizationValidTill ?? this.authorizationValidTill,
         phone: phone ?? this.phone,
         offeredRatesJson: offeredRatesJson ?? this.offeredRatesJson,
         pickupAvailable: pickupAvailable ?? this.pickupAvailable,
@@ -1821,9 +1694,8 @@ class CachedRecycler extends DataClass implements Insertable<CachedRecycler> {
       authorizationNumber: data.authorizationNumber.present
           ? data.authorizationNumber.value
           : this.authorizationNumber,
-      authorizationBody: data.authorizationBody.present
-          ? data.authorizationBody.value
-          : this.authorizationBody,
+      authorizationBody:
+          data.authorizationBody.present ? data.authorizationBody.value : this.authorizationBody,
       authorizationStatus: data.authorizationStatus.present
           ? data.authorizationStatus.value
           : this.authorizationStatus,
@@ -1831,18 +1703,13 @@ class CachedRecycler extends DataClass implements Insertable<CachedRecycler> {
           ? data.authorizationValidTill.value
           : this.authorizationValidTill,
       phone: data.phone.present ? data.phone.value : this.phone,
-      offeredRatesJson: data.offeredRatesJson.present
-          ? data.offeredRatesJson.value
-          : this.offeredRatesJson,
-      pickupAvailable: data.pickupAvailable.present
-          ? data.pickupAvailable.value
-          : this.pickupAvailable,
-      pickupRadiusKm: data.pickupRadiusKm.present
-          ? data.pickupRadiusKm.value
-          : this.pickupRadiusKm,
-      serviceAreaJson: data.serviceAreaJson.present
-          ? data.serviceAreaJson.value
-          : this.serviceAreaJson,
+      offeredRatesJson:
+          data.offeredRatesJson.present ? data.offeredRatesJson.value : this.offeredRatesJson,
+      pickupAvailable:
+          data.pickupAvailable.present ? data.pickupAvailable.value : this.pickupAvailable,
+      pickupRadiusKm: data.pickupRadiusKm.present ? data.pickupRadiusKm.value : this.pickupRadiusKm,
+      serviceAreaJson:
+          data.serviceAreaJson.present ? data.serviceAreaJson.value : this.serviceAreaJson,
       rating: data.rating.present ? data.rating.value : this.rating,
       cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
     );
@@ -2003,15 +1870,11 @@ class CachedRecyclersCompanion extends UpdateCompanion<CachedRecycler> {
       if (name != null) 'name': name,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
-      if (materialsAcceptedJson != null)
-        'materials_accepted_json': materialsAcceptedJson,
-      if (authorizationNumber != null)
-        'authorization_number': authorizationNumber,
+      if (materialsAcceptedJson != null) 'materials_accepted_json': materialsAcceptedJson,
+      if (authorizationNumber != null) 'authorization_number': authorizationNumber,
       if (authorizationBody != null) 'authorization_body': authorizationBody,
-      if (authorizationStatus != null)
-        'authorization_status': authorizationStatus,
-      if (authorizationValidTill != null)
-        'authorization_valid_till': authorizationValidTill,
+      if (authorizationStatus != null) 'authorization_status': authorizationStatus,
+      if (authorizationValidTill != null) 'authorization_valid_till': authorizationValidTill,
       if (phone != null) 'phone': phone,
       if (offeredRatesJson != null) 'offered_rates_json': offeredRatesJson,
       if (pickupAvailable != null) 'pickup_available': pickupAvailable,
@@ -2046,13 +1909,11 @@ class CachedRecyclersCompanion extends UpdateCompanion<CachedRecycler> {
       name: name ?? this.name,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
-      materialsAcceptedJson:
-          materialsAcceptedJson ?? this.materialsAcceptedJson,
+      materialsAcceptedJson: materialsAcceptedJson ?? this.materialsAcceptedJson,
       authorizationNumber: authorizationNumber ?? this.authorizationNumber,
       authorizationBody: authorizationBody ?? this.authorizationBody,
       authorizationStatus: authorizationStatus ?? this.authorizationStatus,
-      authorizationValidTill:
-          authorizationValidTill ?? this.authorizationValidTill,
+      authorizationValidTill: authorizationValidTill ?? this.authorizationValidTill,
       phone: phone ?? this.phone,
       offeredRatesJson: offeredRatesJson ?? this.offeredRatesJson,
       pickupAvailable: pickupAvailable ?? this.pickupAvailable,
@@ -2080,8 +1941,7 @@ class CachedRecyclersCompanion extends UpdateCompanion<CachedRecycler> {
       map['longitude'] = Variable<double>(longitude.value);
     }
     if (materialsAcceptedJson.present) {
-      map['materials_accepted_json'] =
-          Variable<String>(materialsAcceptedJson.value);
+      map['materials_accepted_json'] = Variable<String>(materialsAcceptedJson.value);
     }
     if (authorizationNumber.present) {
       map['authorization_number'] = Variable<String>(authorizationNumber.value);
@@ -2093,8 +1953,7 @@ class CachedRecyclersCompanion extends UpdateCompanion<CachedRecycler> {
       map['authorization_status'] = Variable<String>(authorizationStatus.value);
     }
     if (authorizationValidTill.present) {
-      map['authorization_valid_till'] =
-          Variable<DateTime>(authorizationValidTill.value);
+      map['authorization_valid_till'] = Variable<DateTime>(authorizationValidTill.value);
     }
     if (phone.present) {
       map['phone'] = Variable<String>(phone.value);
@@ -2156,92 +2015,76 @@ class $LocalTransactionsTable extends LocalTransactions
   $LocalTransactionsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _lotIdMeta = const VerificationMeta('lotId');
   @override
-  late final GeneratedColumn<String> lotId = GeneratedColumn<String>(
-      'lot_id', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 5, maxTextLength: 40),
+  late final GeneratedColumn<String> lotId = GeneratedColumn<String>('lot_id', aliasedName, false,
+      additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 5, maxTextLength: 40),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
-  static const VerificationMeta _clientLotUuidMeta =
-      const VerificationMeta('clientLotUuid');
+  static const VerificationMeta _clientLotUuidMeta = const VerificationMeta('clientLotUuid');
   @override
   late final GeneratedColumn<String> clientLotUuid = GeneratedColumn<String>(
       'client_lot_uuid', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _collectorIdMeta =
-      const VerificationMeta('collectorId');
+  static const VerificationMeta _collectorIdMeta = const VerificationMeta('collectorId');
   @override
   late final GeneratedColumn<String> collectorId = GeneratedColumn<String>(
       'collector_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _categoryMeta =
-      const VerificationMeta('category');
+  static const VerificationMeta _categoryMeta = const VerificationMeta('category');
   @override
   late final GeneratedColumn<String> category = GeneratedColumn<String>(
       'category', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _weightKgMeta =
-      const VerificationMeta('weightKg');
+  static const VerificationMeta _weightKgMeta = const VerificationMeta('weightKg');
   @override
   late final GeneratedColumn<double> weightKg = GeneratedColumn<double>(
       'weight_kg', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _quotedPriceMeta =
-      const VerificationMeta('quotedPrice');
+  static const VerificationMeta _quotedPriceMeta = const VerificationMeta('quotedPrice');
   @override
   late final GeneratedColumn<double> quotedPrice = GeneratedColumn<double>(
       'quoted_price', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _finalPriceMeta =
-      const VerificationMeta('finalPrice');
+  static const VerificationMeta _finalPriceMeta = const VerificationMeta('finalPrice');
   @override
   late final GeneratedColumn<double> finalPrice = GeneratedColumn<double>(
       'final_price', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _recyclerIdMeta =
-      const VerificationMeta('recyclerId');
+  static const VerificationMeta _recyclerIdMeta = const VerificationMeta('recyclerId');
   @override
   late final GeneratedColumn<String> recyclerId = GeneratedColumn<String>(
       'recycler_id', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _collectionLatMeta =
-      const VerificationMeta('collectionLat');
+  static const VerificationMeta _collectionLatMeta = const VerificationMeta('collectionLat');
   @override
   late final GeneratedColumn<double> collectionLat = GeneratedColumn<double>(
       'collection_lat', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _collectionLngMeta =
-      const VerificationMeta('collectionLng');
+  static const VerificationMeta _collectionLngMeta = const VerificationMeta('collectionLng');
   @override
   late final GeneratedColumn<double> collectionLng = GeneratedColumn<double>(
       'collection_lng', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _handoverLatMeta =
-      const VerificationMeta('handoverLat');
+  static const VerificationMeta _handoverLatMeta = const VerificationMeta('handoverLat');
   @override
   late final GeneratedColumn<double> handoverLat = GeneratedColumn<double>(
       'handover_lat', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _handoverLngMeta =
-      const VerificationMeta('handoverLng');
+  static const VerificationMeta _handoverLngMeta = const VerificationMeta('handoverLng');
   @override
   late final GeneratedColumn<double> handoverLng = GeneratedColumn<double>(
       'handover_lng', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _handoverAtMeta =
-      const VerificationMeta('handoverAt');
+  static const VerificationMeta _handoverAtMeta = const VerificationMeta('handoverAt');
   @override
   late final GeneratedColumn<DateTime> handoverAt = GeneratedColumn<DateTime>(
       'handover_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _paymentStatusMeta =
-      const VerificationMeta('paymentStatus');
+  static const VerificationMeta _paymentStatusMeta = const VerificationMeta('paymentStatus');
   @override
   late final GeneratedColumn<String> paymentStatus = GeneratedColumn<String>(
       'payment_status', aliasedName, false,
@@ -2251,39 +2094,32 @@ class $LocalTransactionsTable extends LocalTransactions
   static const VerificationMeta _transactionStatusMeta =
       const VerificationMeta('transactionStatus');
   @override
-  late final GeneratedColumn<String> transactionStatus =
-      GeneratedColumn<String>('transaction_status', aliasedName, false,
-          type: DriftSqlType.string,
-          requiredDuringInsert: false,
-          defaultValue: const Constant('draft'));
-  static const VerificationMeta _anomalyFlagMeta =
-      const VerificationMeta('anomalyFlag');
+  late final GeneratedColumn<String> transactionStatus = GeneratedColumn<String>(
+      'transaction_status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('draft'));
+  static const VerificationMeta _anomalyFlagMeta = const VerificationMeta('anomalyFlag');
   @override
   late final GeneratedColumn<bool> anomalyFlag = GeneratedColumn<bool>(
       'anomaly_flag', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("anomaly_flag" IN (0, 1))'),
+      defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("anomaly_flag" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _anomalyReasonMeta =
-      const VerificationMeta('anomalyReason');
+  static const VerificationMeta _anomalyReasonMeta = const VerificationMeta('anomalyReason');
   @override
   late final GeneratedColumn<String> anomalyReason = GeneratedColumn<String>(
       'anomaly_reason', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _isSyncedMeta =
-      const VerificationMeta('isSynced');
+  static const VerificationMeta _isSyncedMeta = const VerificationMeta('isSynced');
   @override
-  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
-      'is_synced', aliasedName, false,
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>('is_synced', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
+      defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _syncedAtMeta =
-      const VerificationMeta('syncedAt');
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta('syncedAt');
   @override
   late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
       'synced_at', aliasedName, true,
@@ -2322,104 +2158,81 @@ class $LocalTransactionsTable extends LocalTransactions
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('lot_id')) {
-      context.handle(
-          _lotIdMeta, lotId.isAcceptableOrUnknown(data['lot_id']!, _lotIdMeta));
+      context.handle(_lotIdMeta, lotId.isAcceptableOrUnknown(data['lot_id']!, _lotIdMeta));
     } else if (isInserting) {
       context.missing(_lotIdMeta);
     }
     if (data.containsKey('client_lot_uuid')) {
-      context.handle(
-          _clientLotUuidMeta,
-          clientLotUuid.isAcceptableOrUnknown(
-              data['client_lot_uuid']!, _clientLotUuidMeta));
+      context.handle(_clientLotUuidMeta,
+          clientLotUuid.isAcceptableOrUnknown(data['client_lot_uuid']!, _clientLotUuidMeta));
     } else if (isInserting) {
       context.missing(_clientLotUuidMeta);
     }
     if (data.containsKey('collector_id')) {
-      context.handle(
-          _collectorIdMeta,
-          collectorId.isAcceptableOrUnknown(
-              data['collector_id']!, _collectorIdMeta));
+      context.handle(_collectorIdMeta,
+          collectorId.isAcceptableOrUnknown(data['collector_id']!, _collectorIdMeta));
     } else if (isInserting) {
       context.missing(_collectorIdMeta);
     }
     if (data.containsKey('category')) {
-      context.handle(_categoryMeta,
-          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+      context.handle(
+          _categoryMeta, category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
     } else if (isInserting) {
       context.missing(_categoryMeta);
     }
     if (data.containsKey('weight_kg')) {
-      context.handle(_weightKgMeta,
-          weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta));
+      context.handle(
+          _weightKgMeta, weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta));
     } else if (isInserting) {
       context.missing(_weightKgMeta);
     }
     if (data.containsKey('quoted_price')) {
-      context.handle(
-          _quotedPriceMeta,
-          quotedPrice.isAcceptableOrUnknown(
-              data['quoted_price']!, _quotedPriceMeta));
+      context.handle(_quotedPriceMeta,
+          quotedPrice.isAcceptableOrUnknown(data['quoted_price']!, _quotedPriceMeta));
     } else if (isInserting) {
       context.missing(_quotedPriceMeta);
     }
     if (data.containsKey('final_price')) {
       context.handle(
-          _finalPriceMeta,
-          finalPrice.isAcceptableOrUnknown(
-              data['final_price']!, _finalPriceMeta));
+          _finalPriceMeta, finalPrice.isAcceptableOrUnknown(data['final_price']!, _finalPriceMeta));
     }
     if (data.containsKey('recycler_id')) {
       context.handle(
-          _recyclerIdMeta,
-          recyclerId.isAcceptableOrUnknown(
-              data['recycler_id']!, _recyclerIdMeta));
+          _recyclerIdMeta, recyclerId.isAcceptableOrUnknown(data['recycler_id']!, _recyclerIdMeta));
     }
     if (data.containsKey('collection_lat')) {
-      context.handle(
-          _collectionLatMeta,
-          collectionLat.isAcceptableOrUnknown(
-              data['collection_lat']!, _collectionLatMeta));
+      context.handle(_collectionLatMeta,
+          collectionLat.isAcceptableOrUnknown(data['collection_lat']!, _collectionLatMeta));
     } else if (isInserting) {
       context.missing(_collectionLatMeta);
     }
     if (data.containsKey('collection_lng')) {
-      context.handle(
-          _collectionLngMeta,
-          collectionLng.isAcceptableOrUnknown(
-              data['collection_lng']!, _collectionLngMeta));
+      context.handle(_collectionLngMeta,
+          collectionLng.isAcceptableOrUnknown(data['collection_lng']!, _collectionLngMeta));
     } else if (isInserting) {
       context.missing(_collectionLngMeta);
     }
     if (data.containsKey('handover_lat')) {
-      context.handle(
-          _handoverLatMeta,
-          handoverLat.isAcceptableOrUnknown(
-              data['handover_lat']!, _handoverLatMeta));
+      context.handle(_handoverLatMeta,
+          handoverLat.isAcceptableOrUnknown(data['handover_lat']!, _handoverLatMeta));
     }
     if (data.containsKey('handover_lng')) {
-      context.handle(
-          _handoverLngMeta,
-          handoverLng.isAcceptableOrUnknown(
-              data['handover_lng']!, _handoverLngMeta));
+      context.handle(_handoverLngMeta,
+          handoverLng.isAcceptableOrUnknown(data['handover_lng']!, _handoverLngMeta));
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+          _createdAtMeta, createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
     if (data.containsKey('handover_at')) {
       context.handle(
-          _handoverAtMeta,
-          handoverAt.isAcceptableOrUnknown(
-              data['handover_at']!, _handoverAtMeta));
+          _handoverAtMeta, handoverAt.isAcceptableOrUnknown(data['handover_at']!, _handoverAtMeta));
     }
     if (data.containsKey('payment_status')) {
-      context.handle(
-          _paymentStatusMeta,
-          paymentStatus.isAcceptableOrUnknown(
-              data['payment_status']!, _paymentStatusMeta));
+      context.handle(_paymentStatusMeta,
+          paymentStatus.isAcceptableOrUnknown(data['payment_status']!, _paymentStatusMeta));
     }
     if (data.containsKey('transaction_status')) {
       context.handle(
@@ -2428,24 +2241,20 @@ class $LocalTransactionsTable extends LocalTransactions
               data['transaction_status']!, _transactionStatusMeta));
     }
     if (data.containsKey('anomaly_flag')) {
-      context.handle(
-          _anomalyFlagMeta,
-          anomalyFlag.isAcceptableOrUnknown(
-              data['anomaly_flag']!, _anomalyFlagMeta));
+      context.handle(_anomalyFlagMeta,
+          anomalyFlag.isAcceptableOrUnknown(data['anomaly_flag']!, _anomalyFlagMeta));
     }
     if (data.containsKey('anomaly_reason')) {
-      context.handle(
-          _anomalyReasonMeta,
-          anomalyReason.isAcceptableOrUnknown(
-              data['anomaly_reason']!, _anomalyReasonMeta));
+      context.handle(_anomalyReasonMeta,
+          anomalyReason.isAcceptableOrUnknown(data['anomaly_reason']!, _anomalyReasonMeta));
     }
     if (data.containsKey('is_synced')) {
-      context.handle(_isSyncedMeta,
-          isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
+      context.handle(
+          _isSyncedMeta, isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
     }
     if (data.containsKey('synced_at')) {
-      context.handle(_syncedAtMeta,
-          syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta));
+      context.handle(
+          _syncedAtMeta, syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta));
     }
     return context;
   }
@@ -2456,10 +2265,10 @@ class $LocalTransactionsTable extends LocalTransactions
   LocalTransaction map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalTransaction(
-      lotId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}lot_id'])!,
-      clientLotUuid: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}client_lot_uuid'])!,
+      lotId:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}lot_id'])!,
+      clientLotUuid: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}client_lot_uuid'])!,
       collectorId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}collector_id'])!,
       category: attachedDatabase.typeMapping
@@ -2486,8 +2295,8 @@ class $LocalTransactionsTable extends LocalTransactions
           .read(DriftSqlType.dateTime, data['${effectivePrefix}handover_at']),
       paymentStatus: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}payment_status'])!,
-      transactionStatus: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}transaction_status'])!,
+      transactionStatus: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}transaction_status'])!,
       anomalyFlag: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}anomaly_flag'])!,
       anomalyReason: attachedDatabase.typeMapping
@@ -2505,8 +2314,7 @@ class $LocalTransactionsTable extends LocalTransactions
   }
 }
 
-class LocalTransaction extends DataClass
-    implements Insertable<LocalTransaction> {
+class LocalTransaction extends DataClass implements Insertable<LocalTransaction> {
   final String lotId;
   final String clientLotUuid;
   final String collectorId;
@@ -2596,39 +2404,25 @@ class LocalTransaction extends DataClass
       category: Value(category),
       weightKg: Value(weightKg),
       quotedPrice: Value(quotedPrice),
-      finalPrice: finalPrice == null && nullToAbsent
-          ? const Value.absent()
-          : Value(finalPrice),
-      recyclerId: recyclerId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(recyclerId),
+      finalPrice: finalPrice == null && nullToAbsent ? const Value.absent() : Value(finalPrice),
+      recyclerId: recyclerId == null && nullToAbsent ? const Value.absent() : Value(recyclerId),
       collectionLat: Value(collectionLat),
       collectionLng: Value(collectionLng),
-      handoverLat: handoverLat == null && nullToAbsent
-          ? const Value.absent()
-          : Value(handoverLat),
-      handoverLng: handoverLng == null && nullToAbsent
-          ? const Value.absent()
-          : Value(handoverLng),
+      handoverLat: handoverLat == null && nullToAbsent ? const Value.absent() : Value(handoverLat),
+      handoverLng: handoverLng == null && nullToAbsent ? const Value.absent() : Value(handoverLng),
       createdAt: Value(createdAt),
-      handoverAt: handoverAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(handoverAt),
+      handoverAt: handoverAt == null && nullToAbsent ? const Value.absent() : Value(handoverAt),
       paymentStatus: Value(paymentStatus),
       transactionStatus: Value(transactionStatus),
       anomalyFlag: Value(anomalyFlag),
-      anomalyReason: anomalyReason == null && nullToAbsent
-          ? const Value.absent()
-          : Value(anomalyReason),
+      anomalyReason:
+          anomalyReason == null && nullToAbsent ? const Value.absent() : Value(anomalyReason),
       isSynced: Value(isSynced),
-      syncedAt: syncedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(syncedAt),
+      syncedAt: syncedAt == null && nullToAbsent ? const Value.absent() : Value(syncedAt),
     );
   }
 
-  factory LocalTransaction.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory LocalTransaction.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalTransaction(
       lotId: serializer.fromJson<String>(json['lotId']),
@@ -2719,51 +2513,31 @@ class LocalTransaction extends DataClass
         paymentStatus: paymentStatus ?? this.paymentStatus,
         transactionStatus: transactionStatus ?? this.transactionStatus,
         anomalyFlag: anomalyFlag ?? this.anomalyFlag,
-        anomalyReason:
-            anomalyReason.present ? anomalyReason.value : this.anomalyReason,
+        anomalyReason: anomalyReason.present ? anomalyReason.value : this.anomalyReason,
         isSynced: isSynced ?? this.isSynced,
         syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
       );
   LocalTransaction copyWithCompanion(LocalTransactionsCompanion data) {
     return LocalTransaction(
       lotId: data.lotId.present ? data.lotId.value : this.lotId,
-      clientLotUuid: data.clientLotUuid.present
-          ? data.clientLotUuid.value
-          : this.clientLotUuid,
-      collectorId:
-          data.collectorId.present ? data.collectorId.value : this.collectorId,
+      clientLotUuid: data.clientLotUuid.present ? data.clientLotUuid.value : this.clientLotUuid,
+      collectorId: data.collectorId.present ? data.collectorId.value : this.collectorId,
       category: data.category.present ? data.category.value : this.category,
       weightKg: data.weightKg.present ? data.weightKg.value : this.weightKg,
-      quotedPrice:
-          data.quotedPrice.present ? data.quotedPrice.value : this.quotedPrice,
-      finalPrice:
-          data.finalPrice.present ? data.finalPrice.value : this.finalPrice,
-      recyclerId:
-          data.recyclerId.present ? data.recyclerId.value : this.recyclerId,
-      collectionLat: data.collectionLat.present
-          ? data.collectionLat.value
-          : this.collectionLat,
-      collectionLng: data.collectionLng.present
-          ? data.collectionLng.value
-          : this.collectionLng,
-      handoverLat:
-          data.handoverLat.present ? data.handoverLat.value : this.handoverLat,
-      handoverLng:
-          data.handoverLng.present ? data.handoverLng.value : this.handoverLng,
+      quotedPrice: data.quotedPrice.present ? data.quotedPrice.value : this.quotedPrice,
+      finalPrice: data.finalPrice.present ? data.finalPrice.value : this.finalPrice,
+      recyclerId: data.recyclerId.present ? data.recyclerId.value : this.recyclerId,
+      collectionLat: data.collectionLat.present ? data.collectionLat.value : this.collectionLat,
+      collectionLng: data.collectionLng.present ? data.collectionLng.value : this.collectionLng,
+      handoverLat: data.handoverLat.present ? data.handoverLat.value : this.handoverLat,
+      handoverLng: data.handoverLng.present ? data.handoverLng.value : this.handoverLng,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      handoverAt:
-          data.handoverAt.present ? data.handoverAt.value : this.handoverAt,
-      paymentStatus: data.paymentStatus.present
-          ? data.paymentStatus.value
-          : this.paymentStatus,
-      transactionStatus: data.transactionStatus.present
-          ? data.transactionStatus.value
-          : this.transactionStatus,
-      anomalyFlag:
-          data.anomalyFlag.present ? data.anomalyFlag.value : this.anomalyFlag,
-      anomalyReason: data.anomalyReason.present
-          ? data.anomalyReason.value
-          : this.anomalyReason,
+      handoverAt: data.handoverAt.present ? data.handoverAt.value : this.handoverAt,
+      paymentStatus: data.paymentStatus.present ? data.paymentStatus.value : this.paymentStatus,
+      transactionStatus:
+          data.transactionStatus.present ? data.transactionStatus.value : this.transactionStatus,
+      anomalyFlag: data.anomalyFlag.present ? data.anomalyFlag.value : this.anomalyFlag,
+      anomalyReason: data.anomalyReason.present ? data.anomalyReason.value : this.anomalyReason,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
       syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
     );
@@ -3121,52 +2895,43 @@ class $LocalTraceabilityTable extends LocalTraceability
   $LocalTraceabilityTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _lotIdMeta = const VerificationMeta('lotId');
   @override
-  late final GeneratedColumn<String> lotId = GeneratedColumn<String>(
-      'lot_id', aliasedName, false,
+  late final GeneratedColumn<String> lotId = GeneratedColumn<String>('lot_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _photoHashesJsonMeta =
-      const VerificationMeta('photoHashesJson');
+  static const VerificationMeta _photoHashesJsonMeta = const VerificationMeta('photoHashesJson');
   @override
   late final GeneratedColumn<String> photoHashesJson = GeneratedColumn<String>(
       'photo_hashes_json', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _weightKgMeta =
-      const VerificationMeta('weightKg');
+  static const VerificationMeta _weightKgMeta = const VerificationMeta('weightKg');
   @override
   late final GeneratedColumn<double> weightKg = GeneratedColumn<double>(
       'weight_kg', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _timestampMeta =
-      const VerificationMeta('timestamp');
+  static const VerificationMeta _timestampMeta = const VerificationMeta('timestamp');
   @override
   late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
       'timestamp', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   static const VerificationMeta _gpsLatMeta = const VerificationMeta('gpsLat');
   @override
-  late final GeneratedColumn<double> gpsLat = GeneratedColumn<double>(
-      'gps_lat', aliasedName, false,
+  late final GeneratedColumn<double> gpsLat = GeneratedColumn<double>('gps_lat', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
   static const VerificationMeta _gpsLngMeta = const VerificationMeta('gpsLng');
   @override
-  late final GeneratedColumn<double> gpsLng = GeneratedColumn<double>(
-      'gps_lng', aliasedName, false,
+  late final GeneratedColumn<double> gpsLng = GeneratedColumn<double>('gps_lng', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _handoverRefNoMeta =
-      const VerificationMeta('handoverRefNo');
+  static const VerificationMeta _handoverRefNoMeta = const VerificationMeta('handoverRefNo');
   @override
   late final GeneratedColumn<String> handoverRefNo = GeneratedColumn<String>(
       'handover_ref_no', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
-  static const VerificationMeta _qrPayloadMeta =
-      const VerificationMeta('qrPayload');
+  static const VerificationMeta _qrPayloadMeta = const VerificationMeta('qrPayload');
   @override
   late final GeneratedColumn<String> qrPayload = GeneratedColumn<String>(
       'qr_payload', aliasedName, false,
@@ -3178,53 +2943,44 @@ class $LocalTraceabilityTable extends LocalTraceability
       'recycler_confirmation', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("recycler_confirmation" IN (0, 1))'),
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("recycler_confirmation" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _confirmedAtMeta =
-      const VerificationMeta('confirmedAt');
+  static const VerificationMeta _confirmedAtMeta = const VerificationMeta('confirmedAt');
   @override
   late final GeneratedColumn<DateTime> confirmedAt = GeneratedColumn<DateTime>(
       'confirmed_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _confirmedByMeta =
-      const VerificationMeta('confirmedBy');
+  static const VerificationMeta _confirmedByMeta = const VerificationMeta('confirmedBy');
   @override
   late final GeneratedColumn<String> confirmedBy = GeneratedColumn<String>(
       'confirmed_by', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _downstreamStatusMeta =
-      const VerificationMeta('downstreamStatus');
+  static const VerificationMeta _downstreamStatusMeta = const VerificationMeta('downstreamStatus');
   @override
   late final GeneratedColumn<String> downstreamStatus = GeneratedColumn<String>(
       'downstream_status', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('received'));
-  static const VerificationMeta _recordHashMeta =
-      const VerificationMeta('recordHash');
+  static const VerificationMeta _recordHashMeta = const VerificationMeta('recordHash');
   @override
   late final GeneratedColumn<String> recordHash = GeneratedColumn<String>(
       'record_hash', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _prevHashMeta =
-      const VerificationMeta('prevHash');
+  static const VerificationMeta _prevHashMeta = const VerificationMeta('prevHash');
   @override
   late final GeneratedColumn<String> prevHash = GeneratedColumn<String>(
       'prev_hash', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _isSyncedMeta =
-      const VerificationMeta('isSynced');
+  static const VerificationMeta _isSyncedMeta = const VerificationMeta('isSynced');
   @override
-  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
-      'is_synced', aliasedName, false,
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>('is_synced', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
+      defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
@@ -3255,8 +3011,7 @@ class $LocalTraceabilityTable extends LocalTraceability
   String get actualTableName => $name;
   static const String $name = 'local_traceability';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<LocalTraceabilityData> instance,
+  VerificationContext validateIntegrity(Insertable<LocalTraceabilityData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -3266,54 +3021,47 @@ class $LocalTraceabilityTable extends LocalTraceability
       context.missing(_idMeta);
     }
     if (data.containsKey('lot_id')) {
-      context.handle(
-          _lotIdMeta, lotId.isAcceptableOrUnknown(data['lot_id']!, _lotIdMeta));
+      context.handle(_lotIdMeta, lotId.isAcceptableOrUnknown(data['lot_id']!, _lotIdMeta));
     } else if (isInserting) {
       context.missing(_lotIdMeta);
     }
     if (data.containsKey('photo_hashes_json')) {
-      context.handle(
-          _photoHashesJsonMeta,
-          photoHashesJson.isAcceptableOrUnknown(
-              data['photo_hashes_json']!, _photoHashesJsonMeta));
+      context.handle(_photoHashesJsonMeta,
+          photoHashesJson.isAcceptableOrUnknown(data['photo_hashes_json']!, _photoHashesJsonMeta));
     } else if (isInserting) {
       context.missing(_photoHashesJsonMeta);
     }
     if (data.containsKey('weight_kg')) {
-      context.handle(_weightKgMeta,
-          weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta));
+      context.handle(
+          _weightKgMeta, weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta));
     } else if (isInserting) {
       context.missing(_weightKgMeta);
     }
     if (data.containsKey('timestamp')) {
-      context.handle(_timestampMeta,
-          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+      context.handle(
+          _timestampMeta, timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
     } else if (isInserting) {
       context.missing(_timestampMeta);
     }
     if (data.containsKey('gps_lat')) {
-      context.handle(_gpsLatMeta,
-          gpsLat.isAcceptableOrUnknown(data['gps_lat']!, _gpsLatMeta));
+      context.handle(_gpsLatMeta, gpsLat.isAcceptableOrUnknown(data['gps_lat']!, _gpsLatMeta));
     } else if (isInserting) {
       context.missing(_gpsLatMeta);
     }
     if (data.containsKey('gps_lng')) {
-      context.handle(_gpsLngMeta,
-          gpsLng.isAcceptableOrUnknown(data['gps_lng']!, _gpsLngMeta));
+      context.handle(_gpsLngMeta, gpsLng.isAcceptableOrUnknown(data['gps_lng']!, _gpsLngMeta));
     } else if (isInserting) {
       context.missing(_gpsLngMeta);
     }
     if (data.containsKey('handover_ref_no')) {
-      context.handle(
-          _handoverRefNoMeta,
-          handoverRefNo.isAcceptableOrUnknown(
-              data['handover_ref_no']!, _handoverRefNoMeta));
+      context.handle(_handoverRefNoMeta,
+          handoverRefNo.isAcceptableOrUnknown(data['handover_ref_no']!, _handoverRefNoMeta));
     } else if (isInserting) {
       context.missing(_handoverRefNoMeta);
     }
     if (data.containsKey('qr_payload')) {
-      context.handle(_qrPayloadMeta,
-          qrPayload.isAcceptableOrUnknown(data['qr_payload']!, _qrPayloadMeta));
+      context.handle(
+          _qrPayloadMeta, qrPayload.isAcceptableOrUnknown(data['qr_payload']!, _qrPayloadMeta));
     } else if (isInserting) {
       context.missing(_qrPayloadMeta);
     }
@@ -3324,16 +3072,12 @@ class $LocalTraceabilityTable extends LocalTraceability
               data['recycler_confirmation']!, _recyclerConfirmationMeta));
     }
     if (data.containsKey('confirmed_at')) {
-      context.handle(
-          _confirmedAtMeta,
-          confirmedAt.isAcceptableOrUnknown(
-              data['confirmed_at']!, _confirmedAtMeta));
+      context.handle(_confirmedAtMeta,
+          confirmedAt.isAcceptableOrUnknown(data['confirmed_at']!, _confirmedAtMeta));
     }
     if (data.containsKey('confirmed_by')) {
-      context.handle(
-          _confirmedByMeta,
-          confirmedBy.isAcceptableOrUnknown(
-              data['confirmed_by']!, _confirmedByMeta));
+      context.handle(_confirmedByMeta,
+          confirmedBy.isAcceptableOrUnknown(data['confirmed_by']!, _confirmedByMeta));
     }
     if (data.containsKey('downstream_status')) {
       context.handle(
@@ -3343,25 +3087,23 @@ class $LocalTraceabilityTable extends LocalTraceability
     }
     if (data.containsKey('record_hash')) {
       context.handle(
-          _recordHashMeta,
-          recordHash.isAcceptableOrUnknown(
-              data['record_hash']!, _recordHashMeta));
+          _recordHashMeta, recordHash.isAcceptableOrUnknown(data['record_hash']!, _recordHashMeta));
     } else if (isInserting) {
       context.missing(_recordHashMeta);
     }
     if (data.containsKey('prev_hash')) {
-      context.handle(_prevHashMeta,
-          prevHash.isAcceptableOrUnknown(data['prev_hash']!, _prevHashMeta));
+      context.handle(
+          _prevHashMeta, prevHash.isAcceptableOrUnknown(data['prev_hash']!, _prevHashMeta));
     } else if (isInserting) {
       context.missing(_prevHashMeta);
     }
     if (data.containsKey('is_synced')) {
-      context.handle(_isSyncedMeta,
-          isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
+      context.handle(
+          _isSyncedMeta, isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+          _createdAtMeta, createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
@@ -3374,12 +3116,11 @@ class $LocalTraceabilityTable extends LocalTraceability
   LocalTraceabilityData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalTraceabilityData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      lotId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}lot_id'])!,
-      photoHashesJson: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}photo_hashes_json'])!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      lotId:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}lot_id'])!,
+      photoHashesJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}photo_hashes_json'])!,
       weightKg: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}weight_kg'])!,
       timestamp: attachedDatabase.typeMapping
@@ -3388,18 +3129,18 @@ class $LocalTraceabilityTable extends LocalTraceability
           .read(DriftSqlType.double, data['${effectivePrefix}gps_lat'])!,
       gpsLng: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}gps_lng'])!,
-      handoverRefNo: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}handover_ref_no'])!,
+      handoverRefNo: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}handover_ref_no'])!,
       qrPayload: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}qr_payload'])!,
-      recyclerConfirmation: attachedDatabase.typeMapping.read(
-          DriftSqlType.bool, data['${effectivePrefix}recycler_confirmation'])!,
+      recyclerConfirmation: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}recycler_confirmation'])!,
       confirmedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}confirmed_at']),
       confirmedBy: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}confirmed_by']),
-      downstreamStatus: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}downstream_status'])!,
+      downstreamStatus: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}downstream_status'])!,
       recordHash: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}record_hash'])!,
       prevHash: attachedDatabase.typeMapping
@@ -3417,8 +3158,7 @@ class $LocalTraceabilityTable extends LocalTraceability
   }
 }
 
-class LocalTraceabilityData extends DataClass
-    implements Insertable<LocalTraceabilityData> {
+class LocalTraceabilityData extends DataClass implements Insertable<LocalTraceabilityData> {
   final String id;
   final String lotId;
   final String photoHashesJson;
@@ -3493,12 +3233,8 @@ class LocalTraceabilityData extends DataClass
       handoverRefNo: Value(handoverRefNo),
       qrPayload: Value(qrPayload),
       recyclerConfirmation: Value(recyclerConfirmation),
-      confirmedAt: confirmedAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(confirmedAt),
-      confirmedBy: confirmedBy == null && nullToAbsent
-          ? const Value.absent()
-          : Value(confirmedBy),
+      confirmedAt: confirmedAt == null && nullToAbsent ? const Value.absent() : Value(confirmedAt),
+      confirmedBy: confirmedBy == null && nullToAbsent ? const Value.absent() : Value(confirmedBy),
       downstreamStatus: Value(downstreamStatus),
       recordHash: Value(recordHash),
       prevHash: Value(prevHash),
@@ -3507,8 +3243,7 @@ class LocalTraceabilityData extends DataClass
     );
   }
 
-  factory LocalTraceabilityData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory LocalTraceabilityData.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalTraceabilityData(
       id: serializer.fromJson<String>(json['id']),
@@ -3520,8 +3255,7 @@ class LocalTraceabilityData extends DataClass
       gpsLng: serializer.fromJson<double>(json['gpsLng']),
       handoverRefNo: serializer.fromJson<String>(json['handoverRefNo']),
       qrPayload: serializer.fromJson<String>(json['qrPayload']),
-      recyclerConfirmation:
-          serializer.fromJson<bool>(json['recyclerConfirmation']),
+      recyclerConfirmation: serializer.fromJson<bool>(json['recyclerConfirmation']),
       confirmedAt: serializer.fromJson<DateTime?>(json['confirmedAt']),
       confirmedBy: serializer.fromJson<String?>(json['confirmedBy']),
       downstreamStatus: serializer.fromJson<String>(json['downstreamStatus']),
@@ -3596,29 +3330,22 @@ class LocalTraceabilityData extends DataClass
     return LocalTraceabilityData(
       id: data.id.present ? data.id.value : this.id,
       lotId: data.lotId.present ? data.lotId.value : this.lotId,
-      photoHashesJson: data.photoHashesJson.present
-          ? data.photoHashesJson.value
-          : this.photoHashesJson,
+      photoHashesJson:
+          data.photoHashesJson.present ? data.photoHashesJson.value : this.photoHashesJson,
       weightKg: data.weightKg.present ? data.weightKg.value : this.weightKg,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
       gpsLat: data.gpsLat.present ? data.gpsLat.value : this.gpsLat,
       gpsLng: data.gpsLng.present ? data.gpsLng.value : this.gpsLng,
-      handoverRefNo: data.handoverRefNo.present
-          ? data.handoverRefNo.value
-          : this.handoverRefNo,
+      handoverRefNo: data.handoverRefNo.present ? data.handoverRefNo.value : this.handoverRefNo,
       qrPayload: data.qrPayload.present ? data.qrPayload.value : this.qrPayload,
       recyclerConfirmation: data.recyclerConfirmation.present
           ? data.recyclerConfirmation.value
           : this.recyclerConfirmation,
-      confirmedAt:
-          data.confirmedAt.present ? data.confirmedAt.value : this.confirmedAt,
-      confirmedBy:
-          data.confirmedBy.present ? data.confirmedBy.value : this.confirmedBy,
-      downstreamStatus: data.downstreamStatus.present
-          ? data.downstreamStatus.value
-          : this.downstreamStatus,
-      recordHash:
-          data.recordHash.present ? data.recordHash.value : this.recordHash,
+      confirmedAt: data.confirmedAt.present ? data.confirmedAt.value : this.confirmedAt,
+      confirmedBy: data.confirmedBy.present ? data.confirmedBy.value : this.confirmedBy,
+      downstreamStatus:
+          data.downstreamStatus.present ? data.downstreamStatus.value : this.downstreamStatus,
+      recordHash: data.recordHash.present ? data.recordHash.value : this.recordHash,
       prevHash: data.prevHash.present ? data.prevHash.value : this.prevHash,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -3691,8 +3418,7 @@ class LocalTraceabilityData extends DataClass
           other.createdAt == this.createdAt);
 }
 
-class LocalTraceabilityCompanion
-    extends UpdateCompanion<LocalTraceabilityData> {
+class LocalTraceabilityCompanion extends UpdateCompanion<LocalTraceabilityData> {
   final Value<String> id;
   final Value<String> lotId;
   final Value<String> photoHashesJson;
@@ -3792,8 +3518,7 @@ class LocalTraceabilityCompanion
       if (gpsLng != null) 'gps_lng': gpsLng,
       if (handoverRefNo != null) 'handover_ref_no': handoverRefNo,
       if (qrPayload != null) 'qr_payload': qrPayload,
-      if (recyclerConfirmation != null)
-        'recycler_confirmation': recyclerConfirmation,
+      if (recyclerConfirmation != null) 'recycler_confirmation': recyclerConfirmation,
       if (confirmedAt != null) 'confirmed_at': confirmedAt,
       if (confirmedBy != null) 'confirmed_by': confirmedBy,
       if (downstreamStatus != null) 'downstream_status': downstreamStatus,
@@ -3938,8 +3663,7 @@ class $CollectorProfileTable extends CollectorProfile
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $CollectorProfileTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _collectorIdMeta =
-      const VerificationMeta('collectorId');
+  static const VerificationMeta _collectorIdMeta = const VerificationMeta('collectorId');
   @override
   late final GeneratedColumn<String> collectorId = GeneratedColumn<String>(
       'collector_id', aliasedName, false,
@@ -3947,25 +3671,20 @@ class $CollectorProfileTable extends CollectorProfile
   static const VerificationMeta _preferredLanguageMeta =
       const VerificationMeta('preferredLanguage');
   @override
-  late final GeneratedColumn<String> preferredLanguage =
-      GeneratedColumn<String>('preferred_language', aliasedName, false,
-          type: DriftSqlType.string,
-          requiredDuringInsert: false,
-          defaultValue: const Constant('mr'));
-  static const VerificationMeta _operatingAreaMeta =
-      const VerificationMeta('operatingArea');
+  late final GeneratedColumn<String> preferredLanguage = GeneratedColumn<String>(
+      'preferred_language', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: false, defaultValue: const Constant('mr'));
+  static const VerificationMeta _operatingAreaMeta = const VerificationMeta('operatingArea');
   @override
   late final GeneratedColumn<String> operatingArea = GeneratedColumn<String>(
       'operating_area', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _quickPinHashMeta =
-      const VerificationMeta('quickPinHash');
+  static const VerificationMeta _quickPinHashMeta = const VerificationMeta('quickPinHash');
   @override
   late final GeneratedColumn<String> quickPinHash = GeneratedColumn<String>(
       'quick_pin_hash', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
@@ -3979,16 +3698,13 @@ class $CollectorProfileTable extends CollectorProfile
   String get actualTableName => $name;
   static const String $name = 'collector_profile';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<CollectorProfileData> instance,
+  VerificationContext validateIntegrity(Insertable<CollectorProfileData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('collector_id')) {
-      context.handle(
-          _collectorIdMeta,
-          collectorId.isAcceptableOrUnknown(
-              data['collector_id']!, _collectorIdMeta));
+      context.handle(_collectorIdMeta,
+          collectorId.isAcceptableOrUnknown(data['collector_id']!, _collectorIdMeta));
     } else if (isInserting) {
       context.missing(_collectorIdMeta);
     }
@@ -3999,22 +3715,18 @@ class $CollectorProfileTable extends CollectorProfile
               data['preferred_language']!, _preferredLanguageMeta));
     }
     if (data.containsKey('operating_area')) {
-      context.handle(
-          _operatingAreaMeta,
-          operatingArea.isAcceptableOrUnknown(
-              data['operating_area']!, _operatingAreaMeta));
+      context.handle(_operatingAreaMeta,
+          operatingArea.isAcceptableOrUnknown(data['operating_area']!, _operatingAreaMeta));
     } else if (isInserting) {
       context.missing(_operatingAreaMeta);
     }
     if (data.containsKey('quick_pin_hash')) {
-      context.handle(
-          _quickPinHashMeta,
-          quickPinHash.isAcceptableOrUnknown(
-              data['quick_pin_hash']!, _quickPinHashMeta));
+      context.handle(_quickPinHashMeta,
+          quickPinHash.isAcceptableOrUnknown(data['quick_pin_hash']!, _quickPinHashMeta));
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+          _createdAtMeta, createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
@@ -4029,8 +3741,8 @@ class $CollectorProfileTable extends CollectorProfile
     return CollectorProfileData(
       collectorId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}collector_id'])!,
-      preferredLanguage: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}preferred_language'])!,
+      preferredLanguage: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}preferred_language'])!,
       operatingArea: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}operating_area'])!,
       quickPinHash: attachedDatabase.typeMapping
@@ -4046,8 +3758,7 @@ class $CollectorProfileTable extends CollectorProfile
   }
 }
 
-class CollectorProfileData extends DataClass
-    implements Insertable<CollectorProfileData> {
+class CollectorProfileData extends DataClass implements Insertable<CollectorProfileData> {
   final String collectorId;
   final String preferredLanguage;
   final String operatingArea;
@@ -4077,15 +3788,13 @@ class CollectorProfileData extends DataClass
       collectorId: Value(collectorId),
       preferredLanguage: Value(preferredLanguage),
       operatingArea: Value(operatingArea),
-      quickPinHash: quickPinHash == null && nullToAbsent
-          ? const Value.absent()
-          : Value(quickPinHash),
+      quickPinHash:
+          quickPinHash == null && nullToAbsent ? const Value.absent() : Value(quickPinHash),
       createdAt: Value(createdAt),
     );
   }
 
-  factory CollectorProfileData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory CollectorProfileData.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CollectorProfileData(
       collectorId: serializer.fromJson<String>(json['collectorId']),
@@ -4117,23 +3826,16 @@ class CollectorProfileData extends DataClass
         collectorId: collectorId ?? this.collectorId,
         preferredLanguage: preferredLanguage ?? this.preferredLanguage,
         operatingArea: operatingArea ?? this.operatingArea,
-        quickPinHash:
-            quickPinHash.present ? quickPinHash.value : this.quickPinHash,
+        quickPinHash: quickPinHash.present ? quickPinHash.value : this.quickPinHash,
         createdAt: createdAt ?? this.createdAt,
       );
   CollectorProfileData copyWithCompanion(CollectorProfileCompanion data) {
     return CollectorProfileData(
-      collectorId:
-          data.collectorId.present ? data.collectorId.value : this.collectorId,
-      preferredLanguage: data.preferredLanguage.present
-          ? data.preferredLanguage.value
-          : this.preferredLanguage,
-      operatingArea: data.operatingArea.present
-          ? data.operatingArea.value
-          : this.operatingArea,
-      quickPinHash: data.quickPinHash.present
-          ? data.quickPinHash.value
-          : this.quickPinHash,
+      collectorId: data.collectorId.present ? data.collectorId.value : this.collectorId,
+      preferredLanguage:
+          data.preferredLanguage.present ? data.preferredLanguage.value : this.preferredLanguage,
+      operatingArea: data.operatingArea.present ? data.operatingArea.value : this.operatingArea,
+      quickPinHash: data.quickPinHash.present ? data.quickPinHash.value : this.quickPinHash,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -4151,8 +3853,8 @@ class CollectorProfileData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(
-      collectorId, preferredLanguage, operatingArea, quickPinHash, createdAt);
+  int get hashCode =>
+      Object.hash(collectorId, preferredLanguage, operatingArea, quickPinHash, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4262,74 +3964,61 @@ class CollectorProfileCompanion extends UpdateCompanion<CollectorProfileData> {
   }
 }
 
-class $LocalLedgerTable extends LocalLedger
-    with TableInfo<$LocalLedgerTable, LocalLedgerData> {
+class $LocalLedgerTable extends LocalLedger with TableInfo<$LocalLedgerTable, LocalLedgerData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $LocalLedgerTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _collectorIdMeta =
-      const VerificationMeta('collectorId');
+  static const VerificationMeta _collectorIdMeta = const VerificationMeta('collectorId');
   @override
   late final GeneratedColumn<String> collectorId = GeneratedColumn<String>(
       'collector_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _lotIdMeta = const VerificationMeta('lotId');
   @override
-  late final GeneratedColumn<String> lotId = GeneratedColumn<String>(
-      'lot_id', aliasedName, true,
+  late final GeneratedColumn<String> lotId = GeneratedColumn<String>('lot_id', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _entryTypeMeta =
-      const VerificationMeta('entryType');
+  static const VerificationMeta _entryTypeMeta = const VerificationMeta('entryType');
   @override
   late final GeneratedColumn<String> entryType = GeneratedColumn<String>(
       'entry_type', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _amountMeta = const VerificationMeta('amount');
   @override
-  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
-      'amount', aliasedName, false,
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>('amount', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _paymentModeMeta =
-      const VerificationMeta('paymentMode');
+  static const VerificationMeta _paymentModeMeta = const VerificationMeta('paymentMode');
   @override
   late final GeneratedColumn<String> paymentMode = GeneratedColumn<String>(
       'payment_mode', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('cash_received'));
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
+  static const VerificationMeta _descriptionMeta = const VerificationMeta('description');
   @override
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _balanceAfterMeta =
-      const VerificationMeta('balanceAfter');
+  static const VerificationMeta _balanceAfterMeta = const VerificationMeta('balanceAfter');
   @override
   late final GeneratedColumn<double> balanceAfter = GeneratedColumn<double>(
       'balance_after', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _recordedAtMeta =
-      const VerificationMeta('recordedAt');
+  static const VerificationMeta _recordedAtMeta = const VerificationMeta('recordedAt');
   @override
   late final GeneratedColumn<DateTime> recordedAt = GeneratedColumn<DateTime>(
       'recorded_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _isSyncedMeta =
-      const VerificationMeta('isSynced');
+  static const VerificationMeta _isSyncedMeta = const VerificationMeta('isSynced');
   @override
-  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
-      'is_synced', aliasedName, false,
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>('is_synced', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
+      defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
       defaultValue: const Constant(false));
   @override
   List<GeneratedColumn> get $columns => [
@@ -4360,62 +4049,50 @@ class $LocalLedgerTable extends LocalLedger
       context.missing(_idMeta);
     }
     if (data.containsKey('collector_id')) {
-      context.handle(
-          _collectorIdMeta,
-          collectorId.isAcceptableOrUnknown(
-              data['collector_id']!, _collectorIdMeta));
+      context.handle(_collectorIdMeta,
+          collectorId.isAcceptableOrUnknown(data['collector_id']!, _collectorIdMeta));
     } else if (isInserting) {
       context.missing(_collectorIdMeta);
     }
     if (data.containsKey('lot_id')) {
-      context.handle(
-          _lotIdMeta, lotId.isAcceptableOrUnknown(data['lot_id']!, _lotIdMeta));
+      context.handle(_lotIdMeta, lotId.isAcceptableOrUnknown(data['lot_id']!, _lotIdMeta));
     }
     if (data.containsKey('entry_type')) {
-      context.handle(_entryTypeMeta,
-          entryType.isAcceptableOrUnknown(data['entry_type']!, _entryTypeMeta));
+      context.handle(
+          _entryTypeMeta, entryType.isAcceptableOrUnknown(data['entry_type']!, _entryTypeMeta));
     } else if (isInserting) {
       context.missing(_entryTypeMeta);
     }
     if (data.containsKey('amount')) {
-      context.handle(_amountMeta,
-          amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
+      context.handle(_amountMeta, amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
     } else if (isInserting) {
       context.missing(_amountMeta);
     }
     if (data.containsKey('payment_mode')) {
-      context.handle(
-          _paymentModeMeta,
-          paymentMode.isAcceptableOrUnknown(
-              data['payment_mode']!, _paymentModeMeta));
+      context.handle(_paymentModeMeta,
+          paymentMode.isAcceptableOrUnknown(data['payment_mode']!, _paymentModeMeta));
     }
     if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
+      context.handle(_descriptionMeta,
+          description.isAcceptableOrUnknown(data['description']!, _descriptionMeta));
     } else if (isInserting) {
       context.missing(_descriptionMeta);
     }
     if (data.containsKey('balance_after')) {
-      context.handle(
-          _balanceAfterMeta,
-          balanceAfter.isAcceptableOrUnknown(
-              data['balance_after']!, _balanceAfterMeta));
+      context.handle(_balanceAfterMeta,
+          balanceAfter.isAcceptableOrUnknown(data['balance_after']!, _balanceAfterMeta));
     } else if (isInserting) {
       context.missing(_balanceAfterMeta);
     }
     if (data.containsKey('recorded_at')) {
       context.handle(
-          _recordedAtMeta,
-          recordedAt.isAcceptableOrUnknown(
-              data['recorded_at']!, _recordedAtMeta));
+          _recordedAtMeta, recordedAt.isAcceptableOrUnknown(data['recorded_at']!, _recordedAtMeta));
     } else if (isInserting) {
       context.missing(_recordedAtMeta);
     }
     if (data.containsKey('is_synced')) {
-      context.handle(_isSyncedMeta,
-          isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
+      context.handle(
+          _isSyncedMeta, isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
     }
     return context;
   }
@@ -4426,16 +4103,15 @@ class $LocalLedgerTable extends LocalLedger
   LocalLedgerData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalLedgerData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       collectorId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}collector_id'])!,
-      lotId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}lot_id']),
+      lotId:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}lot_id']),
       entryType: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}entry_type'])!,
-      amount: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}amount'])!,
+      amount:
+          attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}amount'])!,
       paymentMode: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}payment_mode'])!,
       description: attachedDatabase.typeMapping
@@ -4499,8 +4175,7 @@ class LocalLedgerData extends DataClass implements Insertable<LocalLedgerData> {
     return LocalLedgerCompanion(
       id: Value(id),
       collectorId: Value(collectorId),
-      lotId:
-          lotId == null && nullToAbsent ? const Value.absent() : Value(lotId),
+      lotId: lotId == null && nullToAbsent ? const Value.absent() : Value(lotId),
       entryType: Value(entryType),
       amount: Value(amount),
       paymentMode: Value(paymentMode),
@@ -4511,8 +4186,7 @@ class LocalLedgerData extends DataClass implements Insertable<LocalLedgerData> {
     );
   }
 
-  factory LocalLedgerData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory LocalLedgerData.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalLedgerData(
       id: serializer.fromJson<String>(json['id']),
@@ -4570,20 +4244,14 @@ class LocalLedgerData extends DataClass implements Insertable<LocalLedgerData> {
   LocalLedgerData copyWithCompanion(LocalLedgerCompanion data) {
     return LocalLedgerData(
       id: data.id.present ? data.id.value : this.id,
-      collectorId:
-          data.collectorId.present ? data.collectorId.value : this.collectorId,
+      collectorId: data.collectorId.present ? data.collectorId.value : this.collectorId,
       lotId: data.lotId.present ? data.lotId.value : this.lotId,
       entryType: data.entryType.present ? data.entryType.value : this.entryType,
       amount: data.amount.present ? data.amount.value : this.amount,
-      paymentMode:
-          data.paymentMode.present ? data.paymentMode.value : this.paymentMode,
-      description:
-          data.description.present ? data.description.value : this.description,
-      balanceAfter: data.balanceAfter.present
-          ? data.balanceAfter.value
-          : this.balanceAfter,
-      recordedAt:
-          data.recordedAt.present ? data.recordedAt.value : this.recordedAt,
+      paymentMode: data.paymentMode.present ? data.paymentMode.value : this.paymentMode,
+      description: data.description.present ? data.description.value : this.description,
+      balanceAfter: data.balanceAfter.present ? data.balanceAfter.value : this.balanceAfter,
+      recordedAt: data.recordedAt.present ? data.recordedAt.value : this.recordedAt,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
     );
   }
@@ -4606,8 +4274,8 @@ class LocalLedgerData extends DataClass implements Insertable<LocalLedgerData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, collectorId, lotId, entryType, amount,
-      paymentMode, description, balanceAfter, recordedAt, isSynced);
+  int get hashCode => Object.hash(id, collectorId, lotId, entryType, amount, paymentMode,
+      description, balanceAfter, recordedAt, isSynced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4789,37 +4457,30 @@ class $CachedSafetyContentTable extends CachedSafetyContent
   $CachedSafetyContentTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _categoryMeta =
-      const VerificationMeta('category');
+  static const VerificationMeta _categoryMeta = const VerificationMeta('category');
   @override
   late final GeneratedColumn<String> category = GeneratedColumn<String>(
       'category', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _hazardLevelMeta =
-      const VerificationMeta('hazardLevel');
+  static const VerificationMeta _hazardLevelMeta = const VerificationMeta('hazardLevel');
   @override
   late final GeneratedColumn<String> hazardLevel = GeneratedColumn<String>(
       'hazard_level', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      defaultValue: const Constant('info'));
+      type: DriftSqlType.string, requiredDuringInsert: false, defaultValue: const Constant('info'));
   static const VerificationMeta _pictogramAssetPathMeta =
       const VerificationMeta('pictogramAssetPath');
   @override
-  late final GeneratedColumn<String> pictogramAssetPath =
-      GeneratedColumn<String>('pictogram_asset_path', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _audioAssetPathMeta =
-      const VerificationMeta('audioAssetPath');
+  late final GeneratedColumn<String> pictogramAssetPath = GeneratedColumn<String>(
+      'pictogram_asset_path', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _audioAssetPathMeta = const VerificationMeta('audioAssetPath');
   @override
   late final GeneratedColumn<String> audioAssetPath = GeneratedColumn<String>(
       'audio_asset_path', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _titleVernacularMeta =
-      const VerificationMeta('titleVernacular');
+  static const VerificationMeta _titleVernacularMeta = const VerificationMeta('titleVernacular');
   @override
   late final GeneratedColumn<String> titleVernacular = GeneratedColumn<String>(
       'title_vernacular', aliasedName, false,
@@ -4827,23 +4488,20 @@ class $CachedSafetyContentTable extends CachedSafetyContent
   static const VerificationMeta _instructionsVernacularMeta =
       const VerificationMeta('instructionsVernacular');
   @override
-  late final GeneratedColumn<String> instructionsVernacular =
-      GeneratedColumn<String>('instructions_vernacular', aliasedName, false,
-          type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _dosJsonMeta =
-      const VerificationMeta('dosJson');
+  late final GeneratedColumn<String> instructionsVernacular = GeneratedColumn<String>(
+      'instructions_vernacular', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dosJsonMeta = const VerificationMeta('dosJson');
   @override
   late final GeneratedColumn<String> dosJson = GeneratedColumn<String>(
       'dos_json', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _dontsJsonMeta =
-      const VerificationMeta('dontsJson');
+  static const VerificationMeta _dontsJsonMeta = const VerificationMeta('dontsJson');
   @override
   late final GeneratedColumn<String> dontsJson = GeneratedColumn<String>(
       'donts_json', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _cachedAtMeta =
-      const VerificationMeta('cachedAt');
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta('cachedAt');
   @override
   late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
       'cached_at', aliasedName, false,
@@ -4867,8 +4525,7 @@ class $CachedSafetyContentTable extends CachedSafetyContent
   String get actualTableName => $name;
   static const String $name = 'cached_safety_content';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<CachedSafetyContentData> instance,
+  VerificationContext validateIntegrity(Insertable<CachedSafetyContentData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -4878,16 +4535,14 @@ class $CachedSafetyContentTable extends CachedSafetyContent
       context.missing(_idMeta);
     }
     if (data.containsKey('category')) {
-      context.handle(_categoryMeta,
-          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+      context.handle(
+          _categoryMeta, category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
     } else if (isInserting) {
       context.missing(_categoryMeta);
     }
     if (data.containsKey('hazard_level')) {
-      context.handle(
-          _hazardLevelMeta,
-          hazardLevel.isAcceptableOrUnknown(
-              data['hazard_level']!, _hazardLevelMeta));
+      context.handle(_hazardLevelMeta,
+          hazardLevel.isAcceptableOrUnknown(data['hazard_level']!, _hazardLevelMeta));
     }
     if (data.containsKey('pictogram_asset_path')) {
       context.handle(
@@ -4898,18 +4553,14 @@ class $CachedSafetyContentTable extends CachedSafetyContent
       context.missing(_pictogramAssetPathMeta);
     }
     if (data.containsKey('audio_asset_path')) {
-      context.handle(
-          _audioAssetPathMeta,
-          audioAssetPath.isAcceptableOrUnknown(
-              data['audio_asset_path']!, _audioAssetPathMeta));
+      context.handle(_audioAssetPathMeta,
+          audioAssetPath.isAcceptableOrUnknown(data['audio_asset_path']!, _audioAssetPathMeta));
     } else if (isInserting) {
       context.missing(_audioAssetPathMeta);
     }
     if (data.containsKey('title_vernacular')) {
-      context.handle(
-          _titleVernacularMeta,
-          titleVernacular.isAcceptableOrUnknown(
-              data['title_vernacular']!, _titleVernacularMeta));
+      context.handle(_titleVernacularMeta,
+          titleVernacular.isAcceptableOrUnknown(data['title_vernacular']!, _titleVernacularMeta));
     } else if (isInserting) {
       context.missing(_titleVernacularMeta);
     }
@@ -4922,20 +4573,19 @@ class $CachedSafetyContentTable extends CachedSafetyContent
       context.missing(_instructionsVernacularMeta);
     }
     if (data.containsKey('dos_json')) {
-      context.handle(_dosJsonMeta,
-          dosJson.isAcceptableOrUnknown(data['dos_json']!, _dosJsonMeta));
+      context.handle(_dosJsonMeta, dosJson.isAcceptableOrUnknown(data['dos_json']!, _dosJsonMeta));
     } else if (isInserting) {
       context.missing(_dosJsonMeta);
     }
     if (data.containsKey('donts_json')) {
-      context.handle(_dontsJsonMeta,
-          dontsJson.isAcceptableOrUnknown(data['donts_json']!, _dontsJsonMeta));
+      context.handle(
+          _dontsJsonMeta, dontsJson.isAcceptableOrUnknown(data['donts_json']!, _dontsJsonMeta));
     } else if (isInserting) {
       context.missing(_dontsJsonMeta);
     }
     if (data.containsKey('cached_at')) {
-      context.handle(_cachedAtMeta,
-          cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta));
+      context.handle(
+          _cachedAtMeta, cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta));
     } else if (isInserting) {
       context.missing(_cachedAtMeta);
     }
@@ -4945,25 +4595,22 @@ class $CachedSafetyContentTable extends CachedSafetyContent
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  CachedSafetyContentData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  CachedSafetyContentData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CachedSafetyContentData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       category: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
       hazardLevel: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}hazard_level'])!,
-      pictogramAssetPath: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}pictogram_asset_path'])!,
-      audioAssetPath: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}audio_asset_path'])!,
-      titleVernacular: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}title_vernacular'])!,
-      instructionsVernacular: attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}instructions_vernacular'])!,
+      pictogramAssetPath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}pictogram_asset_path'])!,
+      audioAssetPath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}audio_asset_path'])!,
+      titleVernacular: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title_vernacular'])!,
+      instructionsVernacular: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}instructions_vernacular'])!,
       dosJson: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}dos_json'])!,
       dontsJson: attachedDatabase.typeMapping
@@ -4979,8 +4626,7 @@ class $CachedSafetyContentTable extends CachedSafetyContent
   }
 }
 
-class CachedSafetyContentData extends DataClass
-    implements Insertable<CachedSafetyContentData> {
+class CachedSafetyContentData extends DataClass implements Insertable<CachedSafetyContentData> {
   final String id;
   final String category;
   final String hazardLevel;
@@ -5040,12 +4686,10 @@ class CachedSafetyContentData extends DataClass
       id: serializer.fromJson<String>(json['id']),
       category: serializer.fromJson<String>(json['category']),
       hazardLevel: serializer.fromJson<String>(json['hazardLevel']),
-      pictogramAssetPath:
-          serializer.fromJson<String>(json['pictogramAssetPath']),
+      pictogramAssetPath: serializer.fromJson<String>(json['pictogramAssetPath']),
       audioAssetPath: serializer.fromJson<String>(json['audioAssetPath']),
       titleVernacular: serializer.fromJson<String>(json['titleVernacular']),
-      instructionsVernacular:
-          serializer.fromJson<String>(json['instructionsVernacular']),
+      instructionsVernacular: serializer.fromJson<String>(json['instructionsVernacular']),
       dosJson: serializer.fromJson<String>(json['dosJson']),
       dontsJson: serializer.fromJson<String>(json['dontsJson']),
       cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
@@ -5061,8 +4705,7 @@ class CachedSafetyContentData extends DataClass
       'pictogramAssetPath': serializer.toJson<String>(pictogramAssetPath),
       'audioAssetPath': serializer.toJson<String>(audioAssetPath),
       'titleVernacular': serializer.toJson<String>(titleVernacular),
-      'instructionsVernacular':
-          serializer.toJson<String>(instructionsVernacular),
+      'instructionsVernacular': serializer.toJson<String>(instructionsVernacular),
       'dosJson': serializer.toJson<String>(dosJson),
       'dontsJson': serializer.toJson<String>(dontsJson),
       'cachedAt': serializer.toJson<DateTime>(cachedAt),
@@ -5087,8 +4730,7 @@ class CachedSafetyContentData extends DataClass
         pictogramAssetPath: pictogramAssetPath ?? this.pictogramAssetPath,
         audioAssetPath: audioAssetPath ?? this.audioAssetPath,
         titleVernacular: titleVernacular ?? this.titleVernacular,
-        instructionsVernacular:
-            instructionsVernacular ?? this.instructionsVernacular,
+        instructionsVernacular: instructionsVernacular ?? this.instructionsVernacular,
         dosJson: dosJson ?? this.dosJson,
         dontsJson: dontsJson ?? this.dontsJson,
         cachedAt: cachedAt ?? this.cachedAt,
@@ -5097,17 +4739,12 @@ class CachedSafetyContentData extends DataClass
     return CachedSafetyContentData(
       id: data.id.present ? data.id.value : this.id,
       category: data.category.present ? data.category.value : this.category,
-      hazardLevel:
-          data.hazardLevel.present ? data.hazardLevel.value : this.hazardLevel,
-      pictogramAssetPath: data.pictogramAssetPath.present
-          ? data.pictogramAssetPath.value
-          : this.pictogramAssetPath,
-      audioAssetPath: data.audioAssetPath.present
-          ? data.audioAssetPath.value
-          : this.audioAssetPath,
-      titleVernacular: data.titleVernacular.present
-          ? data.titleVernacular.value
-          : this.titleVernacular,
+      hazardLevel: data.hazardLevel.present ? data.hazardLevel.value : this.hazardLevel,
+      pictogramAssetPath:
+          data.pictogramAssetPath.present ? data.pictogramAssetPath.value : this.pictogramAssetPath,
+      audioAssetPath: data.audioAssetPath.present ? data.audioAssetPath.value : this.audioAssetPath,
+      titleVernacular:
+          data.titleVernacular.present ? data.titleVernacular.value : this.titleVernacular,
       instructionsVernacular: data.instructionsVernacular.present
           ? data.instructionsVernacular.value
           : this.instructionsVernacular,
@@ -5135,17 +4772,8 @@ class CachedSafetyContentData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(
-      id,
-      category,
-      hazardLevel,
-      pictogramAssetPath,
-      audioAssetPath,
-      titleVernacular,
-      instructionsVernacular,
-      dosJson,
-      dontsJson,
-      cachedAt);
+  int get hashCode => Object.hash(id, category, hazardLevel, pictogramAssetPath, audioAssetPath,
+      titleVernacular, instructionsVernacular, dosJson, dontsJson, cachedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5162,8 +4790,7 @@ class CachedSafetyContentData extends DataClass
           other.cachedAt == this.cachedAt);
 }
 
-class CachedSafetyContentCompanion
-    extends UpdateCompanion<CachedSafetyContentData> {
+class CachedSafetyContentCompanion extends UpdateCompanion<CachedSafetyContentData> {
   final Value<String> id;
   final Value<String> category;
   final Value<String> hazardLevel;
@@ -5226,12 +4853,10 @@ class CachedSafetyContentCompanion
       if (id != null) 'id': id,
       if (category != null) 'category': category,
       if (hazardLevel != null) 'hazard_level': hazardLevel,
-      if (pictogramAssetPath != null)
-        'pictogram_asset_path': pictogramAssetPath,
+      if (pictogramAssetPath != null) 'pictogram_asset_path': pictogramAssetPath,
       if (audioAssetPath != null) 'audio_asset_path': audioAssetPath,
       if (titleVernacular != null) 'title_vernacular': titleVernacular,
-      if (instructionsVernacular != null)
-        'instructions_vernacular': instructionsVernacular,
+      if (instructionsVernacular != null) 'instructions_vernacular': instructionsVernacular,
       if (dosJson != null) 'dos_json': dosJson,
       if (dontsJson != null) 'donts_json': dontsJson,
       if (cachedAt != null) 'cached_at': cachedAt,
@@ -5258,8 +4883,7 @@ class CachedSafetyContentCompanion
       pictogramAssetPath: pictogramAssetPath ?? this.pictogramAssetPath,
       audioAssetPath: audioAssetPath ?? this.audioAssetPath,
       titleVernacular: titleVernacular ?? this.titleVernacular,
-      instructionsVernacular:
-          instructionsVernacular ?? this.instructionsVernacular,
+      instructionsVernacular: instructionsVernacular ?? this.instructionsVernacular,
       dosJson: dosJson ?? this.dosJson,
       dontsJson: dontsJson ?? this.dontsJson,
       cachedAt: cachedAt ?? this.cachedAt,
@@ -5289,8 +4913,7 @@ class CachedSafetyContentCompanion
       map['title_vernacular'] = Variable<String>(titleVernacular.value);
     }
     if (instructionsVernacular.present) {
-      map['instructions_vernacular'] =
-          Variable<String>(instructionsVernacular.value);
+      map['instructions_vernacular'] = Variable<String>(instructionsVernacular.value);
     }
     if (dosJson.present) {
       map['dos_json'] = Variable<String>(dosJson.value);
@@ -5332,58 +4955,47 @@ class $SyncQueueEntriesTable extends SyncQueueEntries
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $SyncQueueEntriesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _clientTxIdMeta =
-      const VerificationMeta('clientTxId');
+  static const VerificationMeta _clientTxIdMeta = const VerificationMeta('clientTxId');
   @override
   late final GeneratedColumn<String> clientTxId = GeneratedColumn<String>(
       'client_tx_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _collectorIdMeta =
-      const VerificationMeta('collectorId');
+  static const VerificationMeta _collectorIdMeta = const VerificationMeta('collectorId');
   @override
   late final GeneratedColumn<String> collectorId = GeneratedColumn<String>(
       'collector_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _actionMeta = const VerificationMeta('action');
   @override
-  late final GeneratedColumn<String> action = GeneratedColumn<String>(
-      'action', aliasedName, false,
+  late final GeneratedColumn<String> action = GeneratedColumn<String>('action', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _payloadJsonMeta =
-      const VerificationMeta('payloadJson');
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta('payloadJson');
   @override
   late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
       'payload_json', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  late final GeneratedColumn<String> status = GeneratedColumn<String>(
-      'status', aliasedName, false,
+  late final GeneratedColumn<String> status = GeneratedColumn<String>('status', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('pending'));
-  static const VerificationMeta _retryAttemptsMeta =
-      const VerificationMeta('retryAttempts');
+  static const VerificationMeta _retryAttemptsMeta = const VerificationMeta('retryAttempts');
   @override
   late final GeneratedColumn<int> retryAttempts = GeneratedColumn<int>(
       'retry_attempts', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0));
-  static const VerificationMeta _lastErrorMeta =
-      const VerificationMeta('lastError');
+      type: DriftSqlType.int, requiredDuringInsert: false, defaultValue: const Constant(0));
+  static const VerificationMeta _lastErrorMeta = const VerificationMeta('lastError');
   @override
   late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
       'last_error', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _clientTimestampMeta =
-      const VerificationMeta('clientTimestamp');
+  static const VerificationMeta _clientTimestampMeta = const VerificationMeta('clientTimestamp');
   @override
-  late final GeneratedColumn<DateTime> clientTimestamp =
-      GeneratedColumn<DateTime>('client_timestamp', aliasedName, false,
-          type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  late final GeneratedColumn<DateTime> clientTimestamp = GeneratedColumn<DateTime>(
+      'client_timestamp', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
@@ -5411,60 +5023,48 @@ class $SyncQueueEntriesTable extends SyncQueueEntries
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('client_tx_id')) {
-      context.handle(
-          _clientTxIdMeta,
-          clientTxId.isAcceptableOrUnknown(
-              data['client_tx_id']!, _clientTxIdMeta));
+      context.handle(_clientTxIdMeta,
+          clientTxId.isAcceptableOrUnknown(data['client_tx_id']!, _clientTxIdMeta));
     } else if (isInserting) {
       context.missing(_clientTxIdMeta);
     }
     if (data.containsKey('collector_id')) {
-      context.handle(
-          _collectorIdMeta,
-          collectorId.isAcceptableOrUnknown(
-              data['collector_id']!, _collectorIdMeta));
+      context.handle(_collectorIdMeta,
+          collectorId.isAcceptableOrUnknown(data['collector_id']!, _collectorIdMeta));
     } else if (isInserting) {
       context.missing(_collectorIdMeta);
     }
     if (data.containsKey('action')) {
-      context.handle(_actionMeta,
-          action.isAcceptableOrUnknown(data['action']!, _actionMeta));
+      context.handle(_actionMeta, action.isAcceptableOrUnknown(data['action']!, _actionMeta));
     } else if (isInserting) {
       context.missing(_actionMeta);
     }
     if (data.containsKey('payload_json')) {
-      context.handle(
-          _payloadJsonMeta,
-          payloadJson.isAcceptableOrUnknown(
-              data['payload_json']!, _payloadJsonMeta));
+      context.handle(_payloadJsonMeta,
+          payloadJson.isAcceptableOrUnknown(data['payload_json']!, _payloadJsonMeta));
     } else if (isInserting) {
       context.missing(_payloadJsonMeta);
     }
     if (data.containsKey('status')) {
-      context.handle(_statusMeta,
-          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+      context.handle(_statusMeta, status.isAcceptableOrUnknown(data['status']!, _statusMeta));
     }
     if (data.containsKey('retry_attempts')) {
-      context.handle(
-          _retryAttemptsMeta,
-          retryAttempts.isAcceptableOrUnknown(
-              data['retry_attempts']!, _retryAttemptsMeta));
+      context.handle(_retryAttemptsMeta,
+          retryAttempts.isAcceptableOrUnknown(data['retry_attempts']!, _retryAttemptsMeta));
     }
     if (data.containsKey('last_error')) {
-      context.handle(_lastErrorMeta,
-          lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta));
+      context.handle(
+          _lastErrorMeta, lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta));
     }
     if (data.containsKey('client_timestamp')) {
-      context.handle(
-          _clientTimestampMeta,
-          clientTimestamp.isAcceptableOrUnknown(
-              data['client_timestamp']!, _clientTimestampMeta));
+      context.handle(_clientTimestampMeta,
+          clientTimestamp.isAcceptableOrUnknown(data['client_timestamp']!, _clientTimestampMeta));
     } else if (isInserting) {
       context.missing(_clientTimestampMeta);
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+          _createdAtMeta, createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
@@ -5481,18 +5081,18 @@ class $SyncQueueEntriesTable extends SyncQueueEntries
           .read(DriftSqlType.string, data['${effectivePrefix}client_tx_id'])!,
       collectorId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}collector_id'])!,
-      action: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}action'])!,
+      action:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}action'])!,
       payloadJson: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}payload_json'])!,
-      status: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      status:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}status'])!,
       retryAttempts: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}retry_attempts'])!,
       lastError: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}last_error']),
-      clientTimestamp: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}client_timestamp'])!,
+      clientTimestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}client_timestamp'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -5549,16 +5149,13 @@ class SyncQueueEntry extends DataClass implements Insertable<SyncQueueEntry> {
       payloadJson: Value(payloadJson),
       status: Value(status),
       retryAttempts: Value(retryAttempts),
-      lastError: lastError == null && nullToAbsent
-          ? const Value.absent()
-          : Value(lastError),
+      lastError: lastError == null && nullToAbsent ? const Value.absent() : Value(lastError),
       clientTimestamp: Value(clientTimestamp),
       createdAt: Value(createdAt),
     );
   }
 
-  factory SyncQueueEntry.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory SyncQueueEntry.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SyncQueueEntry(
       clientTxId: serializer.fromJson<String>(json['clientTxId']),
@@ -5611,21 +5208,15 @@ class SyncQueueEntry extends DataClass implements Insertable<SyncQueueEntry> {
       );
   SyncQueueEntry copyWithCompanion(SyncQueueEntriesCompanion data) {
     return SyncQueueEntry(
-      clientTxId:
-          data.clientTxId.present ? data.clientTxId.value : this.clientTxId,
-      collectorId:
-          data.collectorId.present ? data.collectorId.value : this.collectorId,
+      clientTxId: data.clientTxId.present ? data.clientTxId.value : this.clientTxId,
+      collectorId: data.collectorId.present ? data.collectorId.value : this.collectorId,
       action: data.action.present ? data.action.value : this.action,
-      payloadJson:
-          data.payloadJson.present ? data.payloadJson.value : this.payloadJson,
+      payloadJson: data.payloadJson.present ? data.payloadJson.value : this.payloadJson,
       status: data.status.present ? data.status.value : this.status,
-      retryAttempts: data.retryAttempts.present
-          ? data.retryAttempts.value
-          : this.retryAttempts,
+      retryAttempts: data.retryAttempts.present ? data.retryAttempts.value : this.retryAttempts,
       lastError: data.lastError.present ? data.lastError.value : this.lastError,
-      clientTimestamp: data.clientTimestamp.present
-          ? data.clientTimestamp.value
-          : this.clientTimestamp,
+      clientTimestamp:
+          data.clientTimestamp.present ? data.clientTimestamp.value : this.clientTimestamp,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -5647,8 +5238,8 @@ class SyncQueueEntry extends DataClass implements Insertable<SyncQueueEntry> {
   }
 
   @override
-  int get hashCode => Object.hash(clientTxId, collectorId, action, payloadJson,
-      status, retryAttempts, lastError, clientTimestamp, createdAt);
+  int get hashCode => Object.hash(clientTxId, collectorId, action, payloadJson, status,
+      retryAttempts, lastError, clientTimestamp, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5817,70 +5408,56 @@ class $LocalMLSamplesTable extends LocalMLSamples
   $LocalMLSamplesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<String> id = GeneratedColumn<String>('id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _localImagePathMeta =
-      const VerificationMeta('localImagePath');
+  static const VerificationMeta _localImagePathMeta = const VerificationMeta('localImagePath');
   @override
   late final GeneratedColumn<String> localImagePath = GeneratedColumn<String>(
       'local_image_path', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _labelMeta = const VerificationMeta('label');
   @override
-  late final GeneratedColumn<String> label = GeneratedColumn<String>(
-      'label', aliasedName, false,
+  late final GeneratedColumn<String> label = GeneratedColumn<String>('label', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _weightKgMeta =
-      const VerificationMeta('weightKg');
+  static const VerificationMeta _weightKgMeta = const VerificationMeta('weightKg');
   @override
   late final GeneratedColumn<double> weightKg = GeneratedColumn<double>(
       'weight_kg', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _priceMeta = const VerificationMeta('price');
   @override
-  late final GeneratedColumn<double> price = GeneratedColumn<double>(
-      'price', aliasedName, true,
+  late final GeneratedColumn<double> price = GeneratedColumn<double>('price', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _latitudeMeta =
-      const VerificationMeta('latitude');
+  static const VerificationMeta _latitudeMeta = const VerificationMeta('latitude');
   @override
   late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
       'latitude', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _longitudeMeta =
-      const VerificationMeta('longitude');
+  static const VerificationMeta _longitudeMeta = const VerificationMeta('longitude');
   @override
   late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
       'longitude', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
-  late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, false,
+  late final GeneratedColumn<String> source = GeneratedColumn<String>('source', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('field'));
-  static const VerificationMeta _qualityScoreMeta =
-      const VerificationMeta('qualityScore');
+  static const VerificationMeta _qualityScoreMeta = const VerificationMeta('qualityScore');
   @override
   late final GeneratedColumn<double> qualityScore = GeneratedColumn<double>(
       'quality_score', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(1.0));
-  static const VerificationMeta _isUploadedMeta =
-      const VerificationMeta('isUploaded');
+      type: DriftSqlType.double, requiredDuringInsert: false, defaultValue: const Constant(1.0));
+  static const VerificationMeta _isUploadedMeta = const VerificationMeta('isUploaded');
   @override
   late final GeneratedColumn<bool> isUploaded = GeneratedColumn<bool>(
       'is_uploaded', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("is_uploaded" IN (0, 1))'),
+      defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("is_uploaded" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
@@ -5915,54 +5492,45 @@ class $LocalMLSamplesTable extends LocalMLSamples
       context.missing(_idMeta);
     }
     if (data.containsKey('local_image_path')) {
-      context.handle(
-          _localImagePathMeta,
-          localImagePath.isAcceptableOrUnknown(
-              data['local_image_path']!, _localImagePathMeta));
+      context.handle(_localImagePathMeta,
+          localImagePath.isAcceptableOrUnknown(data['local_image_path']!, _localImagePathMeta));
     } else if (isInserting) {
       context.missing(_localImagePathMeta);
     }
     if (data.containsKey('label')) {
-      context.handle(
-          _labelMeta, label.isAcceptableOrUnknown(data['label']!, _labelMeta));
+      context.handle(_labelMeta, label.isAcceptableOrUnknown(data['label']!, _labelMeta));
     } else if (isInserting) {
       context.missing(_labelMeta);
     }
     if (data.containsKey('weight_kg')) {
-      context.handle(_weightKgMeta,
-          weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta));
+      context.handle(
+          _weightKgMeta, weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta));
     }
     if (data.containsKey('price')) {
-      context.handle(
-          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
+      context.handle(_priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
     }
     if (data.containsKey('latitude')) {
-      context.handle(_latitudeMeta,
-          latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta));
+      context.handle(
+          _latitudeMeta, latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta));
     }
     if (data.containsKey('longitude')) {
-      context.handle(_longitudeMeta,
-          longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
+      context.handle(
+          _longitudeMeta, longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta));
     }
     if (data.containsKey('source')) {
-      context.handle(_sourceMeta,
-          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+      context.handle(_sourceMeta, source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
     }
     if (data.containsKey('quality_score')) {
-      context.handle(
-          _qualityScoreMeta,
-          qualityScore.isAcceptableOrUnknown(
-              data['quality_score']!, _qualityScoreMeta));
+      context.handle(_qualityScoreMeta,
+          qualityScore.isAcceptableOrUnknown(data['quality_score']!, _qualityScoreMeta));
     }
     if (data.containsKey('is_uploaded')) {
       context.handle(
-          _isUploadedMeta,
-          isUploaded.isAcceptableOrUnknown(
-              data['is_uploaded']!, _isUploadedMeta));
+          _isUploadedMeta, isUploaded.isAcceptableOrUnknown(data['is_uploaded']!, _isUploadedMeta));
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+          _createdAtMeta, createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
@@ -5975,22 +5543,21 @@ class $LocalMLSamplesTable extends LocalMLSamples
   LocalMLSample map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalMLSample(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      localImagePath: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}local_image_path'])!,
-      label: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}label'])!,
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      localImagePath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}local_image_path'])!,
+      label:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}label'])!,
       weightKg: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}weight_kg']),
-      price: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}price']),
+      price:
+          attachedDatabase.typeMapping.read(DriftSqlType.double, data['${effectivePrefix}price']),
       latitude: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}latitude']),
       longitude: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}longitude']),
-      source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+      source:
+          attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}source'])!,
       qualityScore: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}quality_score'])!,
       isUploaded: attachedDatabase.typeMapping
@@ -6060,17 +5627,10 @@ class LocalMLSample extends DataClass implements Insertable<LocalMLSample> {
       id: Value(id),
       localImagePath: Value(localImagePath),
       label: Value(label),
-      weightKg: weightKg == null && nullToAbsent
-          ? const Value.absent()
-          : Value(weightKg),
-      price:
-          price == null && nullToAbsent ? const Value.absent() : Value(price),
-      latitude: latitude == null && nullToAbsent
-          ? const Value.absent()
-          : Value(latitude),
-      longitude: longitude == null && nullToAbsent
-          ? const Value.absent()
-          : Value(longitude),
+      weightKg: weightKg == null && nullToAbsent ? const Value.absent() : Value(weightKg),
+      price: price == null && nullToAbsent ? const Value.absent() : Value(price),
+      latitude: latitude == null && nullToAbsent ? const Value.absent() : Value(latitude),
+      longitude: longitude == null && nullToAbsent ? const Value.absent() : Value(longitude),
       source: Value(source),
       qualityScore: Value(qualityScore),
       isUploaded: Value(isUploaded),
@@ -6078,8 +5638,7 @@ class LocalMLSample extends DataClass implements Insertable<LocalMLSample> {
     );
   }
 
-  factory LocalMLSample.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory LocalMLSample.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalMLSample(
       id: serializer.fromJson<String>(json['id']),
@@ -6141,20 +5700,15 @@ class LocalMLSample extends DataClass implements Insertable<LocalMLSample> {
   LocalMLSample copyWithCompanion(LocalMLSamplesCompanion data) {
     return LocalMLSample(
       id: data.id.present ? data.id.value : this.id,
-      localImagePath: data.localImagePath.present
-          ? data.localImagePath.value
-          : this.localImagePath,
+      localImagePath: data.localImagePath.present ? data.localImagePath.value : this.localImagePath,
       label: data.label.present ? data.label.value : this.label,
       weightKg: data.weightKg.present ? data.weightKg.value : this.weightKg,
       price: data.price.present ? data.price.value : this.price,
       latitude: data.latitude.present ? data.latitude.value : this.latitude,
       longitude: data.longitude.present ? data.longitude.value : this.longitude,
       source: data.source.present ? data.source.value : this.source,
-      qualityScore: data.qualityScore.present
-          ? data.qualityScore.value
-          : this.qualityScore,
-      isUploaded:
-          data.isUploaded.present ? data.isUploaded.value : this.isUploaded,
+      qualityScore: data.qualityScore.present ? data.qualityScore.value : this.qualityScore,
+      isUploaded: data.isUploaded.present ? data.isUploaded.value : this.isUploaded,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -6178,8 +5732,8 @@ class LocalMLSample extends DataClass implements Insertable<LocalMLSample> {
   }
 
   @override
-  int get hashCode => Object.hash(id, localImagePath, label, weightKg, price,
-      latitude, longitude, source, qualityScore, isUploaded, createdAt);
+  int get hashCode => Object.hash(id, localImagePath, label, weightKg, price, latitude, longitude,
+      source, qualityScore, isUploaded, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6367,19 +5921,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $LocalMaterialsTable localMaterials = $LocalMaterialsTable(this);
   late final $CachedPricesTable cachedPrices = $CachedPricesTable(this);
-  late final $CachedRecyclersTable cachedRecyclers =
-      $CachedRecyclersTable(this);
-  late final $LocalTransactionsTable localTransactions =
-      $LocalTransactionsTable(this);
-  late final $LocalTraceabilityTable localTraceability =
-      $LocalTraceabilityTable(this);
-  late final $CollectorProfileTable collectorProfile =
-      $CollectorProfileTable(this);
+  late final $CachedRecyclersTable cachedRecyclers = $CachedRecyclersTable(this);
+  late final $LocalTransactionsTable localTransactions = $LocalTransactionsTable(this);
+  late final $LocalTraceabilityTable localTraceability = $LocalTraceabilityTable(this);
+  late final $CollectorProfileTable collectorProfile = $CollectorProfileTable(this);
   late final $LocalLedgerTable localLedger = $LocalLedgerTable(this);
-  late final $CachedSafetyContentTable cachedSafetyContent =
-      $CachedSafetyContentTable(this);
-  late final $SyncQueueEntriesTable syncQueueEntries =
-      $SyncQueueEntriesTable(this);
+  late final $CachedSafetyContentTable cachedSafetyContent = $CachedSafetyContentTable(this);
+  late final $SyncQueueEntriesTable syncQueueEntries = $SyncQueueEntriesTable(this);
   late final $LocalMLSamplesTable localMLSamples = $LocalMLSamplesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -6399,8 +5947,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ];
 }
 
-typedef $$LocalMaterialsTableCreateCompanionBuilder = LocalMaterialsCompanion
-    Function({
+typedef $$LocalMaterialsTableCreateCompanionBuilder = LocalMaterialsCompanion Function({
   required String id,
   required String category,
   required String subCategory,
@@ -6414,8 +5961,7 @@ typedef $$LocalMaterialsTableCreateCompanionBuilder = LocalMaterialsCompanion
   required DateTime updatedAt,
   Value<int> rowid,
 });
-typedef $$LocalMaterialsTableUpdateCompanionBuilder = LocalMaterialsCompanion
-    Function({
+typedef $$LocalMaterialsTableUpdateCompanionBuilder = LocalMaterialsCompanion Function({
   Value<String> id,
   Value<String> category,
   Value<String> subCategory,
@@ -6430,8 +5976,7 @@ typedef $$LocalMaterialsTableUpdateCompanionBuilder = LocalMaterialsCompanion
   Value<int> rowid,
 });
 
-class $$LocalMaterialsTableFilterComposer
-    extends Composer<_$AppDatabase, $LocalMaterialsTable> {
+class $$LocalMaterialsTableFilterComposer extends Composer<_$AppDatabase, $LocalMaterialsTable> {
   $$LocalMaterialsTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -6439,44 +5984,41 @@ class $$LocalMaterialsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get subCategory => $composableBuilder(
-      column: $table.subCategory, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get subCategory =>
+      $composableBuilder(column: $table.subCategory, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get description =>
+      $composableBuilder(column: $table.description, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get imageRef => $composableBuilder(
-      column: $table.imageRef, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get imageRef =>
+      $composableBuilder(column: $table.imageRef, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get approxWeightKg => $composableBuilder(
-      column: $table.approxWeightKg,
-      builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get approxWeightKg =>
+      $composableBuilder(column: $table.approxWeightKg, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get condition => $composableBuilder(
-      column: $table.condition, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get condition =>
+      $composableBuilder(column: $table.condition, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get sourceType => $composableBuilder(
-      column: $table.sourceType, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get sourceType =>
+      $composableBuilder(column: $table.sourceType, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get estimatedValue => $composableBuilder(
-      column: $table.estimatedValue,
-      builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get estimatedValue =>
+      $composableBuilder(column: $table.estimatedValue, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$LocalMaterialsTableOrderingComposer
-    extends Composer<_$AppDatabase, $LocalMaterialsTable> {
+class $$LocalMaterialsTableOrderingComposer extends Composer<_$AppDatabase, $LocalMaterialsTable> {
   $$LocalMaterialsTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -6484,40 +6026,38 @@ class $$LocalMaterialsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get subCategory => $composableBuilder(
-      column: $table.subCategory, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get subCategory =>
+      $composableBuilder(column: $table.subCategory, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get description =>
+      $composableBuilder(column: $table.description, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get imageRef => $composableBuilder(
-      column: $table.imageRef, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get imageRef =>
+      $composableBuilder(column: $table.imageRef, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get approxWeightKg => $composableBuilder(
-      column: $table.approxWeightKg,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.approxWeightKg, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get condition => $composableBuilder(
-      column: $table.condition, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get condition =>
+      $composableBuilder(column: $table.condition, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get sourceType => $composableBuilder(
-      column: $table.sourceType, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get sourceType =>
+      $composableBuilder(column: $table.sourceType, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get estimatedValue => $composableBuilder(
-      column: $table.estimatedValue,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.estimatedValue, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalMaterialsTableAnnotationComposer
@@ -6535,26 +6075,26 @@ class $$LocalMaterialsTableAnnotationComposer
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
 
-  GeneratedColumn<String> get subCategory => $composableBuilder(
-      column: $table.subCategory, builder: (column) => column);
+  GeneratedColumn<String> get subCategory =>
+      $composableBuilder(column: $table.subCategory, builder: (column) => column);
 
-  GeneratedColumn<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => column);
+  GeneratedColumn<String> get description =>
+      $composableBuilder(column: $table.description, builder: (column) => column);
 
   GeneratedColumn<String> get imageRef =>
       $composableBuilder(column: $table.imageRef, builder: (column) => column);
 
-  GeneratedColumn<double> get approxWeightKg => $composableBuilder(
-      column: $table.approxWeightKg, builder: (column) => column);
+  GeneratedColumn<double> get approxWeightKg =>
+      $composableBuilder(column: $table.approxWeightKg, builder: (column) => column);
 
   GeneratedColumn<String> get condition =>
       $composableBuilder(column: $table.condition, builder: (column) => column);
 
-  GeneratedColumn<String> get sourceType => $composableBuilder(
-      column: $table.sourceType, builder: (column) => column);
+  GeneratedColumn<String> get sourceType =>
+      $composableBuilder(column: $table.sourceType, builder: (column) => column);
 
-  GeneratedColumn<double> get estimatedValue => $composableBuilder(
-      column: $table.estimatedValue, builder: (column) => column);
+  GeneratedColumn<double> get estimatedValue =>
+      $composableBuilder(column: $table.estimatedValue, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -6572,14 +6112,10 @@ class $$LocalMaterialsTableTableManager extends RootTableManager<
     $$LocalMaterialsTableAnnotationComposer,
     $$LocalMaterialsTableCreateCompanionBuilder,
     $$LocalMaterialsTableUpdateCompanionBuilder,
-    (
-      LocalMaterial,
-      BaseReferences<_$AppDatabase, $LocalMaterialsTable, LocalMaterial>
-    ),
+    (LocalMaterial, BaseReferences<_$AppDatabase, $LocalMaterialsTable, LocalMaterial>),
     LocalMaterial,
     PrefetchHooks Function()> {
-  $$LocalMaterialsTableTableManager(
-      _$AppDatabase db, $LocalMaterialsTable table)
+  $$LocalMaterialsTableTableManager(_$AppDatabase db, $LocalMaterialsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6648,8 +6184,7 @@ class $$LocalMaterialsTableTableManager extends RootTableManager<
           withReferenceMapper: (p0) => p0
               .map((e) => (
                     e.readTable<$LocalMaterialsTable, LocalMaterial>(table),
-                    BaseReferences<_$AppDatabase, $LocalMaterialsTable,
-                        LocalMaterial>(db, table, e)
+                    BaseReferences<_$AppDatabase, $LocalMaterialsTable, LocalMaterial>(db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -6665,14 +6200,10 @@ typedef $$LocalMaterialsTableProcessedTableManager = ProcessedTableManager<
     $$LocalMaterialsTableAnnotationComposer,
     $$LocalMaterialsTableCreateCompanionBuilder,
     $$LocalMaterialsTableUpdateCompanionBuilder,
-    (
-      LocalMaterial,
-      BaseReferences<_$AppDatabase, $LocalMaterialsTable, LocalMaterial>
-    ),
+    (LocalMaterial, BaseReferences<_$AppDatabase, $LocalMaterialsTable, LocalMaterial>),
     LocalMaterial,
     PrefetchHooks Function()>;
-typedef $$CachedPricesTableCreateCompanionBuilder = CachedPricesCompanion
-    Function({
+typedef $$CachedPricesTableCreateCompanionBuilder = CachedPricesCompanion Function({
   required String id,
   required String category,
   Value<String?> subCategory,
@@ -6691,8 +6222,7 @@ typedef $$CachedPricesTableCreateCompanionBuilder = CachedPricesCompanion
   required DateTime createdAt,
   Value<int> rowid,
 });
-typedef $$CachedPricesTableUpdateCompanionBuilder = CachedPricesCompanion
-    Function({
+typedef $$CachedPricesTableUpdateCompanionBuilder = CachedPricesCompanion Function({
   Value<String> id,
   Value<String> category,
   Value<String?> subCategory,
@@ -6712,8 +6242,7 @@ typedef $$CachedPricesTableUpdateCompanionBuilder = CachedPricesCompanion
   Value<int> rowid,
 });
 
-class $$CachedPricesTableFilterComposer
-    extends Composer<_$AppDatabase, $CachedPricesTable> {
+class $$CachedPricesTableFilterComposer extends Composer<_$AppDatabase, $CachedPricesTable> {
   $$CachedPricesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -6721,58 +6250,56 @@ class $$CachedPricesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get subCategory => $composableBuilder(
-      column: $table.subCategory, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get subCategory =>
+      $composableBuilder(column: $table.subCategory, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get district => $composableBuilder(
-      column: $table.district, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get district =>
+      $composableBuilder(column: $table.district, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get city => $composableBuilder(
-      column: $table.city, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get city =>
+      $composableBuilder(column: $table.city, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get latitude => $composableBuilder(
-      column: $table.latitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get longitude => $composableBuilder(
-      column: $table.longitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get recordedAt => $composableBuilder(
-      column: $table.recordedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get recordedAt =>
+      $composableBuilder(column: $table.recordedAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get buyingPrice => $composableBuilder(
-      column: $table.buyingPrice, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get buyingPrice =>
+      $composableBuilder(column: $table.buyingPrice, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get sellingQuotedPrice => $composableBuilder(
-      column: $table.sellingQuotedPrice,
-      builder: (column) => ColumnFilters(column));
+      column: $table.sellingQuotedPrice, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get unit => $composableBuilder(
-      column: $table.unit, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get marketMin => $composableBuilder(
-      column: $table.marketMin, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get marketMin =>
+      $composableBuilder(column: $table.marketMin, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get marketMax => $composableBuilder(
-      column: $table.marketMax, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get marketMax =>
+      $composableBuilder(column: $table.marketMax, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get recyclerId => $composableBuilder(
-      column: $table.recyclerId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get recyclerId =>
+      $composableBuilder(column: $table.recyclerId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$CachedPricesTableOrderingComposer
-    extends Composer<_$AppDatabase, $CachedPricesTable> {
+class $$CachedPricesTableOrderingComposer extends Composer<_$AppDatabase, $CachedPricesTable> {
   $$CachedPricesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -6780,58 +6307,56 @@ class $$CachedPricesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get subCategory => $composableBuilder(
-      column: $table.subCategory, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get subCategory =>
+      $composableBuilder(column: $table.subCategory, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get district => $composableBuilder(
-      column: $table.district, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get district =>
+      $composableBuilder(column: $table.district, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get city => $composableBuilder(
-      column: $table.city, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get city =>
+      $composableBuilder(column: $table.city, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get latitude => $composableBuilder(
-      column: $table.latitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get longitude => $composableBuilder(
-      column: $table.longitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get recordedAt => $composableBuilder(
-      column: $table.recordedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get recordedAt =>
+      $composableBuilder(column: $table.recordedAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get buyingPrice => $composableBuilder(
-      column: $table.buyingPrice, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get buyingPrice =>
+      $composableBuilder(column: $table.buyingPrice, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get sellingQuotedPrice => $composableBuilder(
-      column: $table.sellingQuotedPrice,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.sellingQuotedPrice, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get unit => $composableBuilder(
-      column: $table.unit, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get marketMin => $composableBuilder(
-      column: $table.marketMin, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get marketMin =>
+      $composableBuilder(column: $table.marketMin, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get marketMax => $composableBuilder(
-      column: $table.marketMax, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get marketMax =>
+      $composableBuilder(column: $table.marketMax, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get recyclerId => $composableBuilder(
-      column: $table.recyclerId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get recyclerId =>
+      $composableBuilder(column: $table.recyclerId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$CachedPricesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $CachedPricesTable> {
+class $$CachedPricesTableAnnotationComposer extends Composer<_$AppDatabase, $CachedPricesTable> {
   $$CachedPricesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -6845,8 +6370,8 @@ class $$CachedPricesTableAnnotationComposer
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
 
-  GeneratedColumn<String> get subCategory => $composableBuilder(
-      column: $table.subCategory, builder: (column) => column);
+  GeneratedColumn<String> get subCategory =>
+      $composableBuilder(column: $table.subCategory, builder: (column) => column);
 
   GeneratedColumn<String> get district =>
       $composableBuilder(column: $table.district, builder: (column) => column);
@@ -6860,14 +6385,14 @@ class $$CachedPricesTableAnnotationComposer
   GeneratedColumn<double> get longitude =>
       $composableBuilder(column: $table.longitude, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get recordedAt => $composableBuilder(
-      column: $table.recordedAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get recordedAt =>
+      $composableBuilder(column: $table.recordedAt, builder: (column) => column);
 
-  GeneratedColumn<double> get buyingPrice => $composableBuilder(
-      column: $table.buyingPrice, builder: (column) => column);
+  GeneratedColumn<double> get buyingPrice =>
+      $composableBuilder(column: $table.buyingPrice, builder: (column) => column);
 
-  GeneratedColumn<double> get sellingQuotedPrice => $composableBuilder(
-      column: $table.sellingQuotedPrice, builder: (column) => column);
+  GeneratedColumn<double> get sellingQuotedPrice =>
+      $composableBuilder(column: $table.sellingQuotedPrice, builder: (column) => column);
 
   GeneratedColumn<String> get unit =>
       $composableBuilder(column: $table.unit, builder: (column) => column);
@@ -6878,8 +6403,8 @@ class $$CachedPricesTableAnnotationComposer
   GeneratedColumn<double> get marketMax =>
       $composableBuilder(column: $table.marketMax, builder: (column) => column);
 
-  GeneratedColumn<String> get recyclerId => $composableBuilder(
-      column: $table.recyclerId, builder: (column) => column);
+  GeneratedColumn<String> get recyclerId =>
+      $composableBuilder(column: $table.recyclerId, builder: (column) => column);
 
   GeneratedColumn<String> get source =>
       $composableBuilder(column: $table.source, builder: (column) => column);
@@ -6897,20 +6422,15 @@ class $$CachedPricesTableTableManager extends RootTableManager<
     $$CachedPricesTableAnnotationComposer,
     $$CachedPricesTableCreateCompanionBuilder,
     $$CachedPricesTableUpdateCompanionBuilder,
-    (
-      CachedPrice,
-      BaseReferences<_$AppDatabase, $CachedPricesTable, CachedPrice>
-    ),
+    (CachedPrice, BaseReferences<_$AppDatabase, $CachedPricesTable, CachedPrice>),
     CachedPrice,
     PrefetchHooks Function()> {
   $$CachedPricesTableTableManager(_$AppDatabase db, $CachedPricesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$CachedPricesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$CachedPricesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () => $$CachedPricesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$CachedPricesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$CachedPricesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
@@ -6992,8 +6512,7 @@ class $$CachedPricesTableTableManager extends RootTableManager<
           withReferenceMapper: (p0) => p0
               .map((e) => (
                     e.readTable<$CachedPricesTable, CachedPrice>(table),
-                    BaseReferences<_$AppDatabase, $CachedPricesTable,
-                        CachedPrice>(db, table, e)
+                    BaseReferences<_$AppDatabase, $CachedPricesTable, CachedPrice>(db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -7009,14 +6528,10 @@ typedef $$CachedPricesTableProcessedTableManager = ProcessedTableManager<
     $$CachedPricesTableAnnotationComposer,
     $$CachedPricesTableCreateCompanionBuilder,
     $$CachedPricesTableUpdateCompanionBuilder,
-    (
-      CachedPrice,
-      BaseReferences<_$AppDatabase, $CachedPricesTable, CachedPrice>
-    ),
+    (CachedPrice, BaseReferences<_$AppDatabase, $CachedPricesTable, CachedPrice>),
     CachedPrice,
     PrefetchHooks Function()>;
-typedef $$CachedRecyclersTableCreateCompanionBuilder = CachedRecyclersCompanion
-    Function({
+typedef $$CachedRecyclersTableCreateCompanionBuilder = CachedRecyclersCompanion Function({
   required String id,
   required String name,
   required double latitude,
@@ -7035,8 +6550,7 @@ typedef $$CachedRecyclersTableCreateCompanionBuilder = CachedRecyclersCompanion
   required DateTime cachedAt,
   Value<int> rowid,
 });
-typedef $$CachedRecyclersTableUpdateCompanionBuilder = CachedRecyclersCompanion
-    Function({
+typedef $$CachedRecyclersTableUpdateCompanionBuilder = CachedRecyclersCompanion Function({
   Value<String> id,
   Value<String> name,
   Value<double> latitude,
@@ -7056,8 +6570,7 @@ typedef $$CachedRecyclersTableUpdateCompanionBuilder = CachedRecyclersCompanion
   Value<int> rowid,
 });
 
-class $$CachedRecyclersTableFilterComposer
-    extends Composer<_$AppDatabase, $CachedRecyclersTable> {
+class $$CachedRecyclersTableFilterComposer extends Composer<_$AppDatabase, $CachedRecyclersTable> {
   $$CachedRecyclersTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -7065,62 +6578,53 @@ class $$CachedRecyclersTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get latitude => $composableBuilder(
-      column: $table.latitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get longitude => $composableBuilder(
-      column: $table.longitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get materialsAcceptedJson => $composableBuilder(
-      column: $table.materialsAcceptedJson,
-      builder: (column) => ColumnFilters(column));
+      column: $table.materialsAcceptedJson, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get authorizationNumber => $composableBuilder(
-      column: $table.authorizationNumber,
-      builder: (column) => ColumnFilters(column));
+      column: $table.authorizationNumber, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get authorizationBody => $composableBuilder(
-      column: $table.authorizationBody,
-      builder: (column) => ColumnFilters(column));
+      column: $table.authorizationBody, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get authorizationStatus => $composableBuilder(
-      column: $table.authorizationStatus,
-      builder: (column) => ColumnFilters(column));
+      column: $table.authorizationStatus, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get authorizationValidTill => $composableBuilder(
-      column: $table.authorizationValidTill,
-      builder: (column) => ColumnFilters(column));
+      column: $table.authorizationValidTill, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get phone => $composableBuilder(
-      column: $table.phone, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get offeredRatesJson => $composableBuilder(
-      column: $table.offeredRatesJson,
-      builder: (column) => ColumnFilters(column));
+      column: $table.offeredRatesJson, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get pickupAvailable => $composableBuilder(
-      column: $table.pickupAvailable,
-      builder: (column) => ColumnFilters(column));
+      column: $table.pickupAvailable, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get pickupRadiusKm => $composableBuilder(
-      column: $table.pickupRadiusKm,
-      builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get pickupRadiusKm =>
+      $composableBuilder(column: $table.pickupRadiusKm, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get serviceAreaJson => $composableBuilder(
-      column: $table.serviceAreaJson,
-      builder: (column) => ColumnFilters(column));
+      column: $table.serviceAreaJson, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get rating => $composableBuilder(
-      column: $table.rating, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
-      column: $table.cachedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$CachedRecyclersTableOrderingComposer
@@ -7132,62 +6636,53 @@ class $$CachedRecyclersTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get latitude => $composableBuilder(
-      column: $table.latitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get longitude => $composableBuilder(
-      column: $table.longitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get materialsAcceptedJson => $composableBuilder(
-      column: $table.materialsAcceptedJson,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.materialsAcceptedJson, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get authorizationNumber => $composableBuilder(
-      column: $table.authorizationNumber,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.authorizationNumber, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get authorizationBody => $composableBuilder(
-      column: $table.authorizationBody,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.authorizationBody, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get authorizationStatus => $composableBuilder(
-      column: $table.authorizationStatus,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.authorizationStatus, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<DateTime> get authorizationValidTill => $composableBuilder(
-      column: $table.authorizationValidTill,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.authorizationValidTill, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get phone => $composableBuilder(
-      column: $table.phone, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get offeredRatesJson => $composableBuilder(
-      column: $table.offeredRatesJson,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.offeredRatesJson, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get pickupAvailable => $composableBuilder(
-      column: $table.pickupAvailable,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.pickupAvailable, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get pickupRadiusKm => $composableBuilder(
-      column: $table.pickupRadiusKm,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.pickupRadiusKm, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get serviceAreaJson => $composableBuilder(
-      column: $table.serviceAreaJson,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.serviceAreaJson, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get rating => $composableBuilder(
-      column: $table.rating, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
-      column: $table.cachedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$CachedRecyclersTableAnnotationComposer
@@ -7211,35 +6706,35 @@ class $$CachedRecyclersTableAnnotationComposer
   GeneratedColumn<double> get longitude =>
       $composableBuilder(column: $table.longitude, builder: (column) => column);
 
-  GeneratedColumn<String> get materialsAcceptedJson => $composableBuilder(
-      column: $table.materialsAcceptedJson, builder: (column) => column);
+  GeneratedColumn<String> get materialsAcceptedJson =>
+      $composableBuilder(column: $table.materialsAcceptedJson, builder: (column) => column);
 
-  GeneratedColumn<String> get authorizationNumber => $composableBuilder(
-      column: $table.authorizationNumber, builder: (column) => column);
+  GeneratedColumn<String> get authorizationNumber =>
+      $composableBuilder(column: $table.authorizationNumber, builder: (column) => column);
 
-  GeneratedColumn<String> get authorizationBody => $composableBuilder(
-      column: $table.authorizationBody, builder: (column) => column);
+  GeneratedColumn<String> get authorizationBody =>
+      $composableBuilder(column: $table.authorizationBody, builder: (column) => column);
 
-  GeneratedColumn<String> get authorizationStatus => $composableBuilder(
-      column: $table.authorizationStatus, builder: (column) => column);
+  GeneratedColumn<String> get authorizationStatus =>
+      $composableBuilder(column: $table.authorizationStatus, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get authorizationValidTill => $composableBuilder(
-      column: $table.authorizationValidTill, builder: (column) => column);
+  GeneratedColumn<DateTime> get authorizationValidTill =>
+      $composableBuilder(column: $table.authorizationValidTill, builder: (column) => column);
 
   GeneratedColumn<String> get phone =>
       $composableBuilder(column: $table.phone, builder: (column) => column);
 
-  GeneratedColumn<String> get offeredRatesJson => $composableBuilder(
-      column: $table.offeredRatesJson, builder: (column) => column);
+  GeneratedColumn<String> get offeredRatesJson =>
+      $composableBuilder(column: $table.offeredRatesJson, builder: (column) => column);
 
-  GeneratedColumn<bool> get pickupAvailable => $composableBuilder(
-      column: $table.pickupAvailable, builder: (column) => column);
+  GeneratedColumn<bool> get pickupAvailable =>
+      $composableBuilder(column: $table.pickupAvailable, builder: (column) => column);
 
-  GeneratedColumn<double> get pickupRadiusKm => $composableBuilder(
-      column: $table.pickupRadiusKm, builder: (column) => column);
+  GeneratedColumn<double> get pickupRadiusKm =>
+      $composableBuilder(column: $table.pickupRadiusKm, builder: (column) => column);
 
-  GeneratedColumn<String> get serviceAreaJson => $composableBuilder(
-      column: $table.serviceAreaJson, builder: (column) => column);
+  GeneratedColumn<String> get serviceAreaJson =>
+      $composableBuilder(column: $table.serviceAreaJson, builder: (column) => column);
 
   GeneratedColumn<double> get rating =>
       $composableBuilder(column: $table.rating, builder: (column) => column);
@@ -7257,14 +6752,10 @@ class $$CachedRecyclersTableTableManager extends RootTableManager<
     $$CachedRecyclersTableAnnotationComposer,
     $$CachedRecyclersTableCreateCompanionBuilder,
     $$CachedRecyclersTableUpdateCompanionBuilder,
-    (
-      CachedRecycler,
-      BaseReferences<_$AppDatabase, $CachedRecyclersTable, CachedRecycler>
-    ),
+    (CachedRecycler, BaseReferences<_$AppDatabase, $CachedRecyclersTable, CachedRecycler>),
     CachedRecycler,
     PrefetchHooks Function()> {
-  $$CachedRecyclersTableTableManager(
-      _$AppDatabase db, $CachedRecyclersTable table)
+  $$CachedRecyclersTableTableManager(_$AppDatabase db, $CachedRecyclersTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -7353,8 +6844,8 @@ class $$CachedRecyclersTableTableManager extends RootTableManager<
           withReferenceMapper: (p0) => p0
               .map((e) => (
                     e.readTable<$CachedRecyclersTable, CachedRecycler>(table),
-                    BaseReferences<_$AppDatabase, $CachedRecyclersTable,
-                        CachedRecycler>(db, table, e)
+                    BaseReferences<_$AppDatabase, $CachedRecyclersTable, CachedRecycler>(
+                        db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -7370,14 +6861,10 @@ typedef $$CachedRecyclersTableProcessedTableManager = ProcessedTableManager<
     $$CachedRecyclersTableAnnotationComposer,
     $$CachedRecyclersTableCreateCompanionBuilder,
     $$CachedRecyclersTableUpdateCompanionBuilder,
-    (
-      CachedRecycler,
-      BaseReferences<_$AppDatabase, $CachedRecyclersTable, CachedRecycler>
-    ),
+    (CachedRecycler, BaseReferences<_$AppDatabase, $CachedRecyclersTable, CachedRecycler>),
     CachedRecycler,
     PrefetchHooks Function()>;
-typedef $$LocalTransactionsTableCreateCompanionBuilder
-    = LocalTransactionsCompanion Function({
+typedef $$LocalTransactionsTableCreateCompanionBuilder = LocalTransactionsCompanion Function({
   required String lotId,
   required String clientLotUuid,
   required String collectorId,
@@ -7400,8 +6887,7 @@ typedef $$LocalTransactionsTableCreateCompanionBuilder
   Value<DateTime?> syncedAt,
   Value<int> rowid,
 });
-typedef $$LocalTransactionsTableUpdateCompanionBuilder
-    = LocalTransactionsCompanion Function({
+typedef $$LocalTransactionsTableUpdateCompanionBuilder = LocalTransactionsCompanion Function({
   Value<String> lotId,
   Value<String> clientLotUuid,
   Value<String> collectorId,
@@ -7434,66 +6920,65 @@ class $$LocalTransactionsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get lotId => $composableBuilder(
-      column: $table.lotId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get lotId =>
+      $composableBuilder(column: $table.lotId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get clientLotUuid => $composableBuilder(
-      column: $table.clientLotUuid, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get clientLotUuid =>
+      $composableBuilder(column: $table.clientLotUuid, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get weightKg =>
+      $composableBuilder(column: $table.weightKg, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get quotedPrice => $composableBuilder(
-      column: $table.quotedPrice, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get quotedPrice =>
+      $composableBuilder(column: $table.quotedPrice, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get finalPrice => $composableBuilder(
-      column: $table.finalPrice, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get finalPrice =>
+      $composableBuilder(column: $table.finalPrice, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get recyclerId => $composableBuilder(
-      column: $table.recyclerId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get recyclerId =>
+      $composableBuilder(column: $table.recyclerId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get collectionLat => $composableBuilder(
-      column: $table.collectionLat, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get collectionLat =>
+      $composableBuilder(column: $table.collectionLat, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get collectionLng => $composableBuilder(
-      column: $table.collectionLng, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get collectionLng =>
+      $composableBuilder(column: $table.collectionLng, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get handoverLat => $composableBuilder(
-      column: $table.handoverLat, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get handoverLat =>
+      $composableBuilder(column: $table.handoverLat, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get handoverLng => $composableBuilder(
-      column: $table.handoverLng, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get handoverLng =>
+      $composableBuilder(column: $table.handoverLng, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get handoverAt => $composableBuilder(
-      column: $table.handoverAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get handoverAt =>
+      $composableBuilder(column: $table.handoverAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get paymentStatus => $composableBuilder(
-      column: $table.paymentStatus, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get paymentStatus =>
+      $composableBuilder(column: $table.paymentStatus, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get transactionStatus => $composableBuilder(
-      column: $table.transactionStatus,
-      builder: (column) => ColumnFilters(column));
+      column: $table.transactionStatus, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get anomalyFlag => $composableBuilder(
-      column: $table.anomalyFlag, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get anomalyFlag =>
+      $composableBuilder(column: $table.anomalyFlag, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get anomalyReason => $composableBuilder(
-      column: $table.anomalyReason, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get anomalyReason =>
+      $composableBuilder(column: $table.anomalyReason, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isSynced => $composableBuilder(
-      column: $table.isSynced, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
-      column: $table.syncedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$LocalTransactionsTableOrderingComposer
@@ -7505,71 +6990,65 @@ class $$LocalTransactionsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get lotId => $composableBuilder(
-      column: $table.lotId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get lotId =>
+      $composableBuilder(column: $table.lotId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get clientLotUuid => $composableBuilder(
-      column: $table.clientLotUuid,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.clientLotUuid, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get weightKg =>
+      $composableBuilder(column: $table.weightKg, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get quotedPrice => $composableBuilder(
-      column: $table.quotedPrice, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get quotedPrice =>
+      $composableBuilder(column: $table.quotedPrice, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get finalPrice => $composableBuilder(
-      column: $table.finalPrice, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get finalPrice =>
+      $composableBuilder(column: $table.finalPrice, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get recyclerId => $composableBuilder(
-      column: $table.recyclerId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get recyclerId =>
+      $composableBuilder(column: $table.recyclerId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get collectionLat => $composableBuilder(
-      column: $table.collectionLat,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.collectionLat, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get collectionLng => $composableBuilder(
-      column: $table.collectionLng,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.collectionLng, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get handoverLat => $composableBuilder(
-      column: $table.handoverLat, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get handoverLat =>
+      $composableBuilder(column: $table.handoverLat, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get handoverLng => $composableBuilder(
-      column: $table.handoverLng, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get handoverLng =>
+      $composableBuilder(column: $table.handoverLng, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get handoverAt => $composableBuilder(
-      column: $table.handoverAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get handoverAt =>
+      $composableBuilder(column: $table.handoverAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get paymentStatus => $composableBuilder(
-      column: $table.paymentStatus,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.paymentStatus, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get transactionStatus => $composableBuilder(
-      column: $table.transactionStatus,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.transactionStatus, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get anomalyFlag => $composableBuilder(
-      column: $table.anomalyFlag, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get anomalyFlag =>
+      $composableBuilder(column: $table.anomalyFlag, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get anomalyReason => $composableBuilder(
-      column: $table.anomalyReason,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.anomalyReason, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isSynced => $composableBuilder(
-      column: $table.isSynced, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
-      column: $table.syncedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalTransactionsTableAnnotationComposer
@@ -7584,11 +7063,11 @@ class $$LocalTransactionsTableAnnotationComposer
   GeneratedColumn<String> get lotId =>
       $composableBuilder(column: $table.lotId, builder: (column) => column);
 
-  GeneratedColumn<String> get clientLotUuid => $composableBuilder(
-      column: $table.clientLotUuid, builder: (column) => column);
+  GeneratedColumn<String> get clientLotUuid =>
+      $composableBuilder(column: $table.clientLotUuid, builder: (column) => column);
 
-  GeneratedColumn<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => column);
+  GeneratedColumn<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => column);
 
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
@@ -7596,44 +7075,44 @@ class $$LocalTransactionsTableAnnotationComposer
   GeneratedColumn<double> get weightKg =>
       $composableBuilder(column: $table.weightKg, builder: (column) => column);
 
-  GeneratedColumn<double> get quotedPrice => $composableBuilder(
-      column: $table.quotedPrice, builder: (column) => column);
+  GeneratedColumn<double> get quotedPrice =>
+      $composableBuilder(column: $table.quotedPrice, builder: (column) => column);
 
-  GeneratedColumn<double> get finalPrice => $composableBuilder(
-      column: $table.finalPrice, builder: (column) => column);
+  GeneratedColumn<double> get finalPrice =>
+      $composableBuilder(column: $table.finalPrice, builder: (column) => column);
 
-  GeneratedColumn<String> get recyclerId => $composableBuilder(
-      column: $table.recyclerId, builder: (column) => column);
+  GeneratedColumn<String> get recyclerId =>
+      $composableBuilder(column: $table.recyclerId, builder: (column) => column);
 
-  GeneratedColumn<double> get collectionLat => $composableBuilder(
-      column: $table.collectionLat, builder: (column) => column);
+  GeneratedColumn<double> get collectionLat =>
+      $composableBuilder(column: $table.collectionLat, builder: (column) => column);
 
-  GeneratedColumn<double> get collectionLng => $composableBuilder(
-      column: $table.collectionLng, builder: (column) => column);
+  GeneratedColumn<double> get collectionLng =>
+      $composableBuilder(column: $table.collectionLng, builder: (column) => column);
 
-  GeneratedColumn<double> get handoverLat => $composableBuilder(
-      column: $table.handoverLat, builder: (column) => column);
+  GeneratedColumn<double> get handoverLat =>
+      $composableBuilder(column: $table.handoverLat, builder: (column) => column);
 
-  GeneratedColumn<double> get handoverLng => $composableBuilder(
-      column: $table.handoverLng, builder: (column) => column);
+  GeneratedColumn<double> get handoverLng =>
+      $composableBuilder(column: $table.handoverLng, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get handoverAt => $composableBuilder(
-      column: $table.handoverAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get handoverAt =>
+      $composableBuilder(column: $table.handoverAt, builder: (column) => column);
 
-  GeneratedColumn<String> get paymentStatus => $composableBuilder(
-      column: $table.paymentStatus, builder: (column) => column);
+  GeneratedColumn<String> get paymentStatus =>
+      $composableBuilder(column: $table.paymentStatus, builder: (column) => column);
 
-  GeneratedColumn<String> get transactionStatus => $composableBuilder(
-      column: $table.transactionStatus, builder: (column) => column);
+  GeneratedColumn<String> get transactionStatus =>
+      $composableBuilder(column: $table.transactionStatus, builder: (column) => column);
 
-  GeneratedColumn<bool> get anomalyFlag => $composableBuilder(
-      column: $table.anomalyFlag, builder: (column) => column);
+  GeneratedColumn<bool> get anomalyFlag =>
+      $composableBuilder(column: $table.anomalyFlag, builder: (column) => column);
 
-  GeneratedColumn<String> get anomalyReason => $composableBuilder(
-      column: $table.anomalyReason, builder: (column) => column);
+  GeneratedColumn<String> get anomalyReason =>
+      $composableBuilder(column: $table.anomalyReason, builder: (column) => column);
 
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
@@ -7651,14 +7130,10 @@ class $$LocalTransactionsTableTableManager extends RootTableManager<
     $$LocalTransactionsTableAnnotationComposer,
     $$LocalTransactionsTableCreateCompanionBuilder,
     $$LocalTransactionsTableUpdateCompanionBuilder,
-    (
-      LocalTransaction,
-      BaseReferences<_$AppDatabase, $LocalTransactionsTable, LocalTransaction>
-    ),
+    (LocalTransaction, BaseReferences<_$AppDatabase, $LocalTransactionsTable, LocalTransaction>),
     LocalTransaction,
     PrefetchHooks Function()> {
-  $$LocalTransactionsTableTableManager(
-      _$AppDatabase db, $LocalTransactionsTable table)
+  $$LocalTransactionsTableTableManager(_$AppDatabase db, $LocalTransactionsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -7667,8 +7142,7 @@ class $$LocalTransactionsTableTableManager extends RootTableManager<
           createOrderingComposer: () =>
               $$LocalTransactionsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$LocalTransactionsTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$LocalTransactionsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> lotId = const Value.absent(),
             Value<String> clientLotUuid = const Value.absent(),
@@ -7763,10 +7237,9 @@ class $$LocalTransactionsTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$LocalTransactionsTable, LocalTransaction>(
-                        table),
-                    BaseReferences<_$AppDatabase, $LocalTransactionsTable,
-                        LocalTransaction>(db, table, e)
+                    e.readTable<$LocalTransactionsTable, LocalTransaction>(table),
+                    BaseReferences<_$AppDatabase, $LocalTransactionsTable, LocalTransaction>(
+                        db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -7782,14 +7255,10 @@ typedef $$LocalTransactionsTableProcessedTableManager = ProcessedTableManager<
     $$LocalTransactionsTableAnnotationComposer,
     $$LocalTransactionsTableCreateCompanionBuilder,
     $$LocalTransactionsTableUpdateCompanionBuilder,
-    (
-      LocalTransaction,
-      BaseReferences<_$AppDatabase, $LocalTransactionsTable, LocalTransaction>
-    ),
+    (LocalTransaction, BaseReferences<_$AppDatabase, $LocalTransactionsTable, LocalTransaction>),
     LocalTransaction,
     PrefetchHooks Function()>;
-typedef $$LocalTraceabilityTableCreateCompanionBuilder
-    = LocalTraceabilityCompanion Function({
+typedef $$LocalTraceabilityTableCreateCompanionBuilder = LocalTraceabilityCompanion Function({
   required String id,
   required String lotId,
   required String photoHashesJson,
@@ -7809,8 +7278,7 @@ typedef $$LocalTraceabilityTableCreateCompanionBuilder
   required DateTime createdAt,
   Value<int> rowid,
 });
-typedef $$LocalTraceabilityTableUpdateCompanionBuilder
-    = LocalTraceabilityCompanion Function({
+typedef $$LocalTraceabilityTableUpdateCompanionBuilder = LocalTraceabilityCompanion Function({
   Value<String> id,
   Value<String> lotId,
   Value<String> photoHashesJson,
@@ -7840,59 +7308,56 @@ class $$LocalTraceabilityTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get lotId => $composableBuilder(
-      column: $table.lotId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get lotId =>
+      $composableBuilder(column: $table.lotId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get photoHashesJson => $composableBuilder(
-      column: $table.photoHashesJson,
-      builder: (column) => ColumnFilters(column));
+      column: $table.photoHashesJson, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get weightKg =>
+      $composableBuilder(column: $table.weightKg, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get timestamp => $composableBuilder(
-      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get gpsLat => $composableBuilder(
-      column: $table.gpsLat, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get gpsLat =>
+      $composableBuilder(column: $table.gpsLat, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get gpsLng => $composableBuilder(
-      column: $table.gpsLng, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get gpsLng =>
+      $composableBuilder(column: $table.gpsLng, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get handoverRefNo => $composableBuilder(
-      column: $table.handoverRefNo, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get handoverRefNo =>
+      $composableBuilder(column: $table.handoverRefNo, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get qrPayload => $composableBuilder(
-      column: $table.qrPayload, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get qrPayload =>
+      $composableBuilder(column: $table.qrPayload, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get recyclerConfirmation => $composableBuilder(
-      column: $table.recyclerConfirmation,
-      builder: (column) => ColumnFilters(column));
+      column: $table.recyclerConfirmation, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get confirmedAt => $composableBuilder(
-      column: $table.confirmedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get confirmedAt =>
+      $composableBuilder(column: $table.confirmedAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get confirmedBy => $composableBuilder(
-      column: $table.confirmedBy, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get confirmedBy =>
+      $composableBuilder(column: $table.confirmedBy, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get downstreamStatus => $composableBuilder(
-      column: $table.downstreamStatus,
-      builder: (column) => ColumnFilters(column));
+      column: $table.downstreamStatus, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get recordHash => $composableBuilder(
-      column: $table.recordHash, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get recordHash =>
+      $composableBuilder(column: $table.recordHash, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get prevHash => $composableBuilder(
-      column: $table.prevHash, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get prevHash =>
+      $composableBuilder(column: $table.prevHash, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isSynced => $composableBuilder(
-      column: $table.isSynced, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$LocalTraceabilityTableOrderingComposer
@@ -7904,60 +7369,56 @@ class $$LocalTraceabilityTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get lotId => $composableBuilder(
-      column: $table.lotId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get lotId =>
+      $composableBuilder(column: $table.lotId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get photoHashesJson => $composableBuilder(
-      column: $table.photoHashesJson,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.photoHashesJson, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get weightKg =>
+      $composableBuilder(column: $table.weightKg, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
-      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get gpsLat => $composableBuilder(
-      column: $table.gpsLat, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get gpsLat =>
+      $composableBuilder(column: $table.gpsLat, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get gpsLng => $composableBuilder(
-      column: $table.gpsLng, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get gpsLng =>
+      $composableBuilder(column: $table.gpsLng, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get handoverRefNo => $composableBuilder(
-      column: $table.handoverRefNo,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.handoverRefNo, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get qrPayload => $composableBuilder(
-      column: $table.qrPayload, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get qrPayload =>
+      $composableBuilder(column: $table.qrPayload, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get recyclerConfirmation => $composableBuilder(
-      column: $table.recyclerConfirmation,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.recyclerConfirmation, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get confirmedAt => $composableBuilder(
-      column: $table.confirmedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get confirmedAt =>
+      $composableBuilder(column: $table.confirmedAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get confirmedBy => $composableBuilder(
-      column: $table.confirmedBy, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get confirmedBy =>
+      $composableBuilder(column: $table.confirmedBy, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get downstreamStatus => $composableBuilder(
-      column: $table.downstreamStatus,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.downstreamStatus, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get recordHash => $composableBuilder(
-      column: $table.recordHash, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get recordHash =>
+      $composableBuilder(column: $table.recordHash, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get prevHash => $composableBuilder(
-      column: $table.prevHash, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get prevHash =>
+      $composableBuilder(column: $table.prevHash, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isSynced => $composableBuilder(
-      column: $table.isSynced, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalTraceabilityTableAnnotationComposer
@@ -7975,8 +7436,8 @@ class $$LocalTraceabilityTableAnnotationComposer
   GeneratedColumn<String> get lotId =>
       $composableBuilder(column: $table.lotId, builder: (column) => column);
 
-  GeneratedColumn<String> get photoHashesJson => $composableBuilder(
-      column: $table.photoHashesJson, builder: (column) => column);
+  GeneratedColumn<String> get photoHashesJson =>
+      $composableBuilder(column: $table.photoHashesJson, builder: (column) => column);
 
   GeneratedColumn<double> get weightKg =>
       $composableBuilder(column: $table.weightKg, builder: (column) => column);
@@ -7990,26 +7451,26 @@ class $$LocalTraceabilityTableAnnotationComposer
   GeneratedColumn<double> get gpsLng =>
       $composableBuilder(column: $table.gpsLng, builder: (column) => column);
 
-  GeneratedColumn<String> get handoverRefNo => $composableBuilder(
-      column: $table.handoverRefNo, builder: (column) => column);
+  GeneratedColumn<String> get handoverRefNo =>
+      $composableBuilder(column: $table.handoverRefNo, builder: (column) => column);
 
   GeneratedColumn<String> get qrPayload =>
       $composableBuilder(column: $table.qrPayload, builder: (column) => column);
 
-  GeneratedColumn<bool> get recyclerConfirmation => $composableBuilder(
-      column: $table.recyclerConfirmation, builder: (column) => column);
+  GeneratedColumn<bool> get recyclerConfirmation =>
+      $composableBuilder(column: $table.recyclerConfirmation, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get confirmedAt => $composableBuilder(
-      column: $table.confirmedAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get confirmedAt =>
+      $composableBuilder(column: $table.confirmedAt, builder: (column) => column);
 
-  GeneratedColumn<String> get confirmedBy => $composableBuilder(
-      column: $table.confirmedBy, builder: (column) => column);
+  GeneratedColumn<String> get confirmedBy =>
+      $composableBuilder(column: $table.confirmedBy, builder: (column) => column);
 
-  GeneratedColumn<String> get downstreamStatus => $composableBuilder(
-      column: $table.downstreamStatus, builder: (column) => column);
+  GeneratedColumn<String> get downstreamStatus =>
+      $composableBuilder(column: $table.downstreamStatus, builder: (column) => column);
 
-  GeneratedColumn<String> get recordHash => $composableBuilder(
-      column: $table.recordHash, builder: (column) => column);
+  GeneratedColumn<String> get recordHash =>
+      $composableBuilder(column: $table.recordHash, builder: (column) => column);
 
   GeneratedColumn<String> get prevHash =>
       $composableBuilder(column: $table.prevHash, builder: (column) => column);
@@ -8032,13 +7493,11 @@ class $$LocalTraceabilityTableTableManager extends RootTableManager<
     $$LocalTraceabilityTableUpdateCompanionBuilder,
     (
       LocalTraceabilityData,
-      BaseReferences<_$AppDatabase, $LocalTraceabilityTable,
-          LocalTraceabilityData>
+      BaseReferences<_$AppDatabase, $LocalTraceabilityTable, LocalTraceabilityData>
     ),
     LocalTraceabilityData,
     PrefetchHooks Function()> {
-  $$LocalTraceabilityTableTableManager(
-      _$AppDatabase db, $LocalTraceabilityTable table)
+  $$LocalTraceabilityTableTableManager(_$AppDatabase db, $LocalTraceabilityTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -8047,8 +7506,7 @@ class $$LocalTraceabilityTableTableManager extends RootTableManager<
           createOrderingComposer: () =>
               $$LocalTraceabilityTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$LocalTraceabilityTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$LocalTraceabilityTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
             Value<String> lotId = const Value.absent(),
@@ -8131,10 +7589,9 @@ class $$LocalTraceabilityTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$LocalTraceabilityTable, LocalTraceabilityData>(
-                        table),
-                    BaseReferences<_$AppDatabase, $LocalTraceabilityTable,
-                        LocalTraceabilityData>(db, table, e)
+                    e.readTable<$LocalTraceabilityTable, LocalTraceabilityData>(table),
+                    BaseReferences<_$AppDatabase, $LocalTraceabilityTable, LocalTraceabilityData>(
+                        db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -8152,13 +7609,11 @@ typedef $$LocalTraceabilityTableProcessedTableManager = ProcessedTableManager<
     $$LocalTraceabilityTableUpdateCompanionBuilder,
     (
       LocalTraceabilityData,
-      BaseReferences<_$AppDatabase, $LocalTraceabilityTable,
-          LocalTraceabilityData>
+      BaseReferences<_$AppDatabase, $LocalTraceabilityTable, LocalTraceabilityData>
     ),
     LocalTraceabilityData,
     PrefetchHooks Function()>;
-typedef $$CollectorProfileTableCreateCompanionBuilder
-    = CollectorProfileCompanion Function({
+typedef $$CollectorProfileTableCreateCompanionBuilder = CollectorProfileCompanion Function({
   required String collectorId,
   Value<String> preferredLanguage,
   required String operatingArea,
@@ -8166,8 +7621,7 @@ typedef $$CollectorProfileTableCreateCompanionBuilder
   required DateTime createdAt,
   Value<int> rowid,
 });
-typedef $$CollectorProfileTableUpdateCompanionBuilder
-    = CollectorProfileCompanion Function({
+typedef $$CollectorProfileTableUpdateCompanionBuilder = CollectorProfileCompanion Function({
   Value<String> collectorId,
   Value<String> preferredLanguage,
   Value<String> operatingArea,
@@ -8185,21 +7639,20 @@ class $$CollectorProfileTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get preferredLanguage => $composableBuilder(
-      column: $table.preferredLanguage,
-      builder: (column) => ColumnFilters(column));
+      column: $table.preferredLanguage, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get operatingArea => $composableBuilder(
-      column: $table.operatingArea, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get operatingArea =>
+      $composableBuilder(column: $table.operatingArea, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get quickPinHash => $composableBuilder(
-      column: $table.quickPinHash, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get quickPinHash =>
+      $composableBuilder(column: $table.quickPinHash, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$CollectorProfileTableOrderingComposer
@@ -8211,23 +7664,20 @@ class $$CollectorProfileTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get preferredLanguage => $composableBuilder(
-      column: $table.preferredLanguage,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.preferredLanguage, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get operatingArea => $composableBuilder(
-      column: $table.operatingArea,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.operatingArea, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get quickPinHash => $composableBuilder(
-      column: $table.quickPinHash,
-      builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get quickPinHash =>
+      $composableBuilder(column: $table.quickPinHash, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$CollectorProfileTableAnnotationComposer
@@ -8239,17 +7689,17 @@ class $$CollectorProfileTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => column);
+  GeneratedColumn<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => column);
 
-  GeneratedColumn<String> get preferredLanguage => $composableBuilder(
-      column: $table.preferredLanguage, builder: (column) => column);
+  GeneratedColumn<String> get preferredLanguage =>
+      $composableBuilder(column: $table.preferredLanguage, builder: (column) => column);
 
-  GeneratedColumn<String> get operatingArea => $composableBuilder(
-      column: $table.operatingArea, builder: (column) => column);
+  GeneratedColumn<String> get operatingArea =>
+      $composableBuilder(column: $table.operatingArea, builder: (column) => column);
 
-  GeneratedColumn<String> get quickPinHash => $composableBuilder(
-      column: $table.quickPinHash, builder: (column) => column);
+  GeneratedColumn<String> get quickPinHash =>
+      $composableBuilder(column: $table.quickPinHash, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -8266,13 +7716,11 @@ class $$CollectorProfileTableTableManager extends RootTableManager<
     $$CollectorProfileTableUpdateCompanionBuilder,
     (
       CollectorProfileData,
-      BaseReferences<_$AppDatabase, $CollectorProfileTable,
-          CollectorProfileData>
+      BaseReferences<_$AppDatabase, $CollectorProfileTable, CollectorProfileData>
     ),
     CollectorProfileData,
     PrefetchHooks Function()> {
-  $$CollectorProfileTableTableManager(
-      _$AppDatabase db, $CollectorProfileTable table)
+  $$CollectorProfileTableTableManager(_$AppDatabase db, $CollectorProfileTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -8316,10 +7764,9 @@ class $$CollectorProfileTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$CollectorProfileTable, CollectorProfileData>(
-                        table),
-                    BaseReferences<_$AppDatabase, $CollectorProfileTable,
-                        CollectorProfileData>(db, table, e)
+                    e.readTable<$CollectorProfileTable, CollectorProfileData>(table),
+                    BaseReferences<_$AppDatabase, $CollectorProfileTable, CollectorProfileData>(
+                        db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -8337,13 +7784,11 @@ typedef $$CollectorProfileTableProcessedTableManager = ProcessedTableManager<
     $$CollectorProfileTableUpdateCompanionBuilder,
     (
       CollectorProfileData,
-      BaseReferences<_$AppDatabase, $CollectorProfileTable,
-          CollectorProfileData>
+      BaseReferences<_$AppDatabase, $CollectorProfileTable, CollectorProfileData>
     ),
     CollectorProfileData,
     PrefetchHooks Function()>;
-typedef $$LocalLedgerTableCreateCompanionBuilder = LocalLedgerCompanion
-    Function({
+typedef $$LocalLedgerTableCreateCompanionBuilder = LocalLedgerCompanion Function({
   required String id,
   required String collectorId,
   Value<String?> lotId,
@@ -8356,8 +7801,7 @@ typedef $$LocalLedgerTableCreateCompanionBuilder = LocalLedgerCompanion
   Value<bool> isSynced,
   Value<int> rowid,
 });
-typedef $$LocalLedgerTableUpdateCompanionBuilder = LocalLedgerCompanion
-    Function({
+typedef $$LocalLedgerTableUpdateCompanionBuilder = LocalLedgerCompanion Function({
   Value<String> id,
   Value<String> collectorId,
   Value<String?> lotId,
@@ -8371,8 +7815,7 @@ typedef $$LocalLedgerTableUpdateCompanionBuilder = LocalLedgerCompanion
   Value<int> rowid,
 });
 
-class $$LocalLedgerTableFilterComposer
-    extends Composer<_$AppDatabase, $LocalLedgerTable> {
+class $$LocalLedgerTableFilterComposer extends Composer<_$AppDatabase, $LocalLedgerTable> {
   $$LocalLedgerTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -8380,39 +7823,38 @@ class $$LocalLedgerTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get lotId => $composableBuilder(
-      column: $table.lotId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get lotId =>
+      $composableBuilder(column: $table.lotId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get entryType => $composableBuilder(
-      column: $table.entryType, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get entryType =>
+      $composableBuilder(column: $table.entryType, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get amount => $composableBuilder(
-      column: $table.amount, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get paymentMode => $composableBuilder(
-      column: $table.paymentMode, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get paymentMode =>
+      $composableBuilder(column: $table.paymentMode, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get description =>
+      $composableBuilder(column: $table.description, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get balanceAfter => $composableBuilder(
-      column: $table.balanceAfter, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get balanceAfter =>
+      $composableBuilder(column: $table.balanceAfter, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get recordedAt => $composableBuilder(
-      column: $table.recordedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get recordedAt =>
+      $composableBuilder(column: $table.recordedAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isSynced => $composableBuilder(
-      column: $table.isSynced, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => ColumnFilters(column));
 }
 
-class $$LocalLedgerTableOrderingComposer
-    extends Composer<_$AppDatabase, $LocalLedgerTable> {
+class $$LocalLedgerTableOrderingComposer extends Composer<_$AppDatabase, $LocalLedgerTable> {
   $$LocalLedgerTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -8420,40 +7862,38 @@ class $$LocalLedgerTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get lotId => $composableBuilder(
-      column: $table.lotId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get lotId =>
+      $composableBuilder(column: $table.lotId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get entryType => $composableBuilder(
-      column: $table.entryType, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get entryType =>
+      $composableBuilder(column: $table.entryType, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get amount => $composableBuilder(
-      column: $table.amount, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get paymentMode => $composableBuilder(
-      column: $table.paymentMode, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get paymentMode =>
+      $composableBuilder(column: $table.paymentMode, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get description =>
+      $composableBuilder(column: $table.description, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get balanceAfter => $composableBuilder(
-      column: $table.balanceAfter,
-      builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get balanceAfter =>
+      $composableBuilder(column: $table.balanceAfter, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get recordedAt => $composableBuilder(
-      column: $table.recordedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get recordedAt =>
+      $composableBuilder(column: $table.recordedAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isSynced => $composableBuilder(
-      column: $table.isSynced, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => ColumnOrderings(column));
 }
 
-class $$LocalLedgerTableAnnotationComposer
-    extends Composer<_$AppDatabase, $LocalLedgerTable> {
+class $$LocalLedgerTableAnnotationComposer extends Composer<_$AppDatabase, $LocalLedgerTable> {
   $$LocalLedgerTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -8464,8 +7904,8 @@ class $$LocalLedgerTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => column);
+  GeneratedColumn<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => column);
 
   GeneratedColumn<String> get lotId =>
       $composableBuilder(column: $table.lotId, builder: (column) => column);
@@ -8476,17 +7916,17 @@ class $$LocalLedgerTableAnnotationComposer
   GeneratedColumn<double> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
 
-  GeneratedColumn<String> get paymentMode => $composableBuilder(
-      column: $table.paymentMode, builder: (column) => column);
+  GeneratedColumn<String> get paymentMode =>
+      $composableBuilder(column: $table.paymentMode, builder: (column) => column);
 
-  GeneratedColumn<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => column);
+  GeneratedColumn<String> get description =>
+      $composableBuilder(column: $table.description, builder: (column) => column);
 
-  GeneratedColumn<double> get balanceAfter => $composableBuilder(
-      column: $table.balanceAfter, builder: (column) => column);
+  GeneratedColumn<double> get balanceAfter =>
+      $composableBuilder(column: $table.balanceAfter, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get recordedAt => $composableBuilder(
-      column: $table.recordedAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get recordedAt =>
+      $composableBuilder(column: $table.recordedAt, builder: (column) => column);
 
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
@@ -8501,20 +7941,15 @@ class $$LocalLedgerTableTableManager extends RootTableManager<
     $$LocalLedgerTableAnnotationComposer,
     $$LocalLedgerTableCreateCompanionBuilder,
     $$LocalLedgerTableUpdateCompanionBuilder,
-    (
-      LocalLedgerData,
-      BaseReferences<_$AppDatabase, $LocalLedgerTable, LocalLedgerData>
-    ),
+    (LocalLedgerData, BaseReferences<_$AppDatabase, $LocalLedgerTable, LocalLedgerData>),
     LocalLedgerData,
     PrefetchHooks Function()> {
   $$LocalLedgerTableTableManager(_$AppDatabase db, $LocalLedgerTable table)
       : super(TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$LocalLedgerTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$LocalLedgerTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () => $$LocalLedgerTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$LocalLedgerTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$LocalLedgerTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
@@ -8572,8 +8007,7 @@ class $$LocalLedgerTableTableManager extends RootTableManager<
           withReferenceMapper: (p0) => p0
               .map((e) => (
                     e.readTable<$LocalLedgerTable, LocalLedgerData>(table),
-                    BaseReferences<_$AppDatabase, $LocalLedgerTable,
-                        LocalLedgerData>(db, table, e)
+                    BaseReferences<_$AppDatabase, $LocalLedgerTable, LocalLedgerData>(db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -8589,14 +8023,10 @@ typedef $$LocalLedgerTableProcessedTableManager = ProcessedTableManager<
     $$LocalLedgerTableAnnotationComposer,
     $$LocalLedgerTableCreateCompanionBuilder,
     $$LocalLedgerTableUpdateCompanionBuilder,
-    (
-      LocalLedgerData,
-      BaseReferences<_$AppDatabase, $LocalLedgerTable, LocalLedgerData>
-    ),
+    (LocalLedgerData, BaseReferences<_$AppDatabase, $LocalLedgerTable, LocalLedgerData>),
     LocalLedgerData,
     PrefetchHooks Function()>;
-typedef $$CachedSafetyContentTableCreateCompanionBuilder
-    = CachedSafetyContentCompanion Function({
+typedef $$CachedSafetyContentTableCreateCompanionBuilder = CachedSafetyContentCompanion Function({
   required String id,
   required String category,
   Value<String> hazardLevel,
@@ -8609,8 +8039,7 @@ typedef $$CachedSafetyContentTableCreateCompanionBuilder
   required DateTime cachedAt,
   Value<int> rowid,
 });
-typedef $$CachedSafetyContentTableUpdateCompanionBuilder
-    = CachedSafetyContentCompanion Function({
+typedef $$CachedSafetyContentTableUpdateCompanionBuilder = CachedSafetyContentCompanion Function({
   Value<String> id,
   Value<String> category,
   Value<String> hazardLevel,
@@ -8633,39 +8062,35 @@ class $$CachedSafetyContentTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get hazardLevel => $composableBuilder(
-      column: $table.hazardLevel, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get hazardLevel =>
+      $composableBuilder(column: $table.hazardLevel, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get pictogramAssetPath => $composableBuilder(
-      column: $table.pictogramAssetPath,
-      builder: (column) => ColumnFilters(column));
+      column: $table.pictogramAssetPath, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get audioAssetPath => $composableBuilder(
-      column: $table.audioAssetPath,
-      builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get audioAssetPath =>
+      $composableBuilder(column: $table.audioAssetPath, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get titleVernacular => $composableBuilder(
-      column: $table.titleVernacular,
-      builder: (column) => ColumnFilters(column));
+      column: $table.titleVernacular, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get instructionsVernacular => $composableBuilder(
-      column: $table.instructionsVernacular,
-      builder: (column) => ColumnFilters(column));
+      column: $table.instructionsVernacular, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get dosJson => $composableBuilder(
-      column: $table.dosJson, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get dosJson =>
+      $composableBuilder(column: $table.dosJson, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get dontsJson => $composableBuilder(
-      column: $table.dontsJson, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get dontsJson =>
+      $composableBuilder(column: $table.dontsJson, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
-      column: $table.cachedAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$CachedSafetyContentTableOrderingComposer
@@ -8677,39 +8102,35 @@ class $$CachedSafetyContentTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get category => $composableBuilder(
-      column: $table.category, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get hazardLevel => $composableBuilder(
-      column: $table.hazardLevel, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get hazardLevel =>
+      $composableBuilder(column: $table.hazardLevel, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get pictogramAssetPath => $composableBuilder(
-      column: $table.pictogramAssetPath,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.pictogramAssetPath, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get audioAssetPath => $composableBuilder(
-      column: $table.audioAssetPath,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.audioAssetPath, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get titleVernacular => $composableBuilder(
-      column: $table.titleVernacular,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.titleVernacular, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get instructionsVernacular => $composableBuilder(
-      column: $table.instructionsVernacular,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.instructionsVernacular, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get dosJson => $composableBuilder(
-      column: $table.dosJson, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get dosJson =>
+      $composableBuilder(column: $table.dosJson, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get dontsJson => $composableBuilder(
-      column: $table.dontsJson, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get dontsJson =>
+      $composableBuilder(column: $table.dontsJson, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
-      column: $table.cachedAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$CachedSafetyContentTableAnnotationComposer
@@ -8727,20 +8148,20 @@ class $$CachedSafetyContentTableAnnotationComposer
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
 
-  GeneratedColumn<String> get hazardLevel => $composableBuilder(
-      column: $table.hazardLevel, builder: (column) => column);
+  GeneratedColumn<String> get hazardLevel =>
+      $composableBuilder(column: $table.hazardLevel, builder: (column) => column);
 
-  GeneratedColumn<String> get pictogramAssetPath => $composableBuilder(
-      column: $table.pictogramAssetPath, builder: (column) => column);
+  GeneratedColumn<String> get pictogramAssetPath =>
+      $composableBuilder(column: $table.pictogramAssetPath, builder: (column) => column);
 
-  GeneratedColumn<String> get audioAssetPath => $composableBuilder(
-      column: $table.audioAssetPath, builder: (column) => column);
+  GeneratedColumn<String> get audioAssetPath =>
+      $composableBuilder(column: $table.audioAssetPath, builder: (column) => column);
 
-  GeneratedColumn<String> get titleVernacular => $composableBuilder(
-      column: $table.titleVernacular, builder: (column) => column);
+  GeneratedColumn<String> get titleVernacular =>
+      $composableBuilder(column: $table.titleVernacular, builder: (column) => column);
 
-  GeneratedColumn<String> get instructionsVernacular => $composableBuilder(
-      column: $table.instructionsVernacular, builder: (column) => column);
+  GeneratedColumn<String> get instructionsVernacular =>
+      $composableBuilder(column: $table.instructionsVernacular, builder: (column) => column);
 
   GeneratedColumn<String> get dosJson =>
       $composableBuilder(column: $table.dosJson, builder: (column) => column);
@@ -8763,24 +8184,20 @@ class $$CachedSafetyContentTableTableManager extends RootTableManager<
     $$CachedSafetyContentTableUpdateCompanionBuilder,
     (
       CachedSafetyContentData,
-      BaseReferences<_$AppDatabase, $CachedSafetyContentTable,
-          CachedSafetyContentData>
+      BaseReferences<_$AppDatabase, $CachedSafetyContentTable, CachedSafetyContentData>
     ),
     CachedSafetyContentData,
     PrefetchHooks Function()> {
-  $$CachedSafetyContentTableTableManager(
-      _$AppDatabase db, $CachedSafetyContentTable table)
+  $$CachedSafetyContentTableTableManager(_$AppDatabase db, $CachedSafetyContentTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
               $$CachedSafetyContentTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$CachedSafetyContentTableOrderingComposer(
-                  $db: db, $table: table),
+              $$CachedSafetyContentTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$CachedSafetyContentTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$CachedSafetyContentTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
             Value<String> category = const Value.absent(),
@@ -8835,8 +8252,7 @@ class $$CachedSafetyContentTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable<$CachedSafetyContentTable,
-                        CachedSafetyContentData>(table),
+                    e.readTable<$CachedSafetyContentTable, CachedSafetyContentData>(table),
                     BaseReferences<_$AppDatabase, $CachedSafetyContentTable,
                         CachedSafetyContentData>(db, table, e)
                   ))
@@ -8856,13 +8272,11 @@ typedef $$CachedSafetyContentTableProcessedTableManager = ProcessedTableManager<
     $$CachedSafetyContentTableUpdateCompanionBuilder,
     (
       CachedSafetyContentData,
-      BaseReferences<_$AppDatabase, $CachedSafetyContentTable,
-          CachedSafetyContentData>
+      BaseReferences<_$AppDatabase, $CachedSafetyContentTable, CachedSafetyContentData>
     ),
     CachedSafetyContentData,
     PrefetchHooks Function()>;
-typedef $$SyncQueueEntriesTableCreateCompanionBuilder
-    = SyncQueueEntriesCompanion Function({
+typedef $$SyncQueueEntriesTableCreateCompanionBuilder = SyncQueueEntriesCompanion Function({
   required String clientTxId,
   required String collectorId,
   required String action,
@@ -8874,8 +8288,7 @@ typedef $$SyncQueueEntriesTableCreateCompanionBuilder
   required DateTime createdAt,
   Value<int> rowid,
 });
-typedef $$SyncQueueEntriesTableUpdateCompanionBuilder
-    = SyncQueueEntriesCompanion Function({
+typedef $$SyncQueueEntriesTableUpdateCompanionBuilder = SyncQueueEntriesCompanion Function({
   Value<String> clientTxId,
   Value<String> collectorId,
   Value<String> action,
@@ -8897,33 +8310,32 @@ class $$SyncQueueEntriesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get clientTxId => $composableBuilder(
-      column: $table.clientTxId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get clientTxId =>
+      $composableBuilder(column: $table.clientTxId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get action => $composableBuilder(
-      column: $table.action, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get payloadJson => $composableBuilder(
-      column: $table.payloadJson, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get payloadJson =>
+      $composableBuilder(column: $table.payloadJson, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get retryAttempts => $composableBuilder(
-      column: $table.retryAttempts, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get retryAttempts =>
+      $composableBuilder(column: $table.retryAttempts, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get lastError => $composableBuilder(
-      column: $table.lastError, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get clientTimestamp => $composableBuilder(
-      column: $table.clientTimestamp,
-      builder: (column) => ColumnFilters(column));
+      column: $table.clientTimestamp, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$SyncQueueEntriesTableOrderingComposer
@@ -8935,34 +8347,32 @@ class $$SyncQueueEntriesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get clientTxId => $composableBuilder(
-      column: $table.clientTxId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get clientTxId =>
+      $composableBuilder(column: $table.clientTxId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get action => $composableBuilder(
-      column: $table.action, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get payloadJson => $composableBuilder(
-      column: $table.payloadJson, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get payloadJson =>
+      $composableBuilder(column: $table.payloadJson, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get retryAttempts => $composableBuilder(
-      column: $table.retryAttempts,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.retryAttempts, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get lastError => $composableBuilder(
-      column: $table.lastError, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<DateTime> get clientTimestamp => $composableBuilder(
-      column: $table.clientTimestamp,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.clientTimestamp, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$SyncQueueEntriesTableAnnotationComposer
@@ -8974,29 +8384,29 @@ class $$SyncQueueEntriesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get clientTxId => $composableBuilder(
-      column: $table.clientTxId, builder: (column) => column);
+  GeneratedColumn<String> get clientTxId =>
+      $composableBuilder(column: $table.clientTxId, builder: (column) => column);
 
-  GeneratedColumn<String> get collectorId => $composableBuilder(
-      column: $table.collectorId, builder: (column) => column);
+  GeneratedColumn<String> get collectorId =>
+      $composableBuilder(column: $table.collectorId, builder: (column) => column);
 
   GeneratedColumn<String> get action =>
       $composableBuilder(column: $table.action, builder: (column) => column);
 
-  GeneratedColumn<String> get payloadJson => $composableBuilder(
-      column: $table.payloadJson, builder: (column) => column);
+  GeneratedColumn<String> get payloadJson =>
+      $composableBuilder(column: $table.payloadJson, builder: (column) => column);
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
-  GeneratedColumn<int> get retryAttempts => $composableBuilder(
-      column: $table.retryAttempts, builder: (column) => column);
+  GeneratedColumn<int> get retryAttempts =>
+      $composableBuilder(column: $table.retryAttempts, builder: (column) => column);
 
   GeneratedColumn<String> get lastError =>
       $composableBuilder(column: $table.lastError, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get clientTimestamp => $composableBuilder(
-      column: $table.clientTimestamp, builder: (column) => column);
+  GeneratedColumn<DateTime> get clientTimestamp =>
+      $composableBuilder(column: $table.clientTimestamp, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -9011,14 +8421,10 @@ class $$SyncQueueEntriesTableTableManager extends RootTableManager<
     $$SyncQueueEntriesTableAnnotationComposer,
     $$SyncQueueEntriesTableCreateCompanionBuilder,
     $$SyncQueueEntriesTableUpdateCompanionBuilder,
-    (
-      SyncQueueEntry,
-      BaseReferences<_$AppDatabase, $SyncQueueEntriesTable, SyncQueueEntry>
-    ),
+    (SyncQueueEntry, BaseReferences<_$AppDatabase, $SyncQueueEntriesTable, SyncQueueEntry>),
     SyncQueueEntry,
     PrefetchHooks Function()> {
-  $$SyncQueueEntriesTableTableManager(
-      _$AppDatabase db, $SyncQueueEntriesTable table)
+  $$SyncQueueEntriesTableTableManager(_$AppDatabase db, $SyncQueueEntriesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -9079,8 +8485,8 @@ class $$SyncQueueEntriesTableTableManager extends RootTableManager<
           withReferenceMapper: (p0) => p0
               .map((e) => (
                     e.readTable<$SyncQueueEntriesTable, SyncQueueEntry>(table),
-                    BaseReferences<_$AppDatabase, $SyncQueueEntriesTable,
-                        SyncQueueEntry>(db, table, e)
+                    BaseReferences<_$AppDatabase, $SyncQueueEntriesTable, SyncQueueEntry>(
+                        db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -9096,14 +8502,10 @@ typedef $$SyncQueueEntriesTableProcessedTableManager = ProcessedTableManager<
     $$SyncQueueEntriesTableAnnotationComposer,
     $$SyncQueueEntriesTableCreateCompanionBuilder,
     $$SyncQueueEntriesTableUpdateCompanionBuilder,
-    (
-      SyncQueueEntry,
-      BaseReferences<_$AppDatabase, $SyncQueueEntriesTable, SyncQueueEntry>
-    ),
+    (SyncQueueEntry, BaseReferences<_$AppDatabase, $SyncQueueEntriesTable, SyncQueueEntry>),
     SyncQueueEntry,
     PrefetchHooks Function()>;
-typedef $$LocalMLSamplesTableCreateCompanionBuilder = LocalMLSamplesCompanion
-    Function({
+typedef $$LocalMLSamplesTableCreateCompanionBuilder = LocalMLSamplesCompanion Function({
   required String id,
   required String localImagePath,
   required String label,
@@ -9117,8 +8519,7 @@ typedef $$LocalMLSamplesTableCreateCompanionBuilder = LocalMLSamplesCompanion
   required DateTime createdAt,
   Value<int> rowid,
 });
-typedef $$LocalMLSamplesTableUpdateCompanionBuilder = LocalMLSamplesCompanion
-    Function({
+typedef $$LocalMLSamplesTableUpdateCompanionBuilder = LocalMLSamplesCompanion Function({
   Value<String> id,
   Value<String> localImagePath,
   Value<String> label,
@@ -9133,8 +8534,7 @@ typedef $$LocalMLSamplesTableUpdateCompanionBuilder = LocalMLSamplesCompanion
   Value<int> rowid,
 });
 
-class $$LocalMLSamplesTableFilterComposer
-    extends Composer<_$AppDatabase, $LocalMLSamplesTable> {
+class $$LocalMLSamplesTableFilterComposer extends Composer<_$AppDatabase, $LocalMLSamplesTable> {
   $$LocalMLSamplesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -9142,43 +8542,41 @@ class $$LocalMLSamplesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get localImagePath => $composableBuilder(
-      column: $table.localImagePath,
-      builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get localImagePath =>
+      $composableBuilder(column: $table.localImagePath, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get label => $composableBuilder(
-      column: $table.label, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get weightKg =>
+      $composableBuilder(column: $table.weightKg, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get price => $composableBuilder(
-      column: $table.price, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get price =>
+      $composableBuilder(column: $table.price, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get latitude => $composableBuilder(
-      column: $table.latitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get longitude => $composableBuilder(
-      column: $table.longitude, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get qualityScore => $composableBuilder(
-      column: $table.qualityScore, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get qualityScore =>
+      $composableBuilder(column: $table.qualityScore, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isUploaded => $composableBuilder(
-      column: $table.isUploaded, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get isUploaded =>
+      $composableBuilder(column: $table.isUploaded, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$LocalMLSamplesTableOrderingComposer
-    extends Composer<_$AppDatabase, $LocalMLSamplesTable> {
+class $$LocalMLSamplesTableOrderingComposer extends Composer<_$AppDatabase, $LocalMLSamplesTable> {
   $$LocalMLSamplesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -9186,40 +8584,38 @@ class $$LocalMLSamplesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get localImagePath => $composableBuilder(
-      column: $table.localImagePath,
-      builder: (column) => ColumnOrderings(column));
+      column: $table.localImagePath, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get label => $composableBuilder(
-      column: $table.label, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get weightKg => $composableBuilder(
-      column: $table.weightKg, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get weightKg =>
+      $composableBuilder(column: $table.weightKg, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get price => $composableBuilder(
-      column: $table.price, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get price =>
+      $composableBuilder(column: $table.price, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get latitude => $composableBuilder(
-      column: $table.latitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get longitude => $composableBuilder(
-      column: $table.longitude, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get qualityScore => $composableBuilder(
-      column: $table.qualityScore,
-      builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get qualityScore =>
+      $composableBuilder(column: $table.qualityScore, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isUploaded => $composableBuilder(
-      column: $table.isUploaded, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get isUploaded =>
+      $composableBuilder(column: $table.isUploaded, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalMLSamplesTableAnnotationComposer
@@ -9234,8 +8630,8 @@ class $$LocalMLSamplesTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get localImagePath => $composableBuilder(
-      column: $table.localImagePath, builder: (column) => column);
+  GeneratedColumn<String> get localImagePath =>
+      $composableBuilder(column: $table.localImagePath, builder: (column) => column);
 
   GeneratedColumn<String> get label =>
       $composableBuilder(column: $table.label, builder: (column) => column);
@@ -9255,11 +8651,11 @@ class $$LocalMLSamplesTableAnnotationComposer
   GeneratedColumn<String> get source =>
       $composableBuilder(column: $table.source, builder: (column) => column);
 
-  GeneratedColumn<double> get qualityScore => $composableBuilder(
-      column: $table.qualityScore, builder: (column) => column);
+  GeneratedColumn<double> get qualityScore =>
+      $composableBuilder(column: $table.qualityScore, builder: (column) => column);
 
-  GeneratedColumn<bool> get isUploaded => $composableBuilder(
-      column: $table.isUploaded, builder: (column) => column);
+  GeneratedColumn<bool> get isUploaded =>
+      $composableBuilder(column: $table.isUploaded, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -9274,14 +8670,10 @@ class $$LocalMLSamplesTableTableManager extends RootTableManager<
     $$LocalMLSamplesTableAnnotationComposer,
     $$LocalMLSamplesTableCreateCompanionBuilder,
     $$LocalMLSamplesTableUpdateCompanionBuilder,
-    (
-      LocalMLSample,
-      BaseReferences<_$AppDatabase, $LocalMLSamplesTable, LocalMLSample>
-    ),
+    (LocalMLSample, BaseReferences<_$AppDatabase, $LocalMLSamplesTable, LocalMLSample>),
     LocalMLSample,
     PrefetchHooks Function()> {
-  $$LocalMLSamplesTableTableManager(
-      _$AppDatabase db, $LocalMLSamplesTable table)
+  $$LocalMLSamplesTableTableManager(_$AppDatabase db, $LocalMLSamplesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -9350,8 +8742,7 @@ class $$LocalMLSamplesTableTableManager extends RootTableManager<
           withReferenceMapper: (p0) => p0
               .map((e) => (
                     e.readTable<$LocalMLSamplesTable, LocalMLSample>(table),
-                    BaseReferences<_$AppDatabase, $LocalMLSamplesTable,
-                        LocalMLSample>(db, table, e)
+                    BaseReferences<_$AppDatabase, $LocalMLSamplesTable, LocalMLSample>(db, table, e)
                   ))
               .toList(),
           prefetchHooksCallback: null,
@@ -9367,10 +8758,7 @@ typedef $$LocalMLSamplesTableProcessedTableManager = ProcessedTableManager<
     $$LocalMLSamplesTableAnnotationComposer,
     $$LocalMLSamplesTableCreateCompanionBuilder,
     $$LocalMLSamplesTableUpdateCompanionBuilder,
-    (
-      LocalMLSample,
-      BaseReferences<_$AppDatabase, $LocalMLSamplesTable, LocalMLSample>
-    ),
+    (LocalMLSample, BaseReferences<_$AppDatabase, $LocalMLSamplesTable, LocalMLSample>),
     LocalMLSample,
     PrefetchHooks Function()>;
 

@@ -39,13 +39,13 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (Migrator m) async {
-      await m.createAll();
-    },
-    onUpgrade: (Migrator m, int from, int to) async {
-      // Future schema migrations for mobile local db
-    },
-  );
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          // Future schema migrations for mobile local db
+        },
+      );
 
   /// Stream all local lots/transactions for a collector ordered by newest first
   Stream<List<LocalTransaction>> watchCollectorLots(String collectorId) {
@@ -57,16 +57,12 @@ class AppDatabase extends _$AppDatabase {
 
   /// Stream all local lots across the device
   Stream<List<LocalTransaction>> watchAllLots() {
-    return (select(localTransactions)
-          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
-        .watch();
+    return (select(localTransactions)..orderBy([(t) => OrderingTerm.desc(t.createdAt)])).watch();
   }
 
   /// Stream all cached prices ordered by recorded time
   Stream<List<CachedPrice>> watchCachedPrices() {
-    return (select(cachedPrices)
-          ..orderBy([(p) => OrderingTerm.desc(p.recordedAt)]))
-        .watch();
+    return (select(cachedPrices)..orderBy([(p) => OrderingTerm.desc(p.recordedAt)])).watch();
   }
 
   /// Stream local ledger entries for a collector

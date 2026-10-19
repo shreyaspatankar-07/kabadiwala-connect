@@ -35,10 +35,13 @@ class PickupRequestDto {
       photoUrls: (json['photo_urls'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       addressText: json['address_text']?.toString() ?? json['addressText']?.toString(),
       latitude: (json['latitude'] as num?)?.toDouble() ?? (json['lat'] as num?)?.toDouble() ?? 0.0,
-      longitude: (json['longitude'] as num?)?.toDouble() ?? (json['lng'] as num?)?.toDouble() ?? 0.0,
+      longitude:
+          (json['longitude'] as num?)?.toDouble() ?? (json['lng'] as num?)?.toDouble() ?? 0.0,
       estimatedDistanceKm: (json['estimated_distance_km'] as num?)?.toDouble(),
       assignedCollectorId: json['assigned_collector_id']?.toString(),
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'].toString()) : DateTime.now(),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'].toString())
+          : DateTime.now(),
     );
   }
 

@@ -118,7 +118,9 @@ class _SafetyScreenState extends State<SafetyScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          isMr ? 'सुरक्षा नियम व मार्गदर्शन' : (isHi ? 'सुरक्षा नियम एवं मार्गदर्शन' : 'Safety Guidance'),
+          isMr
+              ? 'सुरक्षा नियम व मार्गदर्शन'
+              : (isHi ? 'सुरक्षा नियम एवं मार्गदर्शन' : 'Safety Guidance'),
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w900,
@@ -211,7 +213,9 @@ class _SafetyScreenState extends State<SafetyScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isAck ? AppTheme.greenGoEarn.withValues(alpha: 0.4) : hazardColor.withValues(alpha: 0.25),
+                        color: isAck
+                            ? AppTheme.greenGoEarn.withValues(alpha: 0.4)
+                            : hazardColor.withValues(alpha: 0.25),
                         width: isAck ? 2 : 1.5,
                       ),
                       boxShadow: [
@@ -271,7 +275,8 @@ class _SafetyScreenState extends State<SafetyScreen> {
                                   if (isAck)
                                     Container(
                                       key: Key('acknowledged_badge_${card.topicId}'),
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding:
+                                          const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: AppTheme.greenGoEarnLight,
                                         borderRadius: BorderRadius.circular(6),
@@ -279,7 +284,8 @@ class _SafetyScreenState extends State<SafetyScreen> {
                                       child: const Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.check_rounded, size: 12, color: AppTheme.greenGoEarn),
+                                          Icon(Icons.check_rounded,
+                                              size: 12, color: AppTheme.greenGoEarn),
                                           SizedBox(width: 2),
                                           Text(
                                             'समजले',

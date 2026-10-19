@@ -199,13 +199,13 @@ abstract class AppLocalizations {
   /// No description provided for @unlockPrompt.
   ///
   /// In mr, this message translates to:
-  /// **'अ‍ॅप उघडण्यासाठी पिन टाका'**
+  /// **'अॅप उघडण्यासाठी पिन टाका'**
   String get unlockPrompt;
 
   /// No description provided for @tabAddLot.
   ///
   /// In mr, this message translates to:
-  /// **'माल जोडा'**
+  /// **'नवीन माल जोडा'**
   String get tabAddLot;
 
   /// No description provided for @tabPriceBoard.
@@ -238,6 +238,12 @@ abstract class AppLocalizations {
   /// **'फोटो काढा'**
   String get takePhoto;
 
+  /// No description provided for @takePhotoHint.
+  ///
+  /// In mr, this message translates to:
+  /// **'कॅमेरा उघडण्यासाठी दाबा'**
+  String get takePhotoHint;
+
   /// No description provided for @photoCaptured.
   ///
   /// In mr, this message translates to:
@@ -253,8 +259,14 @@ abstract class AppLocalizations {
   /// No description provided for @weightKg.
   ///
   /// In mr, this message translates to:
-  /// **'वजन (किलो)'**
+  /// **'वजन नोंदवा (किलो)'**
   String get weightKg;
+
+  /// No description provided for @enterWeight.
+  ///
+  /// In mr, this message translates to:
+  /// **'वजन नोंदवा'**
+  String get enterWeight;
 
   /// No description provided for @estimatedPrice.
   ///
@@ -273,6 +285,36 @@ abstract class AppLocalizations {
   /// In mr, this message translates to:
   /// **'माल यशस्वीरीत्या नोंदवला गेला'**
   String get lotSavedSuccess;
+
+  /// No description provided for @aiConfidenceLabel.
+  ///
+  /// In mr, this message translates to:
+  /// **'% खात्री'**
+  String get aiConfidenceLabel;
+
+  /// No description provided for @aiSuggestedCategories.
+  ///
+  /// In mr, this message translates to:
+  /// **'कॅमेरा सुचवलेले प्रकार:'**
+  String get aiSuggestedCategories;
+
+  /// No description provided for @showAllCategories.
+  ///
+  /// In mr, this message translates to:
+  /// **'सर्व पहा'**
+  String get showAllCategories;
+
+  /// No description provided for @showLessCategories.
+  ///
+  /// In mr, this message translates to:
+  /// **'कमी दाखवा'**
+  String get showLessCategories;
+
+  /// No description provided for @otherCategories.
+  ///
+  /// In mr, this message translates to:
+  /// **'इतर सर्व प्रकार:'**
+  String get otherCategories;
 
   /// No description provided for @catCrt.
   ///
@@ -448,6 +490,18 @@ abstract class AppLocalizations {
   /// **'आता सिंक करा'**
   String get syncNow;
 
+  /// No description provided for @navigationOfflineTitle.
+  ///
+  /// In mr, this message translates to:
+  /// **'नेव्हिगेशन उपलब्ध नाही'**
+  String get navigationOfflineTitle;
+
+  /// No description provided for @navigationOfflineMessage.
+  ///
+  /// In mr, this message translates to:
+  /// **'थेट नेव्हिगेशनसाठी इंटरनेट आवश्यक आहे. कनेक्शन मिळाल्यावर पुन्हा प्रयत्न करा.'**
+  String get navigationOfflineMessage;
+
   /// No description provided for @privacyTitle.
   ///
   /// In mr, this message translates to:
@@ -493,7 +547,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteMyData.
   ///
   /// In mr, this message translates to:
-  /// **'माझा सर्व डेटा नष्ट करा (Delete)'**
+  /// **'माझा सर्व डेटा नष्ट करा'**
   String get deleteMyData;
 
   /// No description provided for @deleteConfirmTitle.

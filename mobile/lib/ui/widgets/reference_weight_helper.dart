@@ -30,7 +30,8 @@ class ReferenceWeightHelper extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.photo_size_select_actual_rounded, color: AppTheme.greenGoEarn, size: 24),
+              const Icon(Icons.photo_size_select_actual_rounded,
+                  color: AppTheme.greenGoEarn, size: 24),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -106,26 +107,50 @@ class ReferenceWeightHelper extends StatelessWidget {
       case 'Batteries':
         return [
           (weightKg: 0.5, label: isHi ? 'छोटा पैक' : 'छोटा पॅक', icon: Icons.battery_1_bar_rounded),
-          (weightKg: 4.0, label: isHi ? 'बाइक बैटरी' : 'बाईक बॅटरी', icon: Icons.battery_5_bar_rounded),
-          (weightKg: 18.0, label: isHi ? 'बड़ी इन्वर्टर' : 'मोठी इन्व्हर्टर', icon: Icons.battery_full_rounded),
+          (
+            weightKg: 4.0,
+            label: isHi ? 'बाइक बैटरी' : 'बाईक बॅटरी',
+            icon: Icons.battery_5_bar_rounded
+          ),
+          (
+            weightKg: 18.0,
+            label: isHi ? 'बड़ी इन्वर्टर' : 'मोठी इन्व्हर्टर',
+            icon: Icons.battery_full_rounded
+          ),
         ];
       case 'Cables':
         return [
           (weightKg: 1.0, label: isHi ? 'छोटा बंडल' : 'छोटा बंडल', icon: Icons.cable_rounded),
-          (weightKg: 5.0, label: isHi ? 'मध्यम थैला' : 'मध्यम गोणी', icon: Icons.shopping_bag_rounded),
+          (
+            weightKg: 5.0,
+            label: isHi ? 'मध्यम थैला' : 'मध्यम गोणी',
+            icon: Icons.shopping_bag_rounded
+          ),
           (weightKg: 20.0, label: isHi ? 'भारी बंडल' : 'मोठा ढीग', icon: Icons.inventory_2_rounded),
         ];
       case 'CRT':
         return [
           (weightKg: 8.0, label: isHi ? '14" मॉनिटर' : '१४" मॉनिटर', icon: Icons.tv_rounded),
           (weightKg: 16.0, label: isHi ? '21" टीवी' : '२१" टीव्ही', icon: Icons.tv_off_rounded),
-          (weightKg: 25.0, label: isHi ? 'बड़ा टीवी' : 'मोठा टीव्ही', icon: Icons.desktop_windows_rounded),
+          (
+            weightKg: 25.0,
+            label: isHi ? 'बड़ा टीवी' : 'मोठा टीव्ही',
+            icon: Icons.desktop_windows_rounded
+          ),
         ];
       case 'PCB':
       default:
         return [
-          (weightKg: 0.3, label: isHi ? 'मोबाइल बोर्ड' : 'मोबाईल बोर्ड', icon: Icons.smartphone_rounded),
-          (weightKg: 5.0, label: isHi ? 'हा आकार ~ ५ कि.' : 'हा आकार ~ ५ कि.', icon: Icons.developer_board_rounded),
+          (
+            weightKg: 0.3,
+            label: isHi ? 'मोबाइल बोर्ड' : 'मोबाईल बोर्ड',
+            icon: Icons.smartphone_rounded
+          ),
+          (
+            weightKg: 5.0,
+            label: isHi ? 'हा आकार ~ ५ कि.' : 'हा आकार ~ ५ कि.',
+            icon: Icons.developer_board_rounded
+          ),
           (weightKg: 15.0, label: isHi ? 'बड़ा रैक' : 'मोठा रॅक', icon: Icons.storage_rounded),
         ];
     }

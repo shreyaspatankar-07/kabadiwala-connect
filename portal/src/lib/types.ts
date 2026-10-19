@@ -1,10 +1,12 @@
-export type UserRole = "recycler" | "admin" | "collector";
+export type UserRole = "public" | "recycler" | "admin";
 
 export interface UserSession {
   id: string;
   email: string;
   name: string;
   role: UserRole;
+  phone?: string;
+  address?: string;
   token?: string;
   recyclerId?: string;
   authorizationNumber?: string;

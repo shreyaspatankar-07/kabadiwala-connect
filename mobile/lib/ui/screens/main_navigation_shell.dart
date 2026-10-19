@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:drift/drift.dart' show countAll;
 import 'package:flutter/material.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/auth/session_service.dart';
+import '../../core/config/app_config.dart';
 import '../../core/haptics/haptic_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/local_database.dart';
@@ -19,7 +22,6 @@ import 'privacy_screen.dart';
 import 'safety_screen.dart';
 import '../../data/models/pickup_request_model.dart';
 import '../widgets/pickup_alert_dialog.dart';
-
 
 /// Bottom Navigation Shell with 4 tabs:
 /// 1. Add Lot (माल जोडा / माल जोड़ें)
@@ -51,8 +53,8 @@ class MainNavigationShell extends StatefulWidget {
 
 class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
-  bool _isOnline = false; // offline-first default
-  int _pendingCount = 2; // offline queue count
+  bool _isOnline = true; // default optimistic until checked
+  int _pendingCount = 0; // live pending count
   String _activeCollectorId = 'KC-C-COLLECTOR';
 
   late final AppDatabase _db;
@@ -86,9 +88,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     _ledgerRepo = widget.ledgerRepository ?? LedgerRepository(_db);
     _priceRepo = widget.priceRepository ?? PriceRepository(_db);
 
+    _initConnectivityAndPending();
+
     if (!WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
       try {
-        _syncEngine = SyncEngine(db: _db);
+        _syncEngine = SyncEngine(db: _db, serverBaseUrl: AppConfig.apiBaseUrl);
         _syncSub = _syncEngine!.stateStream.listen((state) {
           if (!mounted) return;
           setState(() {
@@ -104,6 +108,26 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.audioService.speakPrompt(_tabPromptKeys[_currentIndex]);
     });
+  }
+
+  Future<void> _initConnectivityAndPending() async {
+    try {
+      final connectivityResult = await Connectivity().checkConnectivity();
+      final hasConn = connectivityResult != ConnectivityResult.none;
+      final count = countAll();
+      final query = _db.selectOnly(_db.syncQueueEntries)
+        ..addColumns([count])
+        ..where(_db.syncQueueEntries.status.equals('pending'));
+      final pending = (await query.map((row) => row.read(count)).getSingle()) ?? 0;
+      if (mounted) {
+        setState(() {
+          _isOnline = hasConn;
+          _pendingCount = pending;
+        });
+      }
+    } catch (e) {
+      debugPrint('[MainNavigationShell] _initConnectivityAndPending error: $e');
+    }
   }
 
   Future<void> _initCollectorId() async {
@@ -144,7 +168,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       case 2:
         return locale == 'mr' ? 'माझी कमाई' : (locale == 'hi' ? 'मेरी कमाई' : 'Earnings & Lots');
       case 3:
-        return locale == 'mr' ? 'सुरक्षा नियम' : (locale == 'hi' ? 'सुरक्षा नियम' : 'Safety Guidance');
+        return locale == 'mr'
+            ? 'सुरक्षा नियम'
+            : (locale == 'hi' ? 'सुरक्षा नियम' : 'Safety Guidance');
       default:
         return locale == 'en' ? 'Kabadiwala Connect' : 'कबाडीवाला कनेक्ट';
     }
@@ -167,10 +193,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           return;
         }
 
-        final exitTitle = isMr ? 'अ‍ॅपमधून बाहेर पडायचे आहे का?' : (isHi ? 'ऐप बंद करें?' : 'Exit App?');
+        final exitTitle =
+            isMr ? 'अ‍ॅपमधून बाहेर पडायचे आहे का?' : (isHi ? 'ऐप बंद करें?' : 'Exit App?');
         final exitContent = isMr
             ? 'आपण कबाडीवाला कनेक्ट अ‍ॅपमधून बाहेर पडू इच्छिता?'
-            : (isHi ? 'क्या आप कबाडीवाला कनेक्ट से बाहर निकलना चाहते हैं?' : 'Are you sure you want to exit Kabadiwala Connect?');
+            : (isHi
+                ? 'क्या आप कबाडीवाला कनेक्ट से बाहर निकलना चाहते हैं?'
+                : 'Are you sure you want to exit Kabadiwala Connect?');
         final cancelText = isMr ? 'नाही (रद्द करा)' : (isHi ? 'नहीं, चालू रखें' : 'Cancel');
         final confirmText = isMr ? 'होय, बाहेर पडा' : (isHi ? 'हां, बाहर निकलें' : 'Exit');
 
@@ -200,7 +229,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AppTheme.dangerRed),
                 onPressed: () => Navigator.pop(ctx, true),
-                child: Text(confirmText, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(confirmText,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -218,13 +248,17 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           actions: [
             IconButton(
               key: const Key('btn_doorstep_pickups'),
-              tooltip: locale == 'mr' ? 'घरपोच पिकअप विनंत्या' : (locale == 'hi' ? 'घर से पिकअप' : 'Doorstep Pickups'),
+              tooltip: locale == 'mr'
+                  ? 'घरपोच पिकअप विनंत्या'
+                  : (locale == 'hi' ? 'घर से पिकअप' : 'Doorstep Pickups'),
               icon: const Icon(Icons.two_wheeler_rounded, color: AppTheme.greenGoEarn, size: 28),
               onPressed: () => _checkDoorstepPickups(context, locale),
             ),
             IconButton(
               key: const Key('btn_open_privacy_screen'),
-              tooltip: locale == 'mr' ? 'गोपनीयता व सुरक्षा' : (locale == 'hi' ? 'गोपनीयता एवं सुरक्षा' : 'Privacy & Security'),
+              tooltip: locale == 'mr'
+                  ? 'गोपनीयता व सुरक्षा'
+                  : (locale == 'hi' ? 'गोपनीयता एवं सुरक्षा' : 'Privacy & Security'),
               icon: const Icon(Icons.privacy_tip_outlined, color: AppTheme.greenGoEarn, size: 26),
               onPressed: () {
                 Navigator.push(
@@ -304,13 +338,17 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 label: locale == 'mr' ? 'माल जोडा' : (locale == 'hi' ? 'माल जोड़ें' : 'Add Lot'),
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Icons.currency_rupee_rounded, size: 30, key: Key('nav_price_board')),
-                activeIcon: const Icon(Icons.monetization_on, size: 32, key: Key('nav_price_board')),
+                icon:
+                    const Icon(Icons.currency_rupee_rounded, size: 30, key: Key('nav_price_board')),
+                activeIcon:
+                    const Icon(Icons.monetization_on, size: 32, key: Key('nav_price_board')),
                 label: locale == 'mr' ? 'दर फलक' : (locale == 'hi' ? 'भाव सूची' : 'Price Board'),
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Icons.account_balance_wallet_outlined, size: 30, key: Key('nav_earnings')),
-                activeIcon: const Icon(Icons.account_balance_wallet, size: 32, key: Key('nav_earnings')),
+                icon: const Icon(Icons.account_balance_wallet_outlined,
+                    size: 30, key: Key('nav_earnings')),
+                activeIcon:
+                    const Icon(Icons.account_balance_wallet, size: 32, key: Key('nav_earnings')),
                 label: locale == 'mr' ? 'कमाई' : (locale == 'hi' ? 'कमाई' : 'Earnings'),
               ),
               BottomNavigationBarItem(
@@ -383,7 +421,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           status: 'CREATED',
           categories: const ['CABLES', 'BATTERIES'],
           photoUrls: const [],
-          addressText: locale == 'mr' ? 'कॅम्प रोड, अमरावती (1.2 किमी दूर)' : 'Camp Road, Amravati (1.2 km away)',
+          addressText: locale == 'mr'
+              ? 'कॅम्प रोड, अमरावती (1.2 किमी दूर)'
+              : 'Camp Road, Amravati (1.2 km away)',
           latitude: 20.9320,
           longitude: 77.7523,
           estimatedDistanceKm: 1.2,
@@ -437,7 +477,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       lotRepository: widget.lotRepository ?? LotRepository(_db),
                       priceRepository: _priceRepo,
                       locale: locale,
-                      initialCategory: pickup.categories.isNotEmpty ? pickup.categories.first : 'CABLES',
+                      initialCategory:
+                          pickup.categories.isNotEmpty ? pickup.categories.first : 'CABLES',
                       initialPublicCode: pickup.publicCode,
                       onLotSaved: (tx) {
                         setState(() {

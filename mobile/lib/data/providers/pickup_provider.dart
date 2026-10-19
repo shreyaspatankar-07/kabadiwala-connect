@@ -128,7 +128,8 @@ class PickupDispatchNotifier extends StateNotifier<PickupDispatchState> {
     }
 
     // Local optimistic acceptance if offline
-    final collectorId = await SessionService.getCollectorId() ?? await SessionService.getOrCreateCollectorId();
+    final collectorId =
+        await SessionService.getCollectorId() ?? await SessionService.getOrCreateCollectorId();
     final optimistic = PickupRequestDto(
       id: pickup.id,
       publicCode: pickup.publicCode,

@@ -128,6 +128,27 @@ class AuthService:
             has_pin=True,
         )
 
+    HARDCODED_ACCOUNTS = {
+        "recycler@ecorecycle.in": {
+            "password": "recycler123",
+            "role": UserRole.RECYCLER,
+            "name": "Maharashtra Eco-Recyclers",
+            "recycler_id": "REC-SYNTH-001",
+        },
+        "admin@jnarddc.gov.in": {
+            "password": "admin123",
+            "role": UserRole.ADMIN,
+            "name": "JNARDDC Government Admin Compliance",
+            "recycler_id": None,
+        },
+        "citizen@mumbai.gov.in": {
+            "password": "citizen123",
+            "role": UserRole.PUBLIC,
+            "name": "Sunita Sharma (Citizen)",
+            "recycler_id": None,
+        },
+    }
+
     @staticmethod
     async def register_user(data: UserRegisterRequest, db: AsyncSession) -> TokenResponse:
         # Check if email exists
@@ -137,6 +158,9 @@ class AuthService:
 
         user = User(
             email=data.email,
+            phone=data.phone,
+            name=data.name,
+            address=data.address,
             hashed_password=hash_password(data.password),
             role=UserRole(data.role),
             recycler_id=data.recycler_id,
@@ -148,18 +172,56 @@ class AuthService:
         token = create_access_token(
             subject=str(user.id),
             role=user.role.value,
-            extra_claims={"recycler_id": user.recycler_id},
+            extra_claims={"recycler_id": user.recycler_id, "name": user.name},
         )
         return TokenResponse(
             access_token=token,
             token_type="bearer",
             role=user.role.value,
+            name=user.name,
+            email=user.email,
             collector_id=None,
             has_pin=False,
         )
 
     @staticmethod
     async def login_email(data: EmailLoginRequest, db: AsyncSession) -> TokenResponse:
+        clean_email = data.email.strip().lower()
+
+        # Check for hardcoded demo accounts first
+        if clean_email in AuthService.HARDCODED_ACCOUNTS:
+            demo_cfg = AuthService.HARDCODED_ACCOUNTS[clean_email]
+            if data.password == demo_cfg["password"]:
+                # Ensure user exists in database
+                res = await db.execute(select(User).where(User.email == clean_email))
+                user = res.scalar_one_or_none()
+                if not user:
+                    user = User(
+                        email=clean_email,
+                        name=demo_cfg["name"],
+                        hashed_password=hash_password(demo_cfg["password"]),
+                        role=demo_cfg["role"],
+                        recycler_id=demo_cfg["recycler_id"],
+                    )
+                    db.add(user)
+                    await db.commit()
+                    await db.refresh(user)
+
+                token = create_access_token(
+                    subject=str(user.id),
+                    role=user.role.value,
+                    extra_claims={"recycler_id": user.recycler_id, "name": user.name},
+                )
+                return TokenResponse(
+                    access_token=token,
+                    token_type="bearer",
+                    role=user.role.value,
+                    name=user.name or demo_cfg["name"],
+                    email=user.email,
+                    collector_id=user.collector_id,
+                    has_pin=False,
+                )
+
         res = await db.execute(select(User).where(User.email == data.email))
         user = res.scalar_one_or_none()
 
@@ -172,12 +234,14 @@ class AuthService:
         token = create_access_token(
             subject=str(user.id),
             role=user.role.value,
-            extra_claims={"recycler_id": user.recycler_id},
+            extra_claims={"recycler_id": user.recycler_id, "name": user.name},
         )
         return TokenResponse(
             access_token=token,
             token_type="bearer",
             role=user.role.value,
+            name=user.name,
+            email=user.email,
             collector_id=user.collector_id,
             has_pin=False,
         )

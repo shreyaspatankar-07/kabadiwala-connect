@@ -774,8 +774,7 @@ class SafetyRepository {
     final List<SafetyCard> result = [];
 
     for (final raw in _rawCards) {
-      if (category != null &&
-          (raw['category'] as String).toLowerCase() != category.toLowerCase()) {
+      if (category != null && (raw['category'] as String).toLowerCase() != category.toLowerCase()) {
         continue;
       }
 

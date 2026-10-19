@@ -10,8 +10,7 @@ import 'package:uuid/uuid.dart';
 /// - Collector ID is a generated UUIDv4 prefixed with "KC-C-", stored securely in
 ///   hardware-backed Android KeyStore via [FlutterSecureStorage].
 class AuthService {
-  AuthService({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+  AuthService({FlutterSecureStorage? storage}) : _storage = storage ?? const FlutterSecureStorage();
 
   final FlutterSecureStorage _storage;
   static const String keyCollectorId = 'kc_secure_collector_id';

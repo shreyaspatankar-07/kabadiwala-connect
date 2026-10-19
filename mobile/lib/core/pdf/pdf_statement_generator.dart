@@ -72,7 +72,8 @@ class PdfStatementGenerator {
     streamBuf.writeln('(${esc("KABADIWALA CONNECT - JNARDDC EPR EARNINGS STATEMENT")}) Tj');
     streamBuf.writeln('/F1 10 Tf');
     streamBuf.writeln('0 -18 Td');
-    streamBuf.writeln('(${esc("Official Informal E-Waste Collector Income Proof under E-Waste Rules 2022")}) Tj');
+    streamBuf.writeln(
+        '(${esc("Official Informal E-Waste Collector Income Proof under E-Waste Rules 2022")}) Tj');
     streamBuf.writeln('ET');
 
     // Collector Meta Card
@@ -198,7 +199,8 @@ class PdfStatementGenerator {
     streamBuf.writeln('BT');
     streamBuf.writeln('/F1 8 Tf');
     streamBuf.writeln('30 40 Td');
-    streamBuf.writeln('(${esc("Digitally generated via Kabadiwala Connect offline ledger. Tamper-evident hash chained under Ministry of Mines / JNARDDC.")}) Tj');
+    streamBuf.writeln(
+        '(${esc("Digitally generated via Kabadiwala Connect offline ledger. Tamper-evident hash chained under Ministry of Mines / JNARDDC.")}) Tj');
     streamBuf.writeln('ET');
 
     final streamString = streamBuf.toString();
@@ -225,7 +227,8 @@ class PdfStatementGenerator {
 
     // Object 3: Page (A4: 595.28 x 841.89 pt)
     offsets.add(pdfOutput.length);
-    append('3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>\nendobj\n');
+    append(
+        '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>\nendobj\n');
 
     // Object 4: Content Stream
     offsets.add(pdfOutput.length);

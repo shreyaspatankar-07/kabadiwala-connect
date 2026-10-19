@@ -39,7 +39,10 @@ class EmailLoginRequest(BaseModel):
 class UserRegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6)
-    role: str = Field("recycler", pattern=r"^(recycler|admin)$")
+    role: str = Field("public", pattern=r"^(recycler|admin|public)$")
+    name: str | None = None
+    phone: str | None = None
+    address: str | None = None
     recycler_id: str | None = None
 
 
@@ -47,6 +50,8 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: str
+    name: str | None = None
+    email: str | None = None
     collector_id: str | None = None
     has_pin: bool = False
 
@@ -55,6 +60,8 @@ class UserProfileResponse(BaseModel):
     id: str
     email: str | None = None
     phone: str | None = None
+    name: str | None = None
+    address: str | None = None
     role: str
     collector_id: str | None = None
     recycler_id: str | None = None

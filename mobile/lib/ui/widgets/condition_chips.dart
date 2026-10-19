@@ -19,7 +19,8 @@ class ConditionChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<({ItemCondition cond, String label, IconData icon, Color color, Color bg})> conditions = [
+    final List<({ItemCondition cond, String label, IconData icon, Color color, Color bg})>
+        conditions = [
       (
         cond: ItemCondition.working,
         label: locale == 'hi' ? 'चालू स्थिति' : (locale == 'en' ? 'Working' : 'चालू स्थिति'),
@@ -54,7 +55,9 @@ class ConditionChips extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          locale == 'hi' ? 'सामान की स्थिति:' : (locale == 'en' ? 'Item Condition:' : 'मालाची स्थिती:'),
+          locale == 'hi'
+              ? 'सामान की स्थिति:'
+              : (locale == 'en' ? 'Item Condition:' : 'मालाची स्थिती:'),
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),

@@ -107,7 +107,8 @@ class OfflineHandoverService {
         await SessionService.getOrCreateCollectorId();
     final now = timestamp ?? DateTime.now().toUtc();
     final refNo = generateShortCode();
-    final collectorHash = sha256.convert(utf8.encode(effectiveCollectorId)).toString().substring(0, 16);
+    final collectorHash =
+        sha256.convert(utf8.encode(effectiveCollectorId)).toString().substring(0, 16);
 
     final payloadMap = {
       'collector_id_hash': collectorHash,
@@ -203,7 +204,8 @@ class OfflineHandoverService {
     }
 
     // Look up LocalTraceability
-    final query = _db.select(_db.localTraceability)..where((t) => t.handoverRefNo.equals(targetRef!));
+    final query = _db.select(_db.localTraceability)
+      ..where((t) => t.handoverRefNo.equals(targetRef!));
     final traceRow = await query.getSingleOrNull();
 
     if (traceRow == null) {
@@ -230,52 +232,117 @@ class OfflineHandoverService {
             '${traceRow.qrPayload}:${traceRow.prevHash}:$measuredWeightKg:$finalPrice:$recyclerId:${now.toIso8601String()}'))
         .toString();
 
-    // Update LocalTraceability
-    await (_db.update(_db.localTraceability)..where((t) => t.handoverRefNo.equals(targetRef!))).write(
-      LocalTraceabilityCompanion(
-        recyclerConfirmation: const Value(true),
-        confirmedAt: Value(now),
-        confirmedBy: Value(recyclerId),
-        downstreamStatus: const Value('received'),
-        recordHash: Value(newRecordHash),
-        isSynced: const Value(false),
-      ),
-    );
+    await _db.transaction(() async {
+      // Update LocalTraceability
+      await (_db.update(_db.localTraceability)..where((t) => t.handoverRefNo.equals(targetRef!)))
+          .write(
+        LocalTraceabilityCompanion(
+          recyclerConfirmation: const Value(true),
+          confirmedAt: Value(now),
+          confirmedBy: Value(recyclerId),
+          downstreamStatus: const Value('received'),
+          recordHash: Value(newRecordHash),
+          isSynced: const Value(false),
+        ),
+      );
 
-    // Update LocalTransactions
-    await (_db.update(_db.localTransactions)..where((t) => t.lotId.equals(traceRow.lotId))).write(
-      LocalTransactionsCompanion(
-        transactionStatus: Value(txStatus),
-        finalPrice: Value(finalPrice),
-        handoverAt: Value(now),
-        recyclerId: Value(recyclerId),
-        anomalyFlag: Value(isDisputed),
-        anomalyReason: Value(disputeReason),
-      ),
-    );
+      // 1. Fetch associated LocalTransaction
+      final txRow = await (_db.select(_db.localTransactions)
+            ..where((t) => t.lotId.equals(traceRow.lotId)))
+          .getSingleOrNull();
 
-    // Enqueue confirm sync
-    await _db.into(_db.syncQueueEntries).insert(
-          SyncQueueEntriesCompanion.insert(
-            clientTxId: _uuid.v4(),
-            collectorId: traceRow.lotId,
-            action: 'record_handover',
-            payloadJson: jsonEncode({
-              'handover_ref_no': targetRef,
-              'measured_weight_kg': measuredWeightKg,
-              'final_price': finalPrice,
-              'recycler_id': recyclerId,
-              'confirmed_at': now.toIso8601String(),
-              'transaction_status': txStatus,
-              'is_disputed': isDisputed,
-              'dispute_reason': disputeReason,
-              'record_hash': newRecordHash,
-            }),
-            clientTimestamp: now,
-            createdAt: now,
-            status: const Value('pending'),
+      final effectiveCollectorId = txRow?.collectorId ??
+          await SessionService.getCollectorId() ??
+          await SessionService.getOrCreateCollectorId();
+
+      final paymentStatus = isDisputed ? 'pending' : 'cash_received';
+
+      // 2. Update LocalTransactions
+      await (_db.update(_db.localTransactions)..where((t) => t.lotId.equals(traceRow.lotId))).write(
+        LocalTransactionsCompanion(
+          transactionStatus: Value(txStatus),
+          paymentStatus: Value(paymentStatus),
+          finalPrice: Value(finalPrice),
+          handoverAt: Value(now),
+          recyclerId: Value(recyclerId),
+          anomalyFlag: Value(isDisputed),
+          anomalyReason: Value(disputeReason),
+          isSynced: const Value(false),
+        ),
+      );
+
+      // 3. Create or update Financial LocalLedger Entry for Collector
+      final lastEntries = await (_db.select(_db.localLedger)
+            ..where((l) => l.collectorId.equals(effectiveCollectorId))
+            ..orderBy([(l) => OrderingTerm.desc(l.recordedAt)])
+            ..limit(1))
+          .get();
+      final lastBalance = lastEntries.isNotEmpty ? lastEntries.first.balanceAfter : 0.0;
+      final newBalance = lastBalance + finalPrice;
+
+      final category = txRow?.category ?? 'E-Waste';
+      final desc = isDisputed
+          ? 'Lot Handover payout pending (Disputed) - ${measuredWeightKg.toStringAsFixed(1)} kg $category'
+          : 'Lot Handover payout (${traceRow.lotId}) - ${measuredWeightKg.toStringAsFixed(1)} kg $category';
+
+      final existingLedger = await (_db.select(_db.localLedger)
+            ..where((l) => l.lotId.equals(traceRow.lotId)))
+          .getSingleOrNull();
+
+      if (existingLedger == null) {
+        await _db.into(_db.localLedger).insert(
+              LocalLedgerCompanion.insert(
+                id: _uuid.v4(),
+                collectorId: effectiveCollectorId,
+                lotId: Value(traceRow.lotId),
+                entryType: 'credit',
+                amount: finalPrice,
+                paymentMode: Value(paymentStatus),
+                description: desc,
+                balanceAfter: newBalance,
+                recordedAt: now,
+                isSynced: const Value(false),
+              ),
+            );
+      } else {
+        await (_db.update(_db.localLedger)..where((l) => l.id.equals(existingLedger.id))).write(
+          LocalLedgerCompanion(
+            amount: Value(finalPrice),
+            paymentMode: Value(paymentStatus),
+            description: Value(desc),
+            balanceAfter: Value(newBalance),
+            recordedAt: Value(now),
+            isSynced: const Value(false),
           ),
         );
+      }
+
+      // 4. Enqueue confirm sync with correct collector ID
+      await _db.into(_db.syncQueueEntries).insert(
+            SyncQueueEntriesCompanion.insert(
+              clientTxId: _uuid.v4(),
+              collectorId: effectiveCollectorId,
+              action: 'record_handover',
+              payloadJson: jsonEncode({
+                'handover_ref_no': targetRef,
+                'lot_id': traceRow.lotId,
+                'collector_id': effectiveCollectorId,
+                'measured_weight_kg': measuredWeightKg,
+                'final_price': finalPrice,
+                'recycler_id': recyclerId,
+                'confirmed_at': now.toIso8601String(),
+                'transaction_status': txStatus,
+                'payment_status': paymentStatus,
+                'is_disputed': isDisputed,
+                'dispute_reason': disputeReason,
+                'record_hash': newRecordHash,
+              }),
+              clientTimestamp: now,
+              createdAt: now,
+              status: const Value('pending'),
+            ),
+          );
+    });
 
     return HandoverConfirmResult(
       lotId: traceRow.lotId,

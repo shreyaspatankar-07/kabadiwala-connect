@@ -191,7 +191,8 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
   Future<void> _initPrices() async {
     if (widget.priceRepository == null) return;
     try {
-      final existing = await widget.priceRepository!.db.select(widget.priceRepository!.db.cachedPrices).get();
+      final existing =
+          await widget.priceRepository!.db.select(widget.priceRepository!.db.cachedPrices).get();
       if (existing.isNotEmpty && mounted) {
         _applyPrices(existing);
       } else {
@@ -205,7 +206,8 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
   Future<void> _loadExistingPrices() async {
     if (widget.priceRepository == null) return;
     try {
-      final existing = await widget.priceRepository!.db.select(widget.priceRepository!.db.cachedPrices).get();
+      final existing =
+          await widget.priceRepository!.db.select(widget.priceRepository!.db.cachedPrices).get();
       if (existing.isNotEmpty && mounted) {
         _applyPrices(existing);
       }
@@ -338,7 +340,8 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(msg, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          backgroundColor: ok == true ? AppTheme.greenGoEarn : AppTheme.yellowPending,
+                          backgroundColor:
+                              ok == true ? AppTheme.greenGoEarn : AppTheme.yellowPending,
                           duration: const Duration(seconds: 2),
                         ),
                       );
@@ -437,12 +440,17 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
                 child: Row(
                   children: [
                     Icon(
-                      _selectedDistrict == d ? Icons.check_circle_rounded : Icons.location_city_rounded,
+                      _selectedDistrict == d
+                          ? Icons.check_circle_rounded
+                          : Icons.location_city_rounded,
                       color: _selectedDistrict == d ? AppTheme.greenGoEarn : AppTheme.textMuted,
                       size: 20,
                     ),
                     const SizedBox(width: 10),
-                    Text(d, style: TextStyle(fontWeight: _selectedDistrict == d ? FontWeight.w900 : FontWeight.w600)),
+                    Text(d,
+                        style: TextStyle(
+                            fontWeight:
+                                _selectedDistrict == d ? FontWeight.w900 : FontWeight.w600)),
                   ],
                 ),
               );
@@ -460,7 +468,10 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
                   const SizedBox(width: 4),
                   Text(
                     'जिल्हा: $_selectedDistrict',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppTheme.textHighContrast),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.textHighContrast),
                   ),
                   const SizedBox(width: 4),
                   const Icon(Icons.arrow_drop_down_rounded, color: AppTheme.greenGoEarn, size: 22),
@@ -512,130 +523,130 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final cat = categories[index];
-        final isTrendUp = cat.trend == 'up';
-        final isTrendDown = cat.trend == 'down';
-        final trendColor = isTrendUp
-            ? AppTheme.greenGoEarn
-            : isTrendDown
-                ? AppTheme.dangerRed
-                : AppTheme.textMuted;
-        final trendIcon = isTrendUp
-            ? Icons.trending_up_rounded
-            : isTrendDown
-                ? Icons.trending_down_rounded
-                : Icons.trending_flat_rounded;
+          final isTrendUp = cat.trend == 'up';
+          final isTrendDown = cat.trend == 'down';
+          final trendColor = isTrendUp
+              ? AppTheme.greenGoEarn
+              : isTrendDown
+                  ? AppTheme.dangerRed
+                  : AppTheme.textMuted;
+          final trendIcon = isTrendUp
+              ? Icons.trending_up_rounded
+              : isTrendDown
+                  ? Icons.trending_down_rounded
+                  : Icons.trending_flat_rounded;
 
-        return InkWell(
-          key: Key('category_tile_${cat.id}'),
-          onTap: () {
-            HapticService.selectionClick();
-            setState(() {
-              _selectedCategory = cat;
-            });
-            // Speak category rate immediately
-            unawaited(
-              widget.audioService.speakPriceDetail(
-                category: cat.localizedName(widget.locale),
-                pricePerKg: cat.defaultRate.round(),
-                trendDirection: cat.trend,
-                localeOverride: widget.locale,
+          return InkWell(
+            key: Key('category_tile_${cat.id}'),
+            onTap: () {
+              HapticService.selectionClick();
+              setState(() {
+                _selectedCategory = cat;
+              });
+              // Speak category rate immediately
+              unawaited(
+                widget.audioService.speakPriceDetail(
+                  category: cat.localizedName(widget.locale),
+                  pricePerKg: cat.defaultRate.round(),
+                  trendDirection: cat.trend,
+                  localeOverride: widget.locale,
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppTheme.borderColor, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-            );
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.borderColor, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Icon Header with trend badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: AppTheme.greenGoEarnLight.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Icon Header with trend badge
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: AppTheme.greenGoEarnLight.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(cat.icon, color: AppTheme.greenGoEarn, size: 28),
                       ),
-                      child: Icon(cat.icon, color: AppTheme.greenGoEarn, size: 28),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: trendColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(trendIcon, color: trendColor, size: 16),
-                          const SizedBox(width: 2),
-                          Text(
-                            '${cat.pctChange > 0 ? '+' : ''}${cat.pctChange}%',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w900,
-                              color: trendColor,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: trendColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(trendIcon, color: trendColor, size: 16),
+                            const SizedBox(width: 2),
+                            Text(
+                              '${cat.pctChange > 0 ? '+' : ''}${cat.pctChange}%',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: trendColor,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+
+                  // Category Title
+                  Text(
+                    cat.localizedName(widget.locale),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.textHighContrast,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Rate Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.backgroundLight,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '₹ ${cat.defaultRate.round()} / kg',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.greenGoEarn,
                       ),
                     ),
-                  ],
-                ),
-                const Spacer(),
-
-                // Category Title
-                Text(
-                  cat.localizedName(widget.locale),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: AppTheme.textHighContrast,
                   ),
-                ),
-                const SizedBox(height: 6),
-
-                // Rate Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppTheme.backgroundLight,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '₹ ${cat.defaultRate.round()} / kg',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      color: AppTheme.greenGoEarn,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    ),
-  );
-}
+          );
+        },
+      ),
+    );
+  }
 
   // ---------------------------------------------------------------------------
   // 2. Detail View with Sparkline, Range Bar, and Speaker Read-out
@@ -709,7 +720,8 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
               children: [
                 Text(
                   isHi ? 'आज का सरकारी भाव' : 'आजचा सरकारी प्रमाणित भाव',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -822,7 +834,8 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
                   children: [
                     Text(
                       'किमान: ₹ ${cat.marketMin.round()}',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.textMuted),
+                      style: const TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.textMuted),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -841,7 +854,8 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
                     ),
                     Text(
                       'कमाल: ₹ ${cat.marketMax.round()}',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.textMuted),
+                      style: const TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.textMuted),
                     ),
                   ],
                 ),
@@ -911,135 +925,135 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                  // Handle bar
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: AppTheme.borderColor,
-                        borderRadius: BorderRadius.circular(10),
+                    // Handle bar
+                    Center(
+                      child: Container(
+                        width: 44,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: AppTheme.borderColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
+                    const SizedBox(height: 14),
 
-                  Text(
-                    isHi
-                        ? '${cat.localizedName(widget.locale)}: आपको क्या भाव मिला?'
-                        : '${cat.localizedName(widget.locale)}: तुम्हाला काय भाव मिळाला?',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Display box
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: AppTheme.backgroundLight,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppTheme.borderColor, width: 2),
-                    ),
-                    child: Text(
-                      enteredPrice.isEmpty ? '₹ ० / kg' : '₹ $enteredPrice / kg',
-                      key: const Key('report_price_display'),
+                    Text(
+                      isHi
+                          ? '${cat.localizedName(widget.locale)}: आपको क्या भाव मिला?'
+                          : '${cat.localizedName(widget.locale)}: तुम्हाला काय भाव मिळाला?',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: AppTheme.textHighContrast,
-                      ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
+                    const SizedBox(height: 12),
 
-                  // Big Keypad
-                  BigKeypad(
-                    onDigitPressed: (digit) {
-                      setModalState(() {
-                        if (enteredPrice.length < 5) {
-                          enteredPrice += digit;
-                        }
-                      });
-                    },
-                    onBackspacePressed: () {
-                      setModalState(() {
-                        if (enteredPrice.isNotEmpty) {
-                          enteredPrice = enteredPrice.substring(0, enteredPrice.length - 1);
-                        }
-                      });
-                    },
-                    onSubmitPressed: () {},
-                    showSubmit: false,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Submit Report Button
-                  SizedBox(
-                    height: 56,
-                    child: ElevatedButton(
-                      key: const Key('submit_price_report_button'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.greenGoEarn,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    // Display box
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppTheme.backgroundLight,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppTheme.borderColor, width: 2),
                       ),
-                      onPressed: enteredPrice.isEmpty
-                          ? null
-                          : () async {
-                              final priceVal = double.tryParse(enteredPrice) ?? 0.0;
-                              if (priceVal <= 0) return;
-
-                              if (widget.priceRepository != null) {
-                                await widget.priceRepository!.savePriceReport(
-                                  category: cat.id,
-                                  offeredPrice: priceVal,
-                                  district: widget.district,
-                                );
-                              }
-
-                              await HapticService.heavyImpact();
-                              await widget.audioService.speakCustomText(
-                                isHi
-                                    ? 'भाव दर्ज हो गया है, सिंक कतार में सुरक्षित है।'
-                                    : 'भाव नोंदवला गेला आहे, सिंक रांगेत सुरक्षित आहे.',
-                              );
-
-                              if (modalCtx.mounted) {
-                                Navigator.of(modalCtx).pop();
-                              }
-
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Row(
-                                      children: [
-                                        const Icon(Icons.schedule_rounded, color: Colors.white),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            isHi
-                                                ? '₹ $priceVal भाव सुरक्षित जतन (सिंक प्रतीक्षा)'
-                                                : '₹ $priceVal भाव सुरक्षित जतन (सिंक बाकी)',
-                                            style: const TextStyle(fontWeight: FontWeight.w700),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    backgroundColor: AppTheme.textHighContrast,
-                                  ),
-                                );
-                              }
-                            },
                       child: Text(
-                        isHi ? 'भाव जमा करा (Submit)' : 'भाव जमा करा (Submit)',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                        enteredPrice.isEmpty ? '₹ ० / kg' : '₹ $enteredPrice / kg',
+                        key: const Key('report_price_display'),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.textHighContrast,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 14),
+
+                    // Big Keypad
+                    BigKeypad(
+                      onDigitPressed: (digit) {
+                        setModalState(() {
+                          if (enteredPrice.length < 5) {
+                            enteredPrice += digit;
+                          }
+                        });
+                      },
+                      onBackspacePressed: () {
+                        setModalState(() {
+                          if (enteredPrice.isNotEmpty) {
+                            enteredPrice = enteredPrice.substring(0, enteredPrice.length - 1);
+                          }
+                        });
+                      },
+                      onSubmitPressed: () {},
+                      showSubmit: false,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Submit Report Button
+                    SizedBox(
+                      height: 56,
+                      child: ElevatedButton(
+                        key: const Key('submit_price_report_button'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.greenGoEarn,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: enteredPrice.isEmpty
+                            ? null
+                            : () async {
+                                final priceVal = double.tryParse(enteredPrice) ?? 0.0;
+                                if (priceVal <= 0) return;
+
+                                if (widget.priceRepository != null) {
+                                  await widget.priceRepository!.savePriceReport(
+                                    category: cat.id,
+                                    offeredPrice: priceVal,
+                                    district: widget.district,
+                                  );
+                                }
+
+                                await HapticService.heavyImpact();
+                                await widget.audioService.speakCustomText(
+                                  isHi
+                                      ? 'भाव दर्ज हो गया है, सिंक कतार में सुरक्षित है।'
+                                      : 'भाव नोंदवला गेला आहे, सिंक रांगेत सुरक्षित आहे.',
+                                );
+
+                                if (modalCtx.mounted) {
+                                  Navigator.of(modalCtx).pop();
+                                }
+
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Row(
+                                        children: [
+                                          const Icon(Icons.schedule_rounded, color: Colors.white),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              isHi
+                                                  ? '₹ $priceVal भाव सुरक्षित जतन (सिंक प्रतीक्षा)'
+                                                  : '₹ $priceVal भाव सुरक्षित जतन (सिंक बाकी)',
+                                              style: const TextStyle(fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      backgroundColor: AppTheme.textHighContrast,
+                                    ),
+                                  );
+                                }
+                              },
+                        child: Text(
+                          isHi ? 'भाव जमा करा (Submit)' : 'भाव जमा करा (Submit)',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },

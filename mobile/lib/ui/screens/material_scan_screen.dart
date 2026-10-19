@@ -44,8 +44,7 @@ class MaterialScanScreen extends StatefulWidget {
   State<MaterialScanScreen> createState() => _MaterialScanScreenState();
 }
 
-class _MaterialScanScreenState extends State<MaterialScanScreen>
-    with WidgetsBindingObserver {
+class _MaterialScanScreenState extends State<MaterialScanScreen> with WidgetsBindingObserver {
   late EdgeMaterialClassifier _classifier;
   late AudioFeedbackService _audioService;
 
@@ -98,9 +97,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
   }
 
   bool get _isTestEnvironment {
-    return WidgetsBinding.instance.runtimeType
-        .toString()
-        .contains('TestWidgetsFlutterBinding');
+    return WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding');
   }
 
   Future<void> _initializeServices() async {
@@ -288,9 +285,7 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
             content: Text(
               widget.locale == 'hi'
                   ? 'फोटो प्रोसेस करने में त्रुटि'
-                  : (widget.locale == 'en'
-                      ? 'Error processing frame'
-                      : 'फोटो तपासताना त्रुटी आली'),
+                  : (widget.locale == 'en' ? 'Error processing frame' : 'फोटो तपासताना त्रुटी आली'),
             ),
           ),
         );
@@ -355,9 +350,8 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
               left: 0,
               right: 0,
               bottom: 0,
-              child: _lastResult == null
-                  ? _buildCaptureControls()
-                  : _buildClassificationResultSheet(),
+              child:
+                  _lastResult == null ? _buildCaptureControls() : _buildClassificationResultSheet(),
             ),
 
             // 5. Processing Indicator Overlay
@@ -685,9 +679,8 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
   Widget _buildScannedImageThumbnailBar() {
     if (_capturedFrameBytes == null) return const SizedBox.shrink();
 
-    final String previewLabel = widget.locale == 'hi'
-        ? 'फोटो देखें'
-        : (widget.locale == 'en' ? 'View Photo' : 'फोटो पहा');
+    final String previewLabel =
+        widget.locale == 'hi' ? 'फोटो देखें' : (widget.locale == 'en' ? 'View Photo' : 'फोटो पहा');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -877,7 +870,8 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.check_circle_rounded, color: AppTheme.greenGoEarn, size: 18),
+                        const Icon(Icons.check_circle_rounded,
+                            color: AppTheme.greenGoEarn, size: 18),
                         const SizedBox(width: 6),
                         Text(
                           widget.locale == 'hi'
@@ -931,7 +925,8 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
                     ),
                     const Text(
                       'Confidence',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black54),
+                      style: TextStyle(
+                          fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black54),
                     ),
                   ],
                 ),
@@ -1087,7 +1082,8 @@ class _MaterialScanScreenState extends State<MaterialScanScreen>
                       ? 'Camera hardware uninitialized (Test Mode)'
                       : 'कॅमेरा उपलब्ध नाही (चाचणी मोड)'),
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(

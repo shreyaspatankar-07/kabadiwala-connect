@@ -111,3 +111,49 @@ async def test_email_register_and_login(async_client: AsyncClient):
         },
     )
     assert bad_resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_public_user_registration_and_hardcoded_logins(async_client: AsyncClient):
+    # 1. Register Public citizen user
+    pub_resp = await async_client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "citizen_test@kabadiwala.in",
+            "password": "mypassword123",
+            "role": "public",
+            "name": "Rohan Deshmukh",
+            "phone": "+919988776655",
+            "address": "Shivaji Nagar, Pune",
+        },
+    )
+    assert pub_resp.status_code == 201
+    pub_data = pub_resp.json()
+    assert pub_data["role"] == "public"
+    assert pub_data["name"] == "Rohan Deshmukh"
+
+    # 2. Hardcoded Recycler login
+    rec_resp = await async_client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "recycler@ecorecycle.in",
+            "password": "recycler123",
+        },
+    )
+    assert rec_resp.status_code == 200
+    rec_data = rec_resp.json()
+    assert rec_data["role"] == "recycler"
+    assert "access_token" in rec_data
+
+    # 3. Hardcoded Admin login
+    adm_resp = await async_client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": "admin@jnarddc.gov.in",
+            "password": "admin123",
+        },
+    )
+    assert adm_resp.status_code == 200
+    adm_data = adm_resp.json()
+    assert adm_data["role"] == "admin"
+    assert "access_token" in adm_data

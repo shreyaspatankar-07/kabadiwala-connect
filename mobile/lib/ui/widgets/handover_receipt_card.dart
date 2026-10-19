@@ -141,7 +141,9 @@ class _HandoverReceiptCardState extends State<HandoverReceiptCard> {
                 Text(
                   locale == 'hi'
                       ? 'हस्तांतरण डिजिटल पावती'
-                      : (locale == 'en' ? 'Digital Handover Certificate' : 'डिजिटल हस्तांतरण पावती'),
+                      : (locale == 'en'
+                          ? 'Digital Handover Certificate'
+                          : 'डिजिटल हस्तांतरण पावती'),
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 14),
@@ -166,7 +168,8 @@ class _HandoverReceiptCardState extends State<HandoverReceiptCard> {
                 // 6-Character Short Reference Number
                 Text(
                   locale == 'hi' ? 'संदर्भ कोड (Ref Code)' : 'संदर्भ क्रमांक (Ref Code)',
-                  style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Container(
@@ -255,7 +258,8 @@ class _HandoverReceiptCardState extends State<HandoverReceiptCard> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 14, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+          style:
+              const TextStyle(fontSize: 14, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
         ),
         Text(
           value,

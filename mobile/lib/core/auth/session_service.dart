@@ -82,7 +82,9 @@ class SessionService {
   /// Get current cached collector ID (falls back to hardware secure storage)
   static Future<String?> getCollectorId() async {
     final prefs = await _getPrefs();
-    final cached = prefs != null ? prefs.getString(_keyCollectorId) : _inMemoryPrefs[_keyCollectorId] as String?;
+    final cached = prefs != null
+        ? prefs.getString(_keyCollectorId)
+        : _inMemoryPrefs[_keyCollectorId] as String?;
     if (cached != null && cached.isNotEmpty) {
       return cached;
     }
@@ -101,7 +103,8 @@ class SessionService {
   /// Verify entered PIN against cached PIN hash
   static Future<bool> verifyPin(String enteredHash) async {
     final prefs = await _getPrefs();
-    final savedHash = prefs != null ? prefs.getString(_keyPinHash) : _inMemoryPrefs[_keyPinHash] as String?;
+    final savedHash =
+        prefs != null ? prefs.getString(_keyPinHash) : _inMemoryPrefs[_keyPinHash] as String?;
     if (savedHash != null && savedHash == enteredHash) {
       return true;
     }
@@ -121,4 +124,3 @@ class SessionService {
     await _authService.clearAll();
   }
 }
-

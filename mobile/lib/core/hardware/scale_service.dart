@@ -107,7 +107,8 @@ class BleScaleService implements BluetoothScaleService {
               name.contains('BLE') ||
               name.contains('ELECTRONIC') ||
               name.contains('CAS')) {
-            debugPrint('[BleScaleService] Found matching scale: ${r.device.platformName} (${r.device.remoteId})');
+            debugPrint(
+                '[BleScaleService] Found matching scale: ${r.device.platformName} (${r.device.remoteId})');
             await FlutterBluePlus.stopScan();
             await connect(r.device.remoteId.str);
             break;
@@ -135,7 +136,8 @@ class BleScaleService implements BluetoothScaleService {
       for (final s in services) {
         if (s.serviceUuid == uartServiceUuid || s.serviceUuid.str.contains('ffe0')) {
           for (final c in s.characteristics) {
-            if (c.characteristicUuid == uartCharacteristicUuid || c.characteristicUuid.str.contains('ffe1')) {
+            if (c.characteristicUuid == uartCharacteristicUuid ||
+                c.characteristicUuid.str.contains('ffe1')) {
               _notifyCharacteristic = c;
               break;
             }
@@ -156,7 +158,8 @@ class BleScaleService implements BluetoothScaleService {
         _updateStatus(ScaleConnectionStatus.connected);
         debugPrint('[BleScaleService] Successfully connected and subscribed to scale UART stream.');
       } else {
-        debugPrint('[BleScaleService] UART Service (0xFFE0 / 0xFFE1) characteristic not found on device.');
+        debugPrint(
+            '[BleScaleService] UART Service (0xFFE0 / 0xFFE1) characteristic not found on device.');
         _updateStatus(ScaleConnectionStatus.error);
       }
     } catch (e) {

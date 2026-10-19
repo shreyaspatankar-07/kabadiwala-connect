@@ -56,8 +56,7 @@ class TensorDiagnostics {
       totalElements > 0 ? (saturatedMinCount + saturatedMaxCount) / totalElements : 0.0;
 
   @override
-  String toString() =>
-      'TensorDiagnostics(min: $min, max: $max, mean: ${mean.toStringAsFixed(2)}, '
+  String toString() => 'TensorDiagnostics(min: $min, max: $max, mean: ${mean.toStringAsFixed(2)}, '
       'stdDev: ${stdDev.toStringAsFixed(2)}, saturated: $isSaturated '
       '(${(saturationRatio * 100).toStringAsFixed(1)}% pegged))';
 }
@@ -404,7 +403,8 @@ class EdgeMaterialClassifier {
     if (kDebugMode) {
       print('[EdgeMaterialClassifier] $diagnostics');
       if (diagnostics.isSaturated) {
-        print('[EdgeMaterialClassifier] WARNING: Input tensor is saturated! Check quantization scale/zeroPoint.');
+        print(
+            '[EdgeMaterialClassifier] WARNING: Input tensor is saturated! Check quantization scale/zeroPoint.');
       }
     }
 

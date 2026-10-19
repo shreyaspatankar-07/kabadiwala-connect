@@ -14,6 +14,8 @@ import {
   TrendingUp,
   ShieldAlert,
   BarChart3,
+  Clock,
+  Award,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -26,6 +28,13 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const { t } = useLanguage();
 
   if (!user) return null;
+
+  const citizenNavItems = [
+    { id: "citizen_dashboard", label: t.navCitizenPickup, icon: Truck },
+    { id: "citizen_pickups", label: t.navCitizenTracking, icon: Clock },
+    { id: "citizen_prices", label: t.navCitizenPriceGuide, icon: TrendingUp },
+    { id: "citizen_impact", label: t.navCitizenImpact, icon: Award },
+  ];
 
   const recyclerNavItems = [
     { id: "dashboard", label: t.navDashboard, icon: LayoutDashboard },
@@ -46,66 +55,95 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   return (
     <aside className="w-64 bg-slate-900 border-r border-slate-800 flex-shrink-0 flex flex-col justify-between p-4 hidden md:flex">
       <div className="space-y-6">
-        {/* Recycler Navigation Group */}
-        <div>
-          <h2 className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-            {t.roleRecycler}
-          </h2>
-          <nav className="space-y-1">
-            {recyclerNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  data-testid={`nav-tab-${item.id}`}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-                    isActive
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                  }`}
-                >
-                  <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-emerald-400"}`} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+        {/* Citizen Navigation Group (Visible if public or as role) */}
+        {user.role === "public" && (
+          <div>
+            <h2 className="px-3 text-xs font-bold uppercase tracking-wider text-teal-400 mb-2">
+              {t.rolePublic}
+            </h2>
+            <nav className="space-y-1">
+              {citizenNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    data-testid={`nav-tab-${item.id}`}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                      isActive
+                        ? "bg-teal-600 text-white shadow-md shadow-teal-900/40"
+                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-teal-400"}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        )}
 
-        {/* Admin Navigation Group (Visible to Admin or for demonstration) */}
-        <div>
-          <h2 className="px-3 text-xs font-bold uppercase tracking-wider text-amber-400/90 mb-2 flex items-center justify-between">
-            <span>{t.roleAdmin}</span>
-            {user.role !== "admin" && (
-              <span className="text-[10px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded border border-amber-800">
-                View
-              </span>
-            )}
-          </h2>
-          <nav className="space-y-1">
-            {adminNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  data-testid={`nav-tab-${item.id}`}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-                    isActive
-                      ? "bg-amber-600 text-white shadow-md shadow-amber-900/40"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                  }`}
-                >
-                  <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-amber-400"}`} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+        {/* Recycler Navigation Group */}
+        {(user.role === "recycler" || user.role === "admin") && (
+          <div>
+            <h2 className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+              <span>{t.roleRecycler}</span>
+            </h2>
+            <nav className="space-y-1">
+              {recyclerNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    data-testid={`nav-tab-${item.id}`}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                      isActive
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/40"
+                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-emerald-400"}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+
+        {/* Admin Navigation Group */}
+        {user.role === "admin" && (
+          <div>
+            <h2 className="px-3 text-xs font-bold uppercase tracking-wider text-amber-400/90 mb-2 flex items-center justify-between">
+              <span>{t.roleAdmin}</span>
+            </h2>
+            <nav className="space-y-1">
+              {adminNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    data-testid={`nav-tab-${item.id}`}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+                      isActive
+                        ? "bg-amber-600 text-white shadow-md shadow-amber-900/40"
+                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-amber-400"}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Footer Info */}

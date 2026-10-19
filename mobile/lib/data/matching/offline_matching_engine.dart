@@ -310,9 +310,8 @@ class OfflineMatchingEngine {
       final rate = p.rate;
 
       // 1. Offered Rate (0.0 to 1.0)
-      final normRate = maxRate > minRate
-          ? (rate - minRate) / (maxRate - minRate)
-          : (rate > 0 ? 1.0 : 0.0);
+      final normRate =
+          maxRate > minRate ? (rate - minRate) / (maxRate - minRate) : (rate > 0 ? 1.0 : 0.0);
 
       // 2. Inverse Distance
       final normDist = 1.0 / (1.0 + (distKm / distanceDecayKm));

@@ -52,22 +52,37 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   void initState() {
     super.initState();
+    _ledgerRepo = widget.ledgerRepository ?? LedgerRepository(widget.db);
     if (widget.collectorId != null && widget.collectorId!.isNotEmpty) {
       _activeCollectorId = widget.collectorId!;
     } else {
       _initCollectorId();
     }
-    _ledgerRepo = widget.ledgerRepository ?? LedgerRepository(widget.db);
     _loadOverview();
     _subscribeStreams();
   }
 
   Future<void> _initCollectorId() async {
+    if (widget.collectorId != null && widget.collectorId!.isNotEmpty) return;
     final id = await SessionService.getOrCreateCollectorId();
-    if (mounted) {
+    if (mounted && id != _activeCollectorId) {
       setState(() {
         _activeCollectorId = id;
       });
+      _subscribeStreams();
+      await _loadOverview();
+    }
+  }
+
+  @override
+  void didUpdateWidget(EarningsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.collectorId != null &&
+        widget.collectorId!.isNotEmpty &&
+        widget.collectorId != _activeCollectorId) {
+      _activeCollectorId = widget.collectorId!;
+      _subscribeStreams();
+      _loadOverview();
     }
   }
 
@@ -82,6 +97,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
     if (WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
       return;
     }
+    _overviewSub?.cancel();
+    _lotsSub?.cancel();
+
     _overviewSub = _ledgerRepo.watchDetailedOverview(_activeCollectorId).listen((data) {
       if (mounted) {
         setState(() {
@@ -224,7 +242,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      isMr ? 'अधिकृत कमाई पावती' : (isHi ? 'आधिकारिक आय विवरण' : 'Official Earnings Statement'),
+                      isMr
+                          ? 'अधिकृत कमाई पावती'
+                          : (isHi ? 'आधिकारिक आय विवरण' : 'Official Earnings Statement'),
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
                     ),
                   ),
@@ -254,24 +274,33 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(isMr ? 'एकूण उलाढाल:' : (isHi ? 'कुल कारोबार:' : 'Total Volume:'), style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text('₹${_overview?.allTimeTotal.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn)),
+                        Text(isMr ? 'एकूण उलाढाल:' : (isHi ? 'कुल कारोबार:' : 'Total Volume:'),
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('₹${_overview?.allTimeTotal.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn)),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(isMr ? 'रोख मिळाली:' : (isHi ? 'नकद प्राप्त:' : 'Cash Received:'), style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text('₹${_overview?.receivedAmount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF0284C7))),
+                        Text(isMr ? 'रोख मिळाली:' : (isHi ? 'नकद प्राप्त:' : 'Cash Received:'),
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('₹${_overview?.receivedAmount.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w800, color: Color(0xFF0284C7))),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(isMr ? 'रक्कम येणे बाकी:' : (isHi ? 'बाकी राशि:' : 'Pending Dues:'), style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text('₹${_overview?.pendingAmount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
+                        Text(isMr ? 'रक्कम येणे बाकी:' : (isHi ? 'बाकी राशि:' : 'Pending Dues:'),
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('₹${_overview?.pendingAmount.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w800, color: Color(0xFFD97706))),
                       ],
                     ),
                   ],
@@ -301,7 +330,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   },
                   icon: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
                   label: Text(
-                    isMr ? 'WhatsApp वर पाठवा' : (isHi ? 'WhatsApp पर भेजें' : 'Share via WhatsApp'),
+                    isMr
+                        ? 'WhatsApp वर पाठवा'
+                        : (isHi ? 'WhatsApp पर भेजें' : 'Share via WhatsApp'),
                     style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
                   ),
                 ),
@@ -344,7 +375,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
                       icon: const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
                       label: Text(
                         isMr ? 'समजले' : (isHi ? 'समझ गया' : 'Done'),
-                        style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 14),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w900, color: Colors.white, fontSize: 14),
                       ),
                     ),
                   ),
@@ -392,13 +424,35 @@ class _EarningsScreenState extends State<EarningsScreen> {
     final isMr = widget.locale == 'mr';
     final isHi = widget.locale == 'hi';
 
-    if (cat.contains('PCB')) return isMr ? 'सर्किट बोर्ड (PCB)' : (isHi ? 'सर्किट बोर्ड (PCB)' : 'Circuit Board (PCB)');
-    if (cat.contains('CABLE') || cat.contains('WIRE')) return isMr ? 'तांब्याची केबल (Cables)' : (isHi ? 'तांबे की केबल (Cables)' : 'Copper Cables');
-    if (cat.contains('BATT')) return isMr ? 'बॅटरी (Batteries)' : (isHi ? 'बैटरी (Batteries)' : 'Lithium Batteries');
-    if (cat.contains('LCD') || cat.contains('SCREEN')) return isMr ? 'स्क्रीन / एलसीडी (LCD)' : (isHi ? 'स्क्रीन / एलसीडी (LCD)' : 'Display / LCD Screen');
-    if (cat.contains('CRT')) return isMr ? 'सीआरटी टीव्ही (CRT TV)' : (isHi ? 'सीआरटी टीवी (CRT TV)' : 'CRT Glass / Monitor');
-    if (cat.contains('MOTOR') || cat.contains('MAGNET')) return isMr ? 'मोटार / मॅग्नेट (Motors)' : (isHi ? 'मोटर / चुंबक (Motors)' : 'Motors & Magnets');
-    if (cat.contains('PLASTIC')) return isMr ? 'प्लास्टिक कॅबिनेट (Plastics)' : (isHi ? 'प्लास्टिक कैबिनेट (Plastics)' : 'Mixed Plastics');
+    if (cat.contains('PCB')) {
+      return isMr ? 'सर्किट बोर्ड (PCB)' : (isHi ? 'सर्किट बोर्ड (PCB)' : 'Circuit Board (PCB)');
+    }
+    if (cat.contains('CABLE') || cat.contains('WIRE')) {
+      return isMr ? 'तांब्याची केबल (Cables)' : (isHi ? 'तांबे की केबल (Cables)' : 'Copper Cables');
+    }
+    if (cat.contains('BATT')) {
+      return isMr ? 'बॅटरी (Batteries)' : (isHi ? 'बैटरी (Batteries)' : 'Lithium Batteries');
+    }
+    if (cat.contains('LCD') || cat.contains('SCREEN')) {
+      return isMr
+          ? 'स्क्रीन / एलसीडी (LCD)'
+          : (isHi ? 'स्क्रीन / एलसीडी (LCD)' : 'Display / LCD Screen');
+    }
+    if (cat.contains('CRT')) {
+      return isMr
+          ? 'सीआरटी टीव्ही (CRT TV)'
+          : (isHi ? 'सीआरटी टीवी (CRT TV)' : 'CRT Glass / Monitor');
+    }
+    if (cat.contains('MOTOR') || cat.contains('MAGNET')) {
+      return isMr
+          ? 'मोटार / मॅग्नेट (Motors)'
+          : (isHi ? 'मोटर / चुंबक (Motors)' : 'Motors & Magnets');
+    }
+    if (cat.contains('PLASTIC')) {
+      return isMr
+          ? 'प्लास्टिक कॅबिनेट (Plastics)'
+          : (isHi ? 'प्लास्टिक कैबिनेट (Plastics)' : 'Mixed Plastics');
+    }
     return rawCategory;
   }
 
@@ -419,7 +473,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
           SpeakerButton(
             promptKey: 'tabEarnings',
             audioService: widget.audioService,
-            tooltip: isMr ? 'कमाई माहिती ऐका' : (isHi ? 'कमाई की जानकारी सुनें' : 'Listen Earnings Info'),
+            tooltip: isMr
+                ? 'कमाई माहिती ऐका'
+                : (isHi ? 'कमाई की जानकारी सुनें' : 'Listen Earnings Info'),
           ),
           const SizedBox(width: 8),
         ],
@@ -453,14 +509,21 @@ class _EarningsScreenState extends State<EarningsScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: _activeTab == 0 ? AppTheme.greenGoEarn : Colors.transparent,
+                                  color:
+                                      _activeTab == 0 ? AppTheme.greenGoEarn : Colors.transparent,
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: _activeTab == 0
-                                      ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
+                                      ? [
+                                          BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.1),
+                                              blurRadius: 4)
+                                        ]
                                       : null,
                                 ),
                                 child: Text(
-                                  isMr ? '💰 कमाई व हिशोब' : (isHi ? '💰 मेरी कमाई' : '💰 Earnings & Ledger'),
+                                  isMr
+                                      ? '💰 कमाई व हिशोब'
+                                      : (isHi ? '💰 मेरी कमाई' : '💰 Earnings & Ledger'),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w900,
@@ -480,16 +543,23 @@ class _EarningsScreenState extends State<EarningsScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: _activeTab == 1 ? AppTheme.greenGoEarn : Colors.transparent,
+                                  color:
+                                      _activeTab == 1 ? AppTheme.greenGoEarn : Colors.transparent,
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: _activeTab == 1
-                                      ? [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]
+                                      ? [
+                                          BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.1),
+                                              blurRadius: 4)
+                                        ]
                                       : null,
                                 ),
                                 child: Text(
                                   isMr
                                       ? '📦 माझे माल (${_collectorLots.length})'
-                                      : (isHi ? '📦 मेरे लॉट (${_collectorLots.length})' : '📦 My Lots (${_collectorLots.length})'),
+                                      : (isHi
+                                          ? '📦 मेरे लॉट (${_collectorLots.length})'
+                                          : '📦 My Lots (${_collectorLots.length})'),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w900,
@@ -534,12 +604,17 @@ class _EarningsScreenState extends State<EarningsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            isMr ? 'अलीकडील व्यवहार (Transactions)' : (isHi ? 'हालिया लेनदेन (Transactions)' : 'Recent Transactions'),
+                            isMr
+                                ? 'अलीकडील व्यवहार (Transactions)'
+                                : (isHi ? 'हालिया लेनदेन (Transactions)' : 'Recent Transactions'),
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                           ),
                           Text(
                             '${_overview!.transactions.length} ${isMr ? 'नोंदी' : (isHi ? 'प्रविष्टियां' : 'Records')}',
-                            style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.textMuted,
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -593,7 +668,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
             Text(
               isMr
                   ? 'नवीन ई-कचरा माल जोडण्यासाठी "माल जोडा" टॅब वापरा.'
-                  : (isHi ? 'नया ई-कचरा जोड़ने के लिए "माल जोड़ें" टैब का उपयोग करें।' : 'Use the "Add Lot" tab to record your first e-waste item.'),
+                  : (isHi
+                      ? 'नया ई-कचरा जोड़ने के लिए "माल जोड़ें" टैब का उपयोग करें।'
+                      : 'Use the "Add Lot" tab to record your first e-waste item.'),
               style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
               textAlign: TextAlign.center,
             ),
@@ -606,7 +683,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          isMr ? 'तयार केलेले सर्व ई-कचरा लॉट्स:' : (isHi ? 'तैयार किए गए सभी ई-कचरा लॉट:' : 'All Created E-Waste Lots:'),
+          isMr
+              ? 'तयार केलेले सर्व ई-कचरा लॉट्स:'
+              : (isHi ? 'तैयार किए गए सभी ई-कचरा लॉट:' : 'All Created E-Waste Lots:'),
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 10),
@@ -619,7 +698,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
     final isMr = locale == 'mr';
     final isHi = locale == 'hi';
 
-    final isCompleted = lot.transactionStatus == 'handed_over' || lot.transactionStatus == 'confirmed';
+    final isCompleted =
+        lot.transactionStatus == 'handed_over' || lot.transactionStatus == 'confirmed';
     final isPending = lot.transactionStatus == 'handover_pending';
 
     Color statusColor = const Color(0xFF0284C7);
@@ -629,15 +709,19 @@ class _EarningsScreenState extends State<EarningsScreen> {
     if (isCompleted) {
       statusColor = AppTheme.greenGoEarn;
       statusBg = const Color(0xFFDCFCE7);
-      statusText = isMr ? 'हस्तांतरण पूर्ण (Handed Over)' : (isHi ? 'हस्तांतरित (Handed Over)' : 'Handed Over & Completed');
+      statusText = isMr
+          ? 'हस्तांतरण पूर्ण (Handed Over)'
+          : (isHi ? 'हस्तांतरित (Handed Over)' : 'Handed Over & Completed');
     } else if (isPending) {
       statusColor = const Color(0xFFD97706);
       statusBg = const Color(0xFFFEF3C7);
-      statusText = isMr ? 'हस्तांतरण बाकी (Pending Code)' : (isHi ? 'हस्तांतरण लंबित' : 'Handover Pending');
+      statusText =
+          isMr ? 'हस्तांतरण बाकी (Pending Code)' : (isHi ? 'हस्तांतरण लंबित' : 'Handover Pending');
     }
 
     final categoryDisplay = _getCategoryDisplayName(lot.category);
-    final dateStr = '${lot.createdAt.day}/${lot.createdAt.month}/${lot.createdAt.year} ${lot.createdAt.hour.toString().padLeft(2, '0')}:${lot.createdAt.minute.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${lot.createdAt.day}/${lot.createdAt.month}/${lot.createdAt.year} ${lot.createdAt.hour.toString().padLeft(2, '0')}:${lot.createdAt.minute.toString().padLeft(2, '0')}';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -645,7 +729,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isPending ? const Color(0xFFFBBF24) : Colors.grey.shade200, width: 1.5),
+        border: Border.all(
+            color: isPending ? const Color(0xFFFBBF24) : Colors.grey.shade200, width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -679,7 +764,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     const SizedBox(height: 2),
                     Text(
                       '${isMr ? 'लॉट आयडी' : (isHi ? 'लॉट आईडी' : 'Lot ID')}: ${lot.lotId}',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
                     ),
                   ],
                 ),
@@ -689,11 +775,13 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 children: [
                   Text(
                     '₹${(lot.finalPrice ?? lot.quotedPrice).toStringAsFixed(0)}',
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.greenGoEarn),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.greenGoEarn),
                   ),
                   Text(
                     '${lot.weightKg.toStringAsFixed(1)} kg',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
                   ),
                 ],
               ),
@@ -729,9 +817,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               padding: const EdgeInsets.symmetric(vertical: 10),
             ),
-            onPressed: () {
-              HapticService.heavyImpact();
-              Navigator.of(context).push(
+            onPressed: () async {
+              await HapticService.heavyImpact();
+              await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => HandoverInitiateScreen(
                     lotId: lot.lotId,
@@ -745,6 +833,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   ),
                 ),
               );
+              if (mounted) {
+                await _loadOverview();
+              }
             },
             icon: const Icon(Icons.qr_code_2_rounded, size: 20),
             label: Text(
@@ -816,7 +907,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+            style: const TextStyle(
+                fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
@@ -859,12 +951,15 @@ class _EarningsScreenState extends State<EarningsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                isMr ? 'पेमेंट स्थिती (Payment Status)' : (isHi ? 'भुगतान स्थिति (Payment Status)' : 'Payment Status Split'),
+                isMr
+                    ? 'पेमेंट स्थिती (Payment Status)'
+                    : (isHi ? 'भुगतान स्थिति (Payment Status)' : 'Payment Status Split'),
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               Text(
                 '${isMr ? 'एकूण' : (isHi ? 'कुल' : 'Total')}: ₹${total.toStringAsFixed(0)}',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                style: const TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
               ),
             ],
           ),
@@ -898,21 +993,31 @@ class _EarningsScreenState extends State<EarningsScreen> {
             children: [
               Row(
                 children: [
-                  Container(width: 10, height: 10, decoration: const BoxDecoration(color: AppTheme.greenGoEarn, shape: BoxShape.circle)),
+                  Container(
+                      width: 10,
+                      height: 10,
+                      decoration:
+                          const BoxDecoration(color: AppTheme.greenGoEarn, shape: BoxShape.circle)),
                   const SizedBox(width: 6),
                   Text(
                     '${isMr ? 'मिळाले' : (isHi ? 'रोख मिले' : 'Received')}: ₹${ov.receivedAmount.toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w900, color: AppTheme.greenGoEarn),
                   ),
                 ],
               ),
               Row(
                 children: [
-                  Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFFDC2626), shape: BoxShape.circle)),
+                  Container(
+                      width: 10,
+                      height: 10,
+                      decoration:
+                          const BoxDecoration(color: Color(0xFFDC2626), shape: BoxShape.circle)),
                   const SizedBox(width: 6),
                   Text(
                     '${isMr ? 'येणे बाकी' : (isHi ? 'बाकी' : 'Pending')}: ₹${ov.pendingAmount.toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFFDC2626)),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFFDC2626)),
                   ),
                 ],
               ),
@@ -950,13 +1055,17 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 child: Text(
                   isMr
                       ? 'रक्कम येणे बाकी (${ov.pendingDuesCount} व्यवहार प्रलंबित)'
-                      : (isHi ? 'बाकी राशि (${ov.pendingDuesCount} लॉट लंबित)' : 'Pending Dues (${ov.pendingDuesCount} Lots)'),
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF92400E)),
+                      : (isHi
+                          ? 'बाकी राशि (${ov.pendingDuesCount} लॉट लंबित)'
+                          : 'Pending Dues (${ov.pendingDuesCount} Lots)'),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF92400E)),
                 ),
               ),
               Text(
                 '₹${ov.pendingAmount.toStringAsFixed(0)}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFFB45309)),
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFFB45309)),
               ),
             ],
           ),
@@ -964,7 +1073,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
           Text(
             isMr
                 ? 'रीसायकलरकडून रोख रक्कम मिळाल्यावर खालील "पैसे मिळाले" बटण दाबा.'
-                : (isHi ? 'रीसायकलर से नकद प्राप्त होने पर "पैसे मिले" बटन दबाएं।' : 'Tap "Cash Received" once payment is handed over by recycler.'),
+                : (isHi
+                    ? 'रीसायकलर से नकद प्राप्त होने पर "पैसे मिले" बटन दबाएं।'
+                    : 'Tap "Cash Received" once payment is handed over by recycler.'),
             style: const TextStyle(fontSize: 12, color: Color(0xFF78350F)),
           ),
           const SizedBox(height: 10),
@@ -977,12 +1088,16 @@ class _EarningsScreenState extends State<EarningsScreen> {
             ),
             onPressed: () {
               HapticService.lightImpact();
-              final msg = isMr ? 'रीसायकलरशी संपर्क केला जात आहे' : (isHi ? 'रीसायकलर से संपर्क किया जा रहा है' : 'Contacting Recycler');
+              final msg = isMr
+                  ? 'रीसायकलरशी संपर्क केला जात आहे'
+                  : (isHi ? 'रीसायकलर से संपर्क किया जा रहा है' : 'Contacting Recycler');
               unawaited(widget.audioService.speakCustomText(msg));
             },
             icon: const Icon(Icons.phone_in_talk_rounded, size: 18),
             label: Text(
-              isMr ? 'रीसायकलरशी संपर्क साधा' : (isHi ? 'रीसायकलर से संपर्क करें' : 'Contact Recycler'),
+              isMr
+                  ? 'रीसायकलरशी संपर्क साधा'
+                  : (isHi ? 'रीसायकलर से संपर्क करें' : 'Contact Recycler'),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
           ),
@@ -1048,7 +1163,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
               icon: const Icon(Icons.qr_code_scanner_rounded, color: Color(0xFF2563EB), size: 22),
               label: Text(
                 isMr ? 'UPI पेमेंट' : (isHi ? 'UPI से भुगतान' : 'Pay via UPI'),
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                style: const TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
               ),
             ),
           ),
@@ -1062,7 +1178,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildUpiPaymentCard(String locale) {
     final amt = _selectedUpiAmount > 0 ? _selectedUpiAmount : 1500.0;
-    final upiUri = 'upi://pay?pa=collector.kabadiwala@upi&pn=Kabadiwala%20Connect&am=${amt.toStringAsFixed(2)}&cu=INR&tn=E-Waste%20Handover';
+    final upiUri =
+        'upi://pay?pa=collector.kabadiwala@upi&pn=Kabadiwala%20Connect&am=${amt.toStringAsFixed(2)}&cu=INR&tn=E-Waste%20Handover';
     final isMr = locale == 'mr';
     final isHi = locale == 'hi';
 
@@ -1080,8 +1197,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                isMr ? 'UPI क्यूआर कोड (Optional UPI)' : (isHi ? 'UPI क्यूआर कोड (Optional UPI)' : 'UPI QR Code (Optional)'),
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF1E40AF)),
+                isMr
+                    ? 'UPI क्यूआर कोड (Optional UPI)'
+                    : (isHi ? 'UPI क्यूआर कोड (Optional UPI)' : 'UPI QR Code (Optional)'),
+                style: const TextStyle(
+                    fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF1E40AF)),
               ),
               IconButton(
                 icon: const Icon(Icons.close_rounded, size: 20),
@@ -1107,7 +1227,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
           const SizedBox(height: 8),
           Text(
             '${isMr ? 'रक्कम' : (isHi ? 'राशि' : 'Amount')}: ₹${amt.toStringAsFixed(0)}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF1E3A8A)),
+            style: const TextStyle(
+                fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF1E3A8A)),
           ),
           const SizedBox(height: 4),
           const Text(
@@ -1186,7 +1307,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     const SizedBox(height: 2),
                     Text(
                       tx.recyclerName,
-                      style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -1196,11 +1318,13 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 children: [
                   Text(
                     '₹${tx.amount.toStringAsFixed(0)}',
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.greenGoEarn),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.greenGoEarn),
                   ),
                   Text(
                     '${tx.weightKg.toStringAsFixed(1)} kg',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
                   ),
                 ],
               ),
@@ -1237,7 +1361,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
               onPressed: () => _handleMarkCashReceived(tx),
               icon: const Icon(Icons.check_circle_rounded),
               label: Text(
-                isMr ? 'पैसे मिळाले (Mark Cash Received)' : (isHi ? 'पैसे मिल गए (नकद प्राप्त)' : 'Mark Cash Received'),
+                isMr
+                    ? 'पैसे मिळाले (Mark Cash Received)'
+                    : (isHi ? 'पैसे मिल गए (नकद प्राप्त)' : 'Mark Cash Received'),
                 style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
               ),
             ),
@@ -1263,7 +1389,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
           const Icon(Icons.receipt_long_rounded, size: 48, color: AppTheme.textMuted),
           const SizedBox(height: 12),
           Text(
-            isMr ? 'अद्याप कोणतेही व्यवहार नाहीत' : (isHi ? 'अभी तक कोई लेनदेन नहीं' : 'No transactions recorded yet'),
+            isMr
+                ? 'अद्याप कोणतेही व्यवहार नाहीत'
+                : (isHi ? 'अभी तक कोई लेनदेन नहीं' : 'No transactions recorded yet'),
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ],

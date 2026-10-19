@@ -60,7 +60,6 @@ class _SpeakerButtonState extends State<SpeakerButton> with SingleTickerProvider
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Semantics(

@@ -66,9 +66,8 @@ class ImagePreviewDialog extends StatelessWidget {
         ? 'फोटो पूर्वावलोकन (Preview)'
         : (locale == 'en' ? 'Photo Preview' : 'फोटो पूर्वावलोकन (Preview)');
 
-    final String closeLabel = locale == 'hi'
-        ? 'बंद करें'
-        : (locale == 'en' ? 'Close Preview' : 'पूर्वावलोकन बंद करा');
+    final String closeLabel =
+        locale == 'hi' ? 'बंद करें' : (locale == 'en' ? 'Close Preview' : 'पूर्वावलोकन बंद करा');
 
     final double effectiveKb = sizeInKb ?? (imageBytes.length / 1024.0);
 

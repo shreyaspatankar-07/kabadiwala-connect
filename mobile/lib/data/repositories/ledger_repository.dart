@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:drift/drift.dart';
@@ -86,27 +87,26 @@ class LedgerRepository {
     final newBalance = lastBalance + amount;
 
     await _db.into(_db.localLedger).insert(
-      LocalLedgerCompanion.insert(
-        id: id,
-        collectorId: collectorId,
-        entryType: 'credit',
-        amount: amount,
-        paymentMode: const Value('cash_received'),
-        description: description,
-        balanceAfter: newBalance,
-        recordedAt: now,
-        isSynced: const Value(false),
-      ),
-    );
+          LocalLedgerCompanion.insert(
+            id: id,
+            collectorId: collectorId,
+            entryType: 'credit',
+            amount: amount,
+            paymentMode: const Value('cash_received'),
+            description: description,
+            balanceAfter: newBalance,
+            recordedAt: now,
+            isSynced: const Value(false),
+          ),
+        );
   }
 
   /// Get summary of total earned and pending balance
   Future<({double totalReceived, double pendingAmount})> getEarningsSummary(
     String collectorId,
   ) async {
-    final entries = await (_db.select(_db.localLedger)
-          ..where((l) => l.collectorId.equals(collectorId)))
-        .get();
+    final entries =
+        await (_db.select(_db.localLedger)..where((l) => l.collectorId.equals(collectorId))).get();
 
     double total = 0.0;
     for (final e in entries) {
@@ -117,9 +117,7 @@ class LedgerRepository {
 
     // Pending lots
     final pendingLots = await (_db.select(_db.localTransactions)
-          ..where((t) =>
-              t.collectorId.equals(collectorId) &
-              t.paymentStatus.equals('pending')))
+          ..where((t) => t.collectorId.equals(collectorId) & t.paymentStatus.equals('pending')))
         .get();
 
     double pending = 0.0;
@@ -137,10 +135,82 @@ class LedgerRepository {
     final weekStart = now.subtract(const Duration(days: 7));
     final monthStart = now.subtract(const Duration(days: 30));
 
-    final ledgerEntries = await (_db.select(_db.localLedger)
+    // 1. Fetch transactions for this collector
+    final txRows = await (_db.select(_db.localTransactions)
+          ..where((t) => t.collectorId.equals(collectorId)))
+        .get();
+    final txMap = {for (var t in txRows) t.lotId: t};
+
+    // 2. Fetch existing ledger entries across the DB to prevent duplicate reconciliation
+    final allLedger = await _db.select(_db.localLedger).get();
+    final existingLotIds = allLedger.map((e) => e.lotId).whereType<String>().toSet();
+
+    double runningBalance = allLedger
+        .where((l) => l.collectorId == collectorId)
+        .fold(0.0, (acc, e) => acc + (e.entryType == 'credit' ? e.amount : -e.amount));
+
+    for (final tx in txRows) {
+      if ((tx.transactionStatus == 'handed_over' || tx.transactionStatus == 'confirmed') &&
+          !existingLotIds.contains(tx.lotId)) {
+        final amount = tx.finalPrice ?? tx.quotedPrice;
+        final isDisputed = tx.anomalyFlag;
+        final mode = isDisputed ? 'pending' : (tx.paymentStatus.isNotEmpty ? tx.paymentStatus : 'cash_received');
+        final txTime = tx.handoverAt ?? tx.createdAt;
+        runningBalance += amount;
+
+        await _db.into(_db.localLedger).insert(
+              LocalLedgerCompanion.insert(
+                id: _uuid.v4(),
+                collectorId: collectorId,
+                lotId: Value(tx.lotId),
+                entryType: 'credit',
+                amount: amount,
+                paymentMode: Value(mode),
+                description: 'Lot Handover payout (${tx.lotId}) - ${tx.weightKg.toStringAsFixed(1)} kg ${tx.category}',
+                balanceAfter: runningBalance,
+                recordedAt: txTime,
+                isSynced: const Value(false),
+              ),
+            );
+        existingLotIds.add(tx.lotId);
+      }
+    }
+
+    // 3. Load full sorted ledger entries for this collector
+    final rawLedgerEntries = await (_db.select(_db.localLedger)
           ..where((l) => l.collectorId.equals(collectorId))
           ..orderBy([(l) => OrderingTerm.desc(l.recordedAt)]))
         .get();
+
+    // 4. Strict Deduplication: Purge any duplicate entries sharing the same lotId or fingerprint
+    final seenLotIds = <String>{};
+    final seenFingerprints = <String>{};
+    final ledgerEntries = <LocalLedgerData>[];
+    final duplicateIdsToDelete = <String>[];
+
+    for (final e in rawLedgerEntries) {
+      if (e.lotId != null && e.lotId!.isNotEmpty) {
+        if (seenLotIds.contains(e.lotId!)) {
+          duplicateIdsToDelete.add(e.id);
+          continue;
+        }
+        seenLotIds.add(e.lotId!);
+      } else {
+        // Fingerprint for entries without lotId (e.g. manual cash entry): amount + desc + 10s window
+        final fp = '${e.amount}_${e.description}_${e.recordedAt.millisecondsSinceEpoch ~/ 10000}';
+        if (seenFingerprints.contains(fp)) {
+          duplicateIdsToDelete.add(e.id);
+          continue;
+        }
+        seenFingerprints.add(fp);
+      }
+      ledgerEntries.add(e);
+    }
+
+    // Self-healing: delete duplicate entries from SQLite database
+    if (duplicateIdsToDelete.isNotEmpty) {
+      unawaited((_db.delete(_db.localLedger)..where((l) => l.id.isIn(duplicateIdsToDelete))).go());
+    }
 
     double today = 0.0;
     double week = 0.0;
@@ -160,12 +230,6 @@ class LedgerRepository {
         }
       }
     }
-
-    // Transactions map for category, weight, recycler
-    final txRows = await (_db.select(_db.localTransactions)
-          ..where((t) => t.collectorId.equals(collectorId)))
-        .get();
-    final txMap = {for (var t in txRows) t.lotId: t};
 
     // Recyclers map for recycler details
     final recyclers = await _db.select(_db.cachedRecyclers).get();
@@ -248,28 +312,60 @@ class LedgerRepository {
 
     // 3. Enqueue to SyncQueueEntries for background sync
     await _db.into(_db.syncQueueEntries).insert(
-      SyncQueueEntriesCompanion.insert(
-        clientTxId: _uuid.v4(),
-        collectorId: collectorId,
-        action: 'record_cash_payment',
-        payloadJson: jsonEncode({
-          'entry_id': entryId,
-          'lot_id': lotId,
-          'payment_mode': 'cash_received',
-          'marked_at': now.toIso8601String(),
-        }),
-        clientTimestamp: now,
-        createdAt: now,
-        status: const Value('pending'),
-      ),
-    );
+          SyncQueueEntriesCompanion.insert(
+            clientTxId: _uuid.v4(),
+            collectorId: collectorId,
+            action: 'record_cash_payment',
+            payloadJson: jsonEncode({
+              'entry_id': entryId,
+              'lot_id': lotId,
+              'payment_mode': 'cash_received',
+              'marked_at': now.toIso8601String(),
+            }),
+            clientTimestamp: now,
+            createdAt: now,
+            status: const Value('pending'),
+          ),
+        );
   }
 
-  /// Real-time stream of Detailed collector overview from local SQLite database
+  /// Real-time stream of Detailed collector overview from local SQLite database (watching both ledger and transactions)
   Stream<EarningsOverviewData> watchDetailedOverview(String collectorId) {
-    return _db.select(_db.localLedger).watch().asyncMap((_) async {
-      return await getDetailedOverview(collectorId);
-    });
+    late StreamController<EarningsOverviewData> controller;
+    StreamSubscription? sub1;
+    StreamSubscription? sub2;
+
+    Future<void> emitLatest() async {
+      if (controller.isClosed) return;
+      try {
+        final data = await getDetailedOverview(collectorId);
+        if (!controller.isClosed) {
+          controller.add(data);
+        }
+      } catch (e) {
+        if (!controller.isClosed) {
+          controller.addError(e);
+        }
+      }
+    }
+
+    controller = StreamController<EarningsOverviewData>(
+      onListen: () {
+        emitLatest();
+        sub1 = (_db.select(_db.localLedger)..where((l) => l.collectorId.equals(collectorId)))
+            .watch()
+            .listen((_) => emitLatest());
+        sub2 = (_db.select(_db.localTransactions)..where((t) => t.collectorId.equals(collectorId)))
+            .watch()
+            .listen((_) => emitLatest());
+      },
+      onCancel: () async {
+        await sub1?.cancel();
+        await sub2?.cancel();
+      },
+    );
+
+    return controller.stream;
   }
 
   /// Sync ledger and payment updates directly from backend
@@ -302,21 +398,22 @@ class LedgerRepository {
               final balance = (item['balance_after'] as num?)?.toDouble() ?? amount;
               final mode = item['payment_mode']?.toString() ?? 'cash_received';
               final desc = item['description']?.toString() ?? 'Payment';
-              final recorded = DateTime.tryParse(item['recorded_at']?.toString() ?? '') ?? DateTime.now();
+              final recorded =
+                  DateTime.tryParse(item['recorded_at']?.toString() ?? '') ?? DateTime.now();
 
               await _db.into(_db.localLedger).insertOnConflictUpdate(
-                LocalLedgerCompanion.insert(
-                  id: id,
-                  collectorId: collectorId,
-                  entryType: 'credit',
-                  amount: amount,
-                  paymentMode: Value(mode),
-                  description: desc,
-                  balanceAfter: balance,
-                  recordedAt: recorded,
-                  isSynced: const Value(true),
-                ),
-              );
+                    LocalLedgerCompanion.insert(
+                      id: id,
+                      collectorId: collectorId,
+                      entryType: 'credit',
+                      amount: amount,
+                      paymentMode: Value(mode),
+                      description: desc,
+                      balanceAfter: balance,
+                      recordedAt: recorded,
+                      isSynced: const Value(true),
+                    ),
+                  );
             }
           }
           return true;

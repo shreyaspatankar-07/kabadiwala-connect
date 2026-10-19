@@ -8,6 +8,7 @@ import 'package:kabadiwala_mobile/core/handover/offline_handover_service.dart';
 import 'package:kabadiwala_mobile/core/haptics/haptic_service.dart';
 import 'package:kabadiwala_mobile/core/theme/app_theme.dart';
 import 'package:kabadiwala_mobile/data/local_database.dart';
+import 'package:kabadiwala_mobile/data/repositories/ledger_repository.dart';
 import 'package:kabadiwala_mobile/ui/screens/handover_initiate_screen.dart';
 import 'package:kabadiwala_mobile/ui/screens/recycler_confirm_screen.dart';
 import 'package:kabadiwala_mobile/ui/screens/verify_handover_screen.dart';
@@ -298,6 +299,73 @@ void main() {
 
       // Downstream timeline should be embedded
       expect(find.byType(DownstreamTimelineWidget), findsOneWidget);
+    });
+
+    test('Confirming handover automatically updates transaction paymentStatus, creates ledger entry, and updates earnings', () async {
+      const collectorId = 'KC-C-HANDOVER-007';
+      const lotId = 'LOT-EARN-HANDOVER-01';
+      final now = DateTime.now();
+
+      // 1. Pre-insert a local transaction
+      await db.into(db.localTransactions).insert(
+            LocalTransactionsCompanion.insert(
+              lotId: lotId,
+              clientLotUuid: 'uuid-earn-007',
+              collectorId: collectorId,
+              category: 'PCB',
+              weightKg: 10.0,
+              quotedPrice: 3000.0,
+              collectionLat: 19.0760,
+              collectionLng: 72.8777,
+              createdAt: now,
+            ),
+          );
+
+      // 2. Initiate handover
+      final initResult = await handoverService.initiateHandover(
+        lotId: lotId,
+        weightKg: 10.0,
+        photoHashes: ['photo_hash_test_earn'],
+        gpsLat: 19.0760,
+        gpsLng: 72.8777,
+        collectorId: collectorId,
+      );
+
+      // 3. Confirm handover with scale weight and final price
+      final confirmResult = await handoverService.confirmHandover(
+        handoverRefNo: initResult.handoverRefNo,
+        measuredWeightKg: 10.0,
+        finalPrice: 3200.0,
+        recyclerId: 'REC-ECO-01',
+      );
+
+      expect(confirmResult.isDisputed, isFalse);
+      expect(confirmResult.finalPrice, 3200.0);
+
+      // 4. Verify transaction status & paymentStatus in SQLite
+      final updatedTx = await (db.select(db.localTransactions)..where((t) => t.lotId.equals(lotId))).getSingle();
+      expect(updatedTx.transactionStatus, 'handed_over');
+      expect(updatedTx.paymentStatus, 'cash_received');
+      expect(updatedTx.finalPrice, 3200.0);
+
+      // 5. Verify financial ledger entry was created
+      final ledgerEntries = await (db.select(db.localLedger)..where((l) => l.collectorId.equals(collectorId))).get();
+      expect(ledgerEntries.length, 1);
+      expect(ledgerEntries.first.lotId, lotId);
+      expect(ledgerEntries.first.amount, 3200.0);
+      expect(ledgerEntries.first.paymentMode, 'cash_received');
+      expect(ledgerEntries.first.entryType, 'credit');
+      expect(ledgerEntries.first.balanceAfter, 3200.0);
+
+      // 6. Verify earnings overview is immediately updated
+      final ledgerRepo = LedgerRepository(db);
+      final overview = await ledgerRepo.getDetailedOverview(collectorId);
+      expect(overview.todayTotal, 3200.0);
+      expect(overview.receivedAmount, 3200.0);
+      expect(overview.pendingAmount, 0.0);
+      expect(overview.transactions.length, 1);
+      expect(overview.transactions.first.amount, 3200.0);
+      expect(overview.transactions.first.paymentStatus, 'cash_received');
     });
   });
 }

@@ -41,6 +41,7 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
   String _finalPriceString = '5000';
   bool _isWeightMode = true; // true = entering weight, false = entering price
   bool _isConfirmed = false;
+  bool _isConfirming = false;
   HandoverConfirmResult? _confirmResult;
 
   @override
@@ -87,7 +88,8 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
     setState(() {
       if (_isWeightMode) {
         if (_measuredWeightString.isNotEmpty) {
-          _measuredWeightString = _measuredWeightString.substring(0, _measuredWeightString.length - 1);
+          _measuredWeightString =
+              _measuredWeightString.substring(0, _measuredWeightString.length - 1);
           if (_measuredWeightString.isEmpty) _measuredWeightString = '0';
         }
       } else {
@@ -100,6 +102,11 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
   }
 
   Future<void> _handleConfirm() async {
+    if (_isConfirming || _isConfirmed) return;
+    setState(() {
+      _isConfirming = true;
+    });
+
     await HapticService.heavyImpact();
     try {
       final res = await _handoverService.confirmHandover(
@@ -134,6 +141,12 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isConfirming = false;
+        });
       }
     }
   }
@@ -179,7 +192,8 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
             children: [
               Text(
                 locale == 'hi' ? 'संदर्भ कोड (Ref):' : 'संदर्भ कोड (Ref):',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                style: const TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
               ),
               Text(
                 widget.handoverRefNo,
@@ -205,7 +219,8 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
                 children: [
                   Text(
                     locale == 'hi' ? 'कलेक्टर वजन' : 'कलेक्टर वजन',
-                    style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -219,7 +234,8 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
                 children: [
                   Text(
                     locale == 'hi' ? 'रीसायकलर माप' : 'रीसायकलर वजन',
-                    style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -326,8 +342,12 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
             icon: const Icon(Icons.check_circle_outline_rounded, size: 28),
             label: Text(
               _isMismatched
-                  ? (locale == 'hi' ? 'विवादित दर्ज करें (Confirm Disputed)' : 'विवादित नोंदवा (Confirm Disputed)')
-                  : (locale == 'hi' ? 'पुष्टि करें (Confirm Handover)' : 'हस्तांतरण पूर्ण करा (Confirm Handover)'),
+                  ? (locale == 'hi'
+                      ? 'विवादित दर्ज करें (Confirm Disputed)'
+                      : 'विवादित नोंदवा (Confirm Disputed)')
+                  : (locale == 'hi'
+                      ? 'पुष्टि करें (Confirm Handover)'
+                      : 'हस्तांतरण पूर्ण करा (Confirm Handover)'),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
             ),
           ),
@@ -362,8 +382,12 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
               const SizedBox(height: 12),
               Text(
                 res.isDisputed
-                    ? (locale == 'hi' ? 'हस्तांतरण विवादित (Disputed)' : 'हस्तांतरण विवादित (Disputed)')
-                    : (locale == 'hi' ? 'हस्तांतरण सत्यापित व पूर्ण!' : 'हस्तांतरण यशस्वीरीत्या पूर्ण!'),
+                    ? (locale == 'hi'
+                        ? 'हस्तांतरण विवादित (Disputed)'
+                        : 'हस्तांतरण विवादित (Disputed)')
+                    : (locale == 'hi'
+                        ? 'हस्तांतरण सत्यापित व पूर्ण!'
+                        : 'हस्तांतरण यशस्वीरीत्या पूर्ण!'),
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
                 textAlign: TextAlign.center,
               ),
@@ -372,7 +396,8 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
                 Text(
                   res.disputeReason!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFFB45309), fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 13, color: Color(0xFFB45309), fontWeight: FontWeight.bold),
                 ),
               ],
               const Divider(height: 24),
@@ -404,8 +429,9 @@ class _RecyclerConfirmScreenState extends State<RecyclerConfirmScreen> {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('पूर्ण (Done)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('पूर्ण (Done)',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
         ),
       ],

@@ -78,6 +78,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get takePhoto => 'फोटो लें';
 
   @override
+  String get takePhotoHint => 'कॅमेरा उघडण्यासाठी दाबा';
+
+  @override
   String get photoCaptured => 'फोटो ले लिया गया';
 
   @override
@@ -87,6 +90,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get weightKg => 'वजन (किलो)';
 
   @override
+  String get enterWeight => 'वजन नोंदवा';
+
+  @override
   String get estimatedPrice => 'अनुमानित सरकारी भाव';
 
   @override
@@ -94,6 +100,21 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get lotSavedSuccess => 'माल सफलतापूर्वक दर्ज कर लिया गया';
+
+  @override
+  String get aiConfidenceLabel => '% खात्री';
+
+  @override
+  String get aiSuggestedCategories => 'कॅमेरा सुचवलेले प्रकार:';
+
+  @override
+  String get showAllCategories => 'सर्व पहा';
+
+  @override
+  String get showLessCategories => 'कमी दाखवा';
+
+  @override
+  String get otherCategories => 'इतर सर्व प्रकार:';
 
   @override
   String get catCrt => 'सीआरटी / पुराना टीवी';
@@ -181,6 +202,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get syncNow => 'अभी सिंक करें';
+
+  @override
+  String get navigationOfflineTitle => 'नेव्हिगेशन उपलब्ध नाही';
+
+  @override
+  String get navigationOfflineMessage =>
+      'थेट नेव्हिगेशनसाठी इंटरनेट आवश्यक आहे. कनेक्शन मिळाल्यावर पुन्हा प्रयत्न करा.';
 
   @override
   String get privacyTitle => 'गोपनीयता और डेटा सुरक्षा';

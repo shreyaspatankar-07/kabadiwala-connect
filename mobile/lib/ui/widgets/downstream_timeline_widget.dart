@@ -85,7 +85,9 @@ class DownstreamTimelineWidget extends StatelessWidget {
               Text(
                 locale == 'hi'
                     ? 'पुनर्चक्रण प्रगति (EPR Traceability)'
-                    : (locale == 'en' ? 'Downstream Processing Progress' : 'पुनर्प्रक्रिया प्रगती (EPR Traceability)'),
+                    : (locale == 'en'
+                        ? 'Downstream Processing Progress'
+                        : 'पुनर्प्रक्रिया प्रगती (EPR Traceability)'),
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
@@ -137,7 +139,9 @@ class DownstreamTimelineWidget extends StatelessWidget {
                       maxLines: 2,
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: isCurrent ? FontWeight.w900 : (isDone ? FontWeight.bold : FontWeight.w500),
+                        fontWeight: isCurrent
+                            ? FontWeight.w900
+                            : (isDone ? FontWeight.bold : FontWeight.w500),
                         color: isCurrent
                             ? AppTheme.greenGoEarn
                             : (isDone ? AppTheme.textHighContrast : AppTheme.textMuted),

@@ -1,1 +1,25 @@
-{}
+{
+  "en": [
+    "takePhotoHint",
+    "enterWeight",
+    "aiConfidenceLabel",
+    "aiSuggestedCategories",
+    "showAllCategories",
+    "showLessCategories",
+    "otherCategories",
+    "navigationOfflineTitle",
+    "navigationOfflineMessage"
+  ],
+
+  "hi": [
+    "takePhotoHint",
+    "enterWeight",
+    "aiConfidenceLabel",
+    "aiSuggestedCategories",
+    "showAllCategories",
+    "showLessCategories",
+    "otherCategories",
+    "navigationOfflineTitle",
+    "navigationOfflineMessage"
+  ]
+}

@@ -96,9 +96,7 @@ class _VerifyHandoverScreenState extends State<VerifyHandoverScreen> {
         ));
       } else {
         unawaited(widget.audioService.speakCustomText(
-          widget.locale == 'hi'
-              ? 'यह संदर्भ कोड अमान्य है।'
-              : 'हा संदर्भ क्रमांक अमान्य आहे.',
+          widget.locale == 'hi' ? 'यह संदर्भ कोड अमान्य है।' : 'हा संदर्भ क्रमांक अमान्य आहे.',
         ));
       }
     }
@@ -137,7 +135,8 @@ class _VerifyHandoverScreenState extends State<VerifyHandoverScreen> {
                       locale == 'hi'
                           ? '6-अक्षरी संदर्भ कोड दर्ज करें'
                           : '६-अक्षरी संदर्भ क्रमांक टाका',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
                     ),
                     const SizedBox(height: 10),
                     Container(
@@ -192,10 +191,7 @@ class _VerifyHandoverScreenState extends State<VerifyHandoverScreen> {
 
               // Verification Results
               if (_hasSearched) ...[
-                if (_traceData == null)
-                  _buildNotFoundCard(locale)
-                else
-                  _buildResultCard(locale),
+                if (_traceData == null) _buildNotFoundCard(locale) else _buildResultCard(locale),
               ],
             ],
           ),
@@ -221,7 +217,8 @@ class _VerifyHandoverScreenState extends State<VerifyHandoverScreen> {
             locale == 'hi'
                 ? 'संदर्भ कोड सापडला नाही / अमान्य'
                 : 'संदर्भ क्रमांक सापडला नाही / अमान्य',
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: Color(0xFF991B1B)),
+            style: const TextStyle(
+                fontSize: 17, fontWeight: FontWeight.w900, color: Color(0xFF991B1B)),
           ),
           const SizedBox(height: 6),
           Text(
@@ -299,7 +296,9 @@ class _VerifyHandoverScreenState extends State<VerifyHandoverScreen> {
                         fontWeight: FontWeight.w900,
                         color: isDisputed
                             ? const Color(0xFF92400E)
-                            : (_isSignatureValid ? const Color(0xFF166534) : const Color(0xFF991B1B)),
+                            : (_isSignatureValid
+                                ? const Color(0xFF166534)
+                                : const Color(0xFF991B1B)),
                       ),
                     ),
                   ],
@@ -317,7 +316,8 @@ class _VerifyHandoverScreenState extends State<VerifyHandoverScreen> {
                 _buildInfoRow('अंतिम किंमत', '₹${tx!.finalPrice!.toStringAsFixed(0)}'),
               ],
               const SizedBox(height: 6),
-              _buildInfoRow('रीसायकलर पुष्टी', t.recyclerConfirmation ? 'होय (Confirmed)' : 'प्रलंबित (Pending)'),
+              _buildInfoRow('रीसायकलर पुष्टी',
+                  t.recyclerConfirmation ? 'होय (Confirmed)' : 'प्रलंबित (Pending)'),
               const SizedBox(height: 6),
               _buildInfoRow('हॅश कोड', '${t.recordHash.substring(0, 16)}...'),
             ],

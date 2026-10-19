@@ -98,6 +98,8 @@ async def get_me(current_user: Annotated[User, Depends(get_current_user)]):
         id=str(current_user.id),
         email=current_user.email,
         phone=current_user.phone,
+        name=getattr(current_user, "name", None),
+        address=getattr(current_user, "address", None),
         role=current_user.role.value,
         collector_id=current_user.collector_id,
         recycler_id=current_user.recycler_id,

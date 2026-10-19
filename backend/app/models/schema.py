@@ -166,6 +166,7 @@ class UserRole(enum.StrEnum):
     COLLECTOR = "collector"
     RECYCLER = "recycler"
     ADMIN = "admin"
+    PUBLIC = "public"
 
 
 # -----------------------------------------------------------------------------
@@ -575,6 +576,8 @@ class User(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
     phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
+    name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    address: Mapped[str | None] = mapped_column(Text, nullable=True)
     hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
     pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     role: Mapped[UserRole] = mapped_column(

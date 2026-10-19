@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../../core/config/app_config.dart';
 import '../local_database.dart';
 
 class PriceRepository {
@@ -17,10 +18,19 @@ class PriceRepository {
   static String normalizeCategory(String cat) {
     final lower = cat.toLowerCase();
     if (lower.contains('pcb') || lower.contains('circuit') || lower.contains('board')) return 'PCB';
-    if (lower.contains('cable') || lower.contains('wire') || lower.contains('copper')) return 'Cables';
+    if (lower.contains('cable') || lower.contains('wire') || lower.contains('copper')) {
+      return 'Cables';
+    }
     if (lower.contains('batt')) return 'Batteries';
-    if (lower.contains('lcd') || lower.contains('screen') || lower.contains('panel') || lower.contains('led')) return 'LCD';
-    if (lower.contains('motor') || lower.contains('magnet') || lower.contains('coil')) return 'Motors_Magnets';
+    if (lower.contains('lcd') ||
+        lower.contains('screen') ||
+        lower.contains('panel') ||
+        lower.contains('led')) {
+      return 'LCD';
+    }
+    if (lower.contains('motor') || lower.contains('magnet') || lower.contains('coil')) {
+      return 'Motors_Magnets';
+    }
     if (lower.contains('crt') || lower.contains('tv') || lower.contains('monitor')) return 'CRT';
     if (lower.contains('plastic')) return 'Mixed_Plastics';
     return cat;
@@ -36,8 +46,7 @@ class PriceRepository {
 
   /// Watch all cached prices, ordered by most recently recorded
   Stream<List<CachedPrice>> watchAllPrices() {
-    return (_db.select(_db.cachedPrices)
-          ..orderBy([(p) => OrderingTerm.desc(p.recordedAt)]))
+    return (_db.select(_db.cachedPrices)..orderBy([(p) => OrderingTerm.desc(p.recordedAt)]))
         .watch();
   }
 
@@ -73,22 +82,22 @@ class PriceRepository {
     final canonicalCat = normalizeCategory(category);
     final id = 'PRICE-${district.toUpperCase()}-$canonicalCat';
     await _db.into(_db.cachedPrices).insertOnConflictUpdate(
-      CachedPricesCompanion.insert(
-        id: id,
-        category: canonicalCat,
-        subCategory: Value(subCategory),
-        district: district,
-        latitude: 19.6967,
-        longitude: 72.7699,
-        recordedAt: recordedAt ?? now,
-        buyingPrice: buyingPrice,
-        sellingQuotedPrice: recyclerQuote ?? buyingPrice,
-        marketMin: marketMin ?? (buyingPrice * 0.9),
-        marketMax: marketMax ?? (buyingPrice * 1.1),
-        source: const Value('server_sync'),
-        createdAt: now,
-      ),
-    );
+          CachedPricesCompanion.insert(
+            id: id,
+            category: canonicalCat,
+            subCategory: Value(subCategory),
+            district: district,
+            latitude: 19.6967,
+            longitude: 72.7699,
+            recordedAt: recordedAt ?? now,
+            buyingPrice: buyingPrice,
+            sellingQuotedPrice: recyclerQuote ?? buyingPrice,
+            marketMin: marketMin ?? (buyingPrice * 0.9),
+            marketMax: marketMax ?? (buyingPrice * 1.1),
+            source: const Value('server_sync'),
+            createdAt: now,
+          ),
+        );
   }
 
   /// Fetch latest prices directly from backend server and update cache
@@ -97,14 +106,11 @@ class PriceRepository {
     if (serverBaseUrl != null) {
       candidateUrls.add(serverBaseUrl);
     } else {
-      if (kIsWeb) {
-        candidateUrls.add('http://localhost:8000/api/v1');
-      } else {
-        candidateUrls.addAll([
-          'http://10.0.2.2:8000/api/v1',
-          'http://localhost:8000/api/v1',
-          'http://127.0.0.1:8000/api/v1',
-        ]);
+      candidateUrls.add(AppConfig.apiBaseUrl);
+      for (final url in AppConfig.candidateUrls) {
+        if (!candidateUrls.contains(url)) {
+          candidateUrls.add(url);
+        }
       }
     }
 
@@ -171,34 +177,34 @@ class PriceRepository {
 
     // 1. Enqueue into SyncQueueEntries for background sync
     await _db.into(_db.syncQueueEntries).insert(
-      SyncQueueEntriesCompanion.insert(
-        clientTxId: clientTxId,
-        collectorId: 'COLLECTOR-LOCAL',
-        action: 'report_price',
-        payloadJson: payload,
-        clientTimestamp: now,
-        createdAt: now,
-      ),
-    );
+          SyncQueueEntriesCompanion.insert(
+            clientTxId: clientTxId,
+            collectorId: 'COLLECTOR-LOCAL',
+            action: 'report_price',
+            payloadJson: payload,
+            clientTimestamp: now,
+            createdAt: now,
+          ),
+        );
 
     // 2. Insert into local CachedPrices
     await _db.into(_db.cachedPrices).insertOnConflictUpdate(
-      CachedPricesCompanion.insert(
-        id: clientTxId,
-        category: canonicalCat,
-        subCategory: Value(subCategory),
-        district: district,
-        latitude: 19.6967,
-        longitude: 72.7699,
-        recordedAt: now,
-        buyingPrice: offeredPrice,
-        sellingQuotedPrice: offeredPrice,
-        marketMin: offeredPrice * 0.9,
-        marketMax: offeredPrice * 1.1,
-        source: const Value('collector_report'),
-        createdAt: now,
-      ),
-    );
+          CachedPricesCompanion.insert(
+            id: clientTxId,
+            category: canonicalCat,
+            subCategory: Value(subCategory),
+            district: district,
+            latitude: 19.6967,
+            longitude: 72.7699,
+            recordedAt: now,
+            buyingPrice: offeredPrice,
+            sellingQuotedPrice: offeredPrice,
+            marketMin: offeredPrice * 0.9,
+            marketMax: offeredPrice * 1.1,
+            source: const Value('collector_report'),
+            createdAt: now,
+          ),
+        );
 
     return clientTxId;
   }
@@ -222,21 +228,21 @@ class PriceRepository {
     for (var i = 0; i < initialRates.length; i++) {
       final rate = initialRates[i];
       await _db.into(_db.cachedPrices).insert(
-        CachedPricesCompanion.insert(
-          id: 'SEED-PR-$i',
-          category: rate.$1,
-          subCategory: Value(rate.$2),
-          district: 'Palghar',
-          latitude: 19.6967,
-          longitude: 72.7699,
-          recordedAt: now,
-          buyingPrice: rate.$3,
-          sellingQuotedPrice: rate.$6,
-          marketMin: rate.$4,
-          marketMax: rate.$5,
-          createdAt: now,
-        ),
-      );
+            CachedPricesCompanion.insert(
+              id: 'SEED-PR-$i',
+              category: rate.$1,
+              subCategory: Value(rate.$2),
+              district: 'Palghar',
+              latitude: 19.6967,
+              longitude: 72.7699,
+              recordedAt: now,
+              buyingPrice: rate.$3,
+              sellingQuotedPrice: rate.$6,
+              marketMin: rate.$4,
+              marketMax: rate.$5,
+              createdAt: now,
+            ),
+          );
     }
   }
 }

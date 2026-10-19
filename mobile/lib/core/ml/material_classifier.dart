@@ -165,8 +165,8 @@ class MaterialClassifier {
     final top3 = categories[tertiaryIndex];
 
     // Compute top-1 confidence (or use forced confidence for testing threshold boundary)
-    final double conf1 = forceTopConfidence ??
-        (0.82 + (Random(imageBytes?.length ?? 42).nextDouble() * 0.12));
+    final double conf1 =
+        forceTopConfidence ?? (0.82 + (Random(imageBytes?.length ?? 42).nextDouble() * 0.12));
     final double conf2 = ((1.0 - conf1) * 0.70).clamp(0.0, 1.0);
     final double conf3 = (1.0 - conf1 - conf2).clamp(0.0, 1.0);
 

@@ -323,5 +323,59 @@ void main() {
       // Clean up test file
       await file.delete();
     });
+
+    test('7. getDetailedOverview strictly deduplicates duplicate ledger entries and deletes redundant rows', () async {
+      const collectorId = 'KC-C-TEST-DUP';
+      final now = DateTime.now();
+
+      // Seed 2 duplicate ledger entries with the exact same lotId
+      await db.into(db.localLedger).insert(
+            LocalLedgerCompanion.insert(
+              id: 'LEDG-DUP-001',
+              collectorId: collectorId,
+              lotId: const drift.Value('LOT-DUP-1'),
+              entryType: 'credit',
+              amount: 5000.0,
+              paymentMode: const drift.Value('cash_received'),
+              description: 'Lot Handover payout (LOT-DUP-1) - 5.0 kg Motors_Magnets',
+              balanceAfter: 5000.0,
+              recordedAt: now.subtract(const Duration(seconds: 2)),
+              isSynced: const drift.Value(false),
+            ),
+          );
+
+      await db.into(db.localLedger).insert(
+            LocalLedgerCompanion.insert(
+              id: 'LEDG-DUP-002',
+              collectorId: collectorId,
+              lotId: const drift.Value('LOT-DUP-1'),
+              entryType: 'credit',
+              amount: 5000.0,
+              paymentMode: const drift.Value('cash_received'),
+              description: 'Lot Handover payout (LOT-DUP-1) - 5.0 kg Motors_Magnets',
+              balanceAfter: 10000.0,
+              recordedAt: now,
+              isSynced: const drift.Value(false),
+            ),
+          );
+
+      final overview = await ledgerRepo.getDetailedOverview(collectorId);
+
+      // Verify that overview returned only 1 entry for 5000, NOT 2 entries for 10000
+      expect(overview.transactions.length, equals(1));
+      expect(overview.todayTotal, equals(5000.0));
+      expect(overview.receivedAmount, equals(5000.0));
+      expect(overview.allTimeTotal, equals(5000.0));
+
+      // Allow background delete future to settle
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      // Verify that the duplicate row was self-healed and deleted from SQLite
+      final rowsInDb = await (db.select(db.localLedger)
+            ..where((l) => l.collectorId.equals(collectorId)))
+          .get();
+      expect(rowsInDb.length, equals(1));
+      expect(rowsInDb.first.id, equals('LEDG-DUP-002'));
+    });
   });
 }
