@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/audio/audio_service.dart';
 import '../../core/hardware/navigation_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -103,7 +104,91 @@ class PickupAlertDialog extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+
+            // Citizen Scrap Photo (Prominent Display with Tap to Zoom)
+            if (pickup.photoUrls.isNotEmpty) ...[
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => Dialog(
+                      backgroundColor: Colors.black,
+                      insetPadding: const EdgeInsets.all(8),
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: InteractiveViewer(
+                              child: Image.network(
+                                pickup.photoUrls.first,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.white,
+                                  size: 64,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: IconButton(
+                              icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                              onPressed: () => Navigator.of(ctx).pop(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 140,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.black12,
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(
+                        pickup.photoUrls.first,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Icon(Icons.inventory_2, color: Colors.grey.shade500, size: 40),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 6,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.65),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.zoom_in, color: Colors.white, size: 14),
+                              const SizedBox(width: 4),
+                              Text(
+                                locale == 'mr' ? 'फोटो मोठा करा' : 'Tap to Zoom',
+                                style: const TextStyle(color: Colors.white, fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
 
             // Distance & Location Card
             Container(
@@ -132,38 +217,95 @@ class PickupAlertDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      pickup.addressText ?? (locale == 'mr' ? 'जवळचे ठिकाण' : 'Nearby Location'),
-                      style: const TextStyle(fontSize: 13, color: AppTheme.textHighContrast),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          pickup.addressText ?? (locale == 'mr' ? 'जवळचे ठिकाण' : 'Nearby Location'),
+                          style: const TextStyle(fontSize: 13, color: AppTheme.textHighContrast),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (pickup.preferredTimeSlot != null) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.schedule, size: 12, color: Colors.grey.shade600),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  pickup.preferredTimeSlot!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
 
-            // Categories Chips
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: pickup.categories.map((cat) {
-                return Chip(
-                  backgroundColor: AppTheme.greenGoEarn.withValues(alpha: 0.08),
-                  side: BorderSide(color: AppTheme.greenGoEarn.withValues(alpha: 0.3)),
-                  label: Text(
-                    cat,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.greenGoEarn,
-                    ),
+            // Call Citizen Button (Direct Dial)
+            if (pickup.citizenPhone != null && pickup.citizenPhone!.isNotEmpty) ...[
+              SizedBox(
+                height: 44,
+                child: OutlinedButton.icon(
+                  key: const Key('btn_call_citizen'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.blue.shade800,
+                    side: BorderSide(color: Colors.blue.shade300),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
+                  onPressed: () async {
+                    final cleanPhone = pickup.citizenPhone!.replaceAll(RegExp(r'[^0-9+]'), '');
+                    final telUri = Uri.parse('tel:$cleanPhone');
+                    if (await canLaunchUrl(telUri)) {
+                      await launchUrl(telUri);
+                    }
+                  },
+                  icon: const Icon(Icons.phone, size: 18),
+                  label: Text(
+                    locale == 'mr'
+                        ? 'नागरिकाला कॉल करा (${pickup.citizenPhone})'
+                        : 'Call Citizen (${pickup.citizenPhone})',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
+            // Categories Chips (if any categorized)
+            if (pickup.categories.isNotEmpty) ...[
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: pickup.categories.map((cat) {
+                  return Chip(
+                    backgroundColor: AppTheme.greenGoEarn.withValues(alpha: 0.08),
+                    side: BorderSide(color: AppTheme.greenGoEarn.withValues(alpha: 0.3)),
+                    label: Text(
+                      cat,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.greenGoEarn,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 14),
+            ],
 
             // ACTION BUTTONS (Min 56dp height)
             if (!isAccepted) ...[
@@ -215,7 +357,7 @@ class PickupAlertDialog extends StatelessWidget {
                 ],
               ),
             ] else ...[
-              // Accepted Flow: Turn-by-turn Navigation & Arrived Button
+              // Accepted Flow: Turn-by-turn Navigation & Arrived / Start Weighing Button
               SizedBox(
                 height: 56,
                 child: ElevatedButton.icon(
@@ -232,8 +374,6 @@ class PickupAlertDialog extends StatelessWidget {
                       longitude: pickup.longitude,
                     );
                     if (!launched) {
-                      // Offline or no maps app — show a graceful localized warning
-                      // ignore: use_build_context_synchronously
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -267,9 +407,9 @@ class PickupAlertDialog extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   onPressed: onArrived,
-                  icon: const Icon(Icons.storefront, size: 24),
+                  icon: const Icon(Icons.scale, size: 24),
                   label: Text(
-                    locale == 'mr' ? 'पोहोचलो (I Have Arrived)' : 'Arrived at Destination',
+                    locale == 'mr' ? 'पोहोचलो व वजन करा (Arrived & Start Weighing)' : 'Arrived & Start Weighing',
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),

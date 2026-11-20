@@ -30,13 +30,13 @@ class PickupCreateSchema(BaseModel):
         description="Optional textual street/locality address",
     )
     categories: list[str] = Field(
-        default_factory=lambda: ["CABLES"],
-        description="Selected e-waste categories (e.g. ['CABLES', 'BATTERIES', 'CRT', 'PCB'])",
+        default_factory=list,
+        description="Selected e-waste categories (optional for photo-first citizen submissions; classified on-site)",
     )
     photos: list[str] = Field(
         default_factory=list,
         validation_alias=AliasChoices("photos", "photo_urls", "photoUrls"),
-        description="Base64 or image URLs of scrap items",
+        description="Scrap photo URLs (Supabase storage CDN)",
     )
     phone: str = Field(
         ...,

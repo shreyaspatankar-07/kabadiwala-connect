@@ -96,7 +96,7 @@ async def create_pickup_request(
         citizen_phone=payload.phone,
         location=wkt_location,
         address_text=payload.address,
-        categories=payload.categories or ["CABLES"],
+        categories=payload.categories or [],
         photo_urls=payload.photos or [],
         status=PickupStatus.CREATED,
     )

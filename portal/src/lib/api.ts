@@ -632,8 +632,10 @@ export interface CitizenPickupPayload {
   lat: number;
   lng: number;
   address?: string;
-  categories: string[];
-  photos?: string[];
+  /** Optional — collector classifies on-site. Leave empty for photo-first flow. */
+  categories?: string[];
+  /** Public Supabase CDN URLs of citizen scrap photos (at least 1 required). */
+  photos: string[];
   phone: string;
   otp?: string;
   preferred_time_slot?: string;

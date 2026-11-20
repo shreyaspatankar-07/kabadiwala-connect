@@ -4,6 +4,31 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
+## Current Status: Phase 20 (Photo-First Citizen Pickup Flow & Cross-Platform Sync)
+
+### Completed Items
+- [x] **Photo-First Citizen Pickup Flow Refactoring (Phase 20)**:
+  - **Citizen Web Portal (`portal/src/app/pickup/page.tsx` & `portal/src/components/views/PublicDashboardView.tsx`)**:
+    - Removed e-waste category selection cards and weight inputs from the citizen web flow entirely.
+    - Added **Step 1: Mandatory Scrap Photo Snap/Upload** with live mobile camera capture (`accept="image/*" capture="environment"`) and desktop drag-and-drop/file picker.
+    - Implemented client-side HTML5 Canvas compression (`compressImageToWebP` in `portal/src/lib/imageUtils.ts`) compressing images to **< 800 KB** before network transmission.
+    - Added interactive photo preview with compressed size display and "Retake / Change Photo" controls.
+    - Integrated direct REST upload to Supabase Storage bucket `scrap-photos` (`uploadScrapPhotoToSupabase`).
+    - Streamlined citizen inputs to the 4 essential fields: (1) Scrap Photo, (2) Address & GPS coordinates, (3) Contact Phone, (4) Preferred Time Window.
+  - **Backend API & Data Models (`backend/app/schemas/pickup.py` & `backend/app/api/v1/pickup.py`)**:
+    - Updated `PickupCreateSchema` so `categories` is optional (`default_factory=list`).
+    - Updated `create_pickup_request` endpoint to accept empty categories for doorstep edge classification, persisting citizen scrap photo URLs in `photo_urls`.
+  - **Collector Mobile Client (`mobile/lib/data/models/pickup_request_model.dart` & `mobile/lib/ui/widgets/pickup_alert_dialog.dart`)**:
+    - Updated `PickupRequestDto` to parse `preferred_time_slot` and `citizen_phone`.
+    - Prominently rendered citizen scrap photo in `PickupAlertDialog` with tap-to-zoom interactive viewer.
+    - Added one-tap **Call Citizen** button (`tel:`) using `url_launcher`.
+    - Added **"Arrived & Start Weighing"** doorstep transition button for the Edge AI + scale verification workflow.
+  - **Build Verification**:
+    - Next.js webpack production build (`npx next build --webpack`) passed with 0 errors.
+    - TypeScript compilation (`npx tsc --noEmit`) passed with 0 errors.
+
+---
+
 ## Current Status: Phase 19 (Web Portal & Cross-Platform Synchronization Bug Sweep)
 
 ### Completed Items

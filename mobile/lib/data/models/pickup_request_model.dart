@@ -10,6 +10,8 @@ class PickupRequestDto {
   final double longitude;
   final double? estimatedDistanceKm;
   final String? assignedCollectorId;
+  final String? citizenPhone;
+  final String? preferredTimeSlot;
   final DateTime createdAt;
 
   const PickupRequestDto({
@@ -23,6 +25,8 @@ class PickupRequestDto {
     required this.longitude,
     this.estimatedDistanceKm,
     this.assignedCollectorId,
+    this.citizenPhone,
+    this.preferredTimeSlot,
     required this.createdAt,
   });
 
@@ -39,6 +43,8 @@ class PickupRequestDto {
           (json['longitude'] as num?)?.toDouble() ?? (json['lng'] as num?)?.toDouble() ?? 0.0,
       estimatedDistanceKm: (json['estimated_distance_km'] as num?)?.toDouble(),
       assignedCollectorId: json['assigned_collector_id']?.toString(),
+      citizenPhone: json['citizen_phone']?.toString() ?? json['phone']?.toString(),
+      preferredTimeSlot: json['preferred_time_slot']?.toString() ?? json['timeSlot']?.toString(),
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'].toString())
           : DateTime.now(),
@@ -57,6 +63,8 @@ class PickupRequestDto {
       'longitude': longitude,
       'estimated_distance_km': estimatedDistanceKm,
       'assigned_collector_id': assignedCollectorId,
+      'citizen_phone': citizenPhone,
+      'preferred_time_slot': preferredTimeSlot,
       'created_at': createdAt.toIso8601String(),
     };
   }

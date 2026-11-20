@@ -20,8 +20,12 @@ import {
   Phone,
   Info,
   Check,
+  Camera,
+  Upload,
+  RefreshCw,
 } from "lucide-react";
 import { createPickupRequest, getCategoryPhotoUrl } from "../../lib/api";
+import { compressImageToWebP, uploadScrapPhotoToSupabase } from "../../lib/imageUtils";
 
 interface PickupItem {
   id: string;
@@ -94,11 +98,16 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
   };
 
   // Booking Form State
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [compressedSizeKb, setCompressedSizeKb] = useState<number | null>(null);
+  const [isCompressing, setIsCompressing] = useState<boolean>(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const [lat, setLat] = useState<number>(19.076);
   const [lng, setLng] = useState<number>(72.8777);
   const [address, setAddress] = useState<string>(user?.address || "Bandra West, Mumbai, Maharashtra");
   const [phone, setPhone] = useState<string>(user?.phone || "+91 98765 43210");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(["CABLES", "BATTERIES"]);
   const [timeSlot, setTimeSlot] = useState<string>("Immediate (Next 2 Hours)");
   const [loading, setLoading] = useState<boolean>(false);
   const [successBooking, setSuccessBooking] = useState<string | null>(null);
@@ -112,7 +121,7 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
       id: "req-1",
       public_code: "PR-MH-2026-F9A12",
       status: "dispatched",
-      categories: ["CABLES", "BATTERIES"],
+      categories: ["Mixed E-Waste"],
       address_text: "Bandra West, Mumbai",
       created_at: new Date(Date.now() - 3600000).toISOString(),
       collector_name: "Suresh K. (Verified Kabadiwala #KC-C-8812)",
@@ -122,7 +131,7 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
       id: "req-0",
       public_code: "PR-MH-2026-B3E08",
       status: "completed",
-      categories: ["PCB", "APPLIANCES"],
+      categories: ["Appliance & PCB"],
       address_text: "Bandra West, Mumbai",
       created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
       collector_name: "Ramesh Pawar (Kabadiwala #KC-C-4109)",
@@ -154,7 +163,6 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
       },
       (err) => {
         console.warn("Geolocation fallback:", err.message);
-        // Immediate fallback for desktop/laptop browsers without GPS hardware
         setLat(19.0760);
         setLng(72.8777);
         setAddress("Bandra West, Mumbai (Default City Hub)");
@@ -165,29 +173,73 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
     );
   };
 
-  const toggleCategory = (catId: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(catId)
-        ? prev.length > 1
-          ? prev.filter((c) => c !== catId)
-          : prev
-        : [...prev, catId]
-    );
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsCompressing(true);
+    setErrorMessage(null);
+
+    try {
+      const compressedBlob = await compressImageToWebP(file, 800);
+      const compressedFile = new File([compressedBlob], `scrap_${Date.now()}.webp`, {
+        type: compressedBlob.type || "image/webp",
+      });
+
+      setPhotoFile(compressedFile);
+      setCompressedSizeKb(Math.round(compressedFile.size / 1024));
+      setPhotoPreview(URL.createObjectURL(compressedFile));
+    } catch (err: any) {
+      setPhotoFile(file);
+      setCompressedSizeKb(Math.round(file.size / 1024));
+      setPhotoPreview(URL.createObjectURL(file));
+    } finally {
+      setIsCompressing(false);
+    }
+  };
+
+  const handleRetakePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    setCompressedSizeKb(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      fileInputRef.current.click();
+    }
   };
 
   const handleBookPickup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!photoFile && !photoPreview) {
+      setErrorMessage("Please capture or upload a scrap photo before submitting.");
+      return;
+    }
+
     setLoading(true);
     setErrorMessage(null);
 
     try {
+      let finalPhotoUrl = "";
+      if (photoFile) {
+        try {
+          finalPhotoUrl = await uploadScrapPhotoToSupabase(
+            photoFile,
+            `citizen_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.webp`
+          );
+        } catch {
+          finalPhotoUrl = getCategoryPhotoUrl("mixed_ewaste");
+        }
+      } else {
+        finalPhotoUrl = getCategoryPhotoUrl("mixed_ewaste");
+      }
+
       const formattedPhone = phone.replace(/[^0-9+]/g, "") || "+919876543210";
       const res = await createPickupRequest({
         lat,
         lng,
         address,
-        categories: selectedCategories,
-        photos: [getCategoryPhotoUrl(selectedCategories[0] || "CABLES")],
+        categories: [],
+        photos: [finalPhotoUrl],
         phone: formattedPhone,
         otp: "123456",
         preferred_time_slot: timeSlot,
@@ -197,7 +249,7 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
         id: res.id || `req-${Date.now()}`,
         public_code: res.public_code,
         status: "created",
-        categories: selectedCategories,
+        categories: ["Awaiting On-Site Weighing"],
         address_text: address,
         created_at: new Date().toISOString(),
         collector_name: "Finding nearest active verified collector...",
@@ -208,13 +260,12 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
       setSuccessBooking(res.public_code);
       setLoading(false);
     } catch (err: any) {
-      // In offline/mock mode, provide a reliable local booking confirmation
       const mockCode = `PR-MH-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
       const newPickup: PickupItem = {
         id: `req-${Date.now()}`,
         public_code: mockCode,
         status: "dispatched",
-        categories: selectedCategories,
+        categories: ["Awaiting On-Site Weighing"],
         address_text: address,
         created_at: new Date().toISOString(),
         collector_name: "Nearby Collector Assigned (#KC-C-7741)",
@@ -371,38 +422,77 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
             </div>
 
             <form onSubmit={handleBookPickup} className="space-y-6">
-              {/* Category Selection */}
+              {/* Step 1: Scrap Photo Upload */}
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-2">
-                  1. Select E-Waste Categories to Hand Over
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {CATEGORIES.map((cat) => {
-                    const isSelected = selectedCategories.includes(cat.id);
-                    return (
-                      <button
-                        type="button"
-                        key={cat.id}
-                        onClick={() => toggleCategory(cat.id)}
-                        className={`p-3.5 rounded-2xl border text-left flex items-start gap-3 transition-all ${
-                          isSelected
-                            ? "bg-emerald-950/60 border-emerald-500 shadow-md shadow-emerald-950"
-                            : "bg-slate-800/60 border-slate-700/80 hover:border-slate-600"
-                        }`}
-                      >
-                        <span className="text-2xl">{cat.icon}</span>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-extrabold text-white">{cat.name}</span>
-                            {isSelected && <Check className="w-4 h-4 text-emerald-400" />}
-                          </div>
-                          <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">{cat.desc}</p>
-                          <div className="text-[10px] font-bold text-emerald-400 mt-1.5">{cat.rate}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-300">
+                    1. Photo of Scrap / Kabad <span className="text-emerald-400 font-normal">(Required)</span>
+                  </label>
+                  {photoPreview && (
+                    <button
+                      type="button"
+                      onClick={handleRetakePhoto}
+                      className="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-semibold"
+                    >
+                      <RefreshCw className="w-3 h-3" /> Retake Photo
+                    </button>
+                  )}
                 </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handlePhotoSelect}
+                  className="hidden"
+                />
+
+                {!photoPreview ? (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-emerald-500/40 hover:border-emerald-400 bg-slate-800/40 hover:bg-slate-800/80 rounded-2xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 group"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition">
+                      <Camera className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white">Tap to Snap or Upload Scrap Photo</div>
+                      <p className="text-[11px] text-slate-400">Mobile camera or file picker. Auto-compressed &lt; 800 KB.</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-full">
+                      <Upload className="w-3 h-3" />
+                      <span>Choose File</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl overflow-hidden border border-emerald-500/40 bg-slate-950 p-3 flex items-center gap-4">
+                    <img
+                      src={photoPreview}
+                      alt="Scrap Preview"
+                      className="w-24 h-24 object-cover rounded-xl border border-slate-800"
+                    />
+                    <div className="flex-1 space-y-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Photo Attached ✓</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300">
+                        Kabadiwala will review this photo before arriving with precision digital scales.
+                      </p>
+                      {compressedSizeKb && (
+                        <div className="text-[10px] font-mono text-slate-400">
+                          Compressed size: <span className="text-emerald-300 font-bold">{compressedSizeKb} KB</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {isCompressing && (
+                  <p className="text-xs text-emerald-400 mt-2 flex items-center gap-1.5 animate-pulse">
+                    <RefreshCw className="w-3 h-3 animate-spin" /> Compressing image...
+                  </p>
+                )}
               </div>
 
               {/* Location Input */}
