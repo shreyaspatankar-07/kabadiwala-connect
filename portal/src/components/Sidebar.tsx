@@ -86,7 +86,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         )}
 
         {/* Recycler Navigation Group */}
-        {(user.role === "recycler" || user.role === "admin") && (
+        {user.role === "recycler" && (
           <div>
             <h2 className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
               <span>{t.roleRecycler}</span>

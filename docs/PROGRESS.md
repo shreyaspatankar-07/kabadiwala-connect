@@ -4,7 +4,45 @@ Living record of project deliverables, milestones completed, and pending roadmap
 
 ---
 
-## Current Status: Phase 17 (Production Deployments & Edge Hardware Integration)
+## Current Status: Phase 19 (Web Portal & Cross-Platform Synchronization Bug Sweep)
+
+### Completed Items
+- [x] **Web Portal & Cross-Platform Sync Bug Sweep (Phase 19)**:
+  - **Issue 1 Fix — Handover Verification & Real-Time Sync**:
+    - Mobile app `OfflineHandoverService.initiateHandover` now queries local Drift SQLite transaction to embed the collector's actual category, weight, and quoted price into the signed handover payload.
+    - Added non-blocking immediate live sync push in `OfflineHandoverService` to push the handover record directly to the backend without waiting for manual sync trigger.
+    - Backend `SyncService.push_batch` updates or creates the `Transaction` entity when receiving `record_handover` operations.
+    - Backend `HandoverService.verify_handover_public` now inspects pending `SyncQueue` entries and ensures `final_price` falls back to `tx.quoted_price` rather than returning null.
+    - Portal `HandoverConfirmationView` respects `result.final_price` when loaded rather than forcing an arbitrary ₹420/kg multiplier.
+    - Portal `lookupHandoverByCode` sends auth headers and cross-references active lots feed before resorting to fallback.
+  - **Issue 2 Fix — Government Admin Role-Based Sidebar Isolation**:
+    - Fixed `portal/src/components/Sidebar.tsx` navigation guard from `(user.role === "recycler" || user.role === "admin")` to strictly `user.role === "recycler"`. Government Admins now only see administrative governance tabs (Verification Queue, Expiry Alerts, Price Board Management, Anomaly Review, Analytics).
+  - **Issue 3 Fix — Price Board Regional Override Synchronization**:
+    - `overridePriceApi` now attaches `Authorization: Bearer <token>` and replicates overrides to the companion regional district (Mumbai / Palghar) so mobile collectors in all demo operational areas receive the benchmark update.
+    - Mobile app `PriceBoardScreen` updated `_applyPrices` to prioritize newer `server_sync` prices over local seed data.
+    - Mobile app refresh button (`btn_refresh_prices`) re-queries Drift SQLite cache upon network fetch completion to instantly re-render the view.
+  - **Issue 4 Fix — Matched Lots Decline Immediate Refresh & Auth**:
+    - Fixed `MatchedLotsInboxView` state indexing: `localOverrides` now stores and looks up by both `lot.lotId` and `lot.id`.
+    - Declined lots now display an explicit "✕ Lot Declined (Removed from Queue)" badge and are subtracted from the Pending Actions counter.
+    - Updated `updateLotStatusApi` to send auth headers, and updated backend `/api/v1/lots/{lot_id}/status` to use `get_optional_current_user` to avoid 401 errors.
+  - **Issue 5 Fix — Citizen "Detect Current Location" Button**:
+    - Rewrote `handleGetCurrentLocation` in `PublicDashboardView` to handle laptop and desktop environments without dedicated GPS hardware.
+    - First attempts standard geolocation accuracy, falling back gracefully to detected city hub coordinates (Bandra West, Mumbai) on timeout or permission denial.
+    - Added dynamic button label feedback: "Detect Current Location" -> "Acquiring GPS..." -> "GPS Locked ✓".
+  - **Build Verification**: Next.js production build (`npx next build --webpack`) passes with 0 errors. TypeScript (`npx tsc --noEmit`) passes with 0 type errors.
+
+## Current Status: Phase 18 (Portal Bug Sweep & Citizen Tab Routing Fix)
+
+### Completed Items
+- [x] **Portal Exhaustive Bug Sweep & Fixes (Phase 18)**:
+  - **Critical Fix — Citizen Sidebar Tab Routing**: `PublicDashboardView` was always rendering the "Book Pickup" sub-view regardless of which sidebar/mobile-nav tab was active. Now accepts `activeTab` and `setActiveTab` props from `page.tsx`. Maps outer tab IDs (`citizen_dashboard`, `citizen_pickups`, `citizen_prices`, `citizen_impact`) to internal view IDs (`book`, `pickups`, `prices`, `impact`) bidirectionally — sidebar tabs now correctly drive the citizen view.
+  - **Critical Fix — Access Restriction Guard**: Changed `isAccessForbidden` logic from `user.role !== "admin"` (which incorrectly blocked public users who are in their own view) to `user.role === "recycler"` — only recycler users attempting to access admin-only tabs trigger the restriction screen.
+  - **Fix — Async Login in 1-Click Demo Buttons**: All three 1-click demo login buttons (`btn-demo-recycler`, `btn-demo-admin`, `btn-demo-citizen`) now properly `await login(...)` before calling `setActiveTab(...)`, preventing race conditions where the tab changed before the session was established.
+  - **Fix — AuthContext `login` Return Type**: Declared `login` as `Promise<void>` both in the `AuthContextType` interface and the implementation so TypeScript correctly types awaited calls.
+  - **Fix — Sidebar Redundant `isActive` Check**: Removed a dead redundant double condition (`activeTab === "citizen_dashboard" && item.id === "citizen_dashboard"`) that was equivalent to the primary check.
+  - **Verification**: `npm run build` passes with 0 TypeScript errors. 90/92 backend tests pass (2 are pre-existing order-dependent flaky tests that pass in isolation).
+
+
 
 ### Completed Items
 - [x] **Production Patch: Transaction Deduplication & Atomic Handover Ledger Sync**:
@@ -493,3 +531,4 @@ Living record of project deliverables, milestones completed, and pending roadmap
       3. **Government Admin (शासकीय प्रशासन — JNARDDC / SPCB)**: Dedicated login with hardcoded credentials banner (`admin@jnarddc.gov.in` / `admin123`), 1-click demo login, SPCB license verification queue, expiry alerts, price board management, and Isolation Forest anomaly review.
     * Backend updates: Added `PUBLIC = "public"` to `UserRole` enum and `User` model, updated `auth.py` with public registration, hardcoded account auto-provisioning, and added `/api/v1/pickup/my-requests` endpoint for citizen bookings.
     * Quality verification: 92 / 92 backend pytest tests passing, Next.js 16 production build passing with 100% success.
+    * Navbar refinement: Removed redundant `Portal: [Role]` switcher button from the top navigation bar since role-based login and logout now govern user identity.

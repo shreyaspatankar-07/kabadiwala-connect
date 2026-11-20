@@ -48,19 +48,32 @@ export function MatchedLotsInboxView() {
 
   // Optimistic local overrides for accept / decline / counter — merged at render
   const [localOverrides, setLocalOverrides] = useState<Record<string, Partial<MatchedLot>>>({});
-  const displayLots = lots.map((l) => ({ ...l, ...(localOverrides[l.lotId] ?? {}) }));
+  const displayLots = lots.map((l) => {
+    const override = localOverrides[l.lotId] ?? localOverrides[l.id] ?? {};
+    return { ...l, ...override };
+  });
 
-  const handleAccept = async (lotId: string) => {
-    setLocalOverrides((prev) => ({ ...prev, [lotId]: { status: "accepted" } }));
-    await updateLotStatusApi(lotId, "accepted");
-    setActionSuccessMessage(`Lot ${lotId} accepted! Handover code generated for collector.`);
+  const handleAccept = async (targetLot: MatchedLot) => {
+    const primaryId = targetLot.lotId || targetLot.id;
+    setLocalOverrides((prev) => ({
+      ...prev,
+      [targetLot.lotId]: { status: "accepted" },
+      [targetLot.id]: { status: "accepted" },
+    }));
+    await updateLotStatusApi(primaryId, "accepted");
+    setActionSuccessMessage(`Lot ${targetLot.lotId} accepted! Handover code generated for collector.`);
     setTimeout(() => setActionSuccessMessage(null), 4000);
   };
 
-  const handleDecline = async (lotId: string) => {
-    setLocalOverrides((prev) => ({ ...prev, [lotId]: { status: "declined" } }));
-    await updateLotStatusApi(lotId, "cancelled");
-    setActionSuccessMessage(`Lot ${lotId} declined.`);
+  const handleDecline = async (targetLot: MatchedLot) => {
+    const primaryId = targetLot.lotId || targetLot.id;
+    setLocalOverrides((prev) => ({
+      ...prev,
+      [targetLot.lotId]: { status: "declined" },
+      [targetLot.id]: { status: "declined" },
+    }));
+    await updateLotStatusApi(primaryId, "cancelled");
+    setActionSuccessMessage(`Lot ${targetLot.lotId} declined.`);
     setTimeout(() => setActionSuccessMessage(null), 4000);
   };
 
@@ -76,8 +89,9 @@ export function MatchedLotsInboxView() {
     setLocalOverrides((prev) => ({
       ...prev,
       [counterModalLot.lotId]: { status: "counter_offered" as any, quotedPrice: newPrice },
+      [counterModalLot.id]: { status: "counter_offered" as any, quotedPrice: newPrice },
     }));
-    await updateLotStatusApi(counterModalLot.lotId, "matched", newPrice);
+    await updateLotStatusApi(counterModalLot.lotId || counterModalLot.id, "matched", newPrice);
     setActionSuccessMessage(
       `Counter-offer of ₹${rate}/kg sent to collector for Lot ${counterModalLot.lotId}`
     );
@@ -123,7 +137,7 @@ export function MatchedLotsInboxView() {
             Refresh Feed
           </button>
           <span className="px-3 py-1.5 bg-emerald-950 text-emerald-300 border border-emerald-800 rounded-lg text-xs font-bold">
-            {lots.filter((l) => l.status === "matched").length} Pending Actions
+            {displayLots.filter((l) => l.status === "matched").length} Pending Actions
           </span>
         </div>
       </div>
@@ -234,7 +248,7 @@ export function MatchedLotsInboxView() {
                 {isPending ? (
                   <div className="grid grid-cols-3 gap-2">
                     <button
-                      onClick={() => handleAccept(lot.id)}
+                      onClick={() => handleAccept(lot)}
                       data-testid={`btn-accept-${lot.id}`}
                       className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center space-x-1 shadow-lg shadow-emerald-900/40 transition"
                     >
@@ -250,13 +264,18 @@ export function MatchedLotsInboxView() {
                       <span>Counter</span>
                     </button>
                     <button
-                      onClick={() => handleDecline(lot.id)}
+                      onClick={() => handleDecline(lot)}
                       data-testid={`btn-decline-${lot.id}`}
                       className="bg-slate-800 hover:bg-red-950 hover:text-red-300 text-slate-400 font-bold py-2 px-2 rounded-xl text-xs flex items-center justify-center space-x-1 transition"
                     >
                       <XCircle className="w-3.5 h-3.5" />
                       <span>Decline</span>
                     </button>
+                  </div>
+                ) : lot.status === "declined" ? (
+                  <div className="text-center py-2 bg-red-950/40 border border-red-800/40 rounded-xl text-xs font-bold text-red-400 flex items-center justify-center gap-1.5">
+                    <XCircle className="w-3.5 h-3.5 text-red-400" />
+                    <span>Declined (Removed from Queue)</span>
                   </div>
                 ) : (
                   <div className="text-center py-2 bg-slate-800/60 rounded-xl text-xs font-semibold text-slate-400">

@@ -217,15 +217,26 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
   void _applyPrices(List<CachedPrice> prices) {
     final map = <String, CachedPrice>{};
     DateTime? latest;
+    // Pass 1: exact target district match
     for (final p in prices) {
       final canonical = PriceRepository.normalizeCategory(p.category);
       final isTargetDistrict = p.district.toLowerCase() == _selectedDistrict.toLowerCase();
-      final key = canonical;
-      if (isTargetDistrict || !map.containsKey(key)) {
-        map[key] = p;
+      if (isTargetDistrict) {
+        if (!map.containsKey(canonical) || p.recordedAt.isAfter(map[canonical]!.recordedAt)) {
+          map[canonical] = p;
+        }
       }
       if (latest == null || p.recordedAt.isAfter(latest)) {
         latest = p.recordedAt;
+      }
+    }
+    // Pass 2: any newer synced benchmark rates from server override local seed rates
+    for (final p in prices) {
+      final canonical = PriceRepository.normalizeCategory(p.category);
+      if (!map.containsKey(canonical)) {
+        map[canonical] = p;
+      } else if (p.recordedAt.isAfter(map[canonical]!.recordedAt) && p.source == 'server_sync') {
+        map[canonical] = p;
       }
     }
     setState(() {
@@ -332,6 +343,14 @@ class _PriceBoardScreenState extends State<PriceBoardScreen> {
                     setState(() => _isRefreshing = true);
                     await HapticService.selectionClick();
                     final ok = await widget.priceRepository?.fetchLatestPricesFromServer();
+                    if (mounted && widget.priceRepository != null) {
+                      final all = await widget.priceRepository!.db
+                          .select(widget.priceRepository!.db.cachedPrices)
+                          .get();
+                      if (all.isNotEmpty && mounted) {
+                        _applyPrices(all);
+                      }
+                    }
                     if (mounted) {
                       setState(() => _isRefreshing = false);
                       final msg = ok == true

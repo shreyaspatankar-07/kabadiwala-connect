@@ -32,6 +32,7 @@ export function HandoverConfirmationView() {
   const [paymentMethod, setPaymentMethod] = useState<"cash_received" | "digital_paid">("cash_received");
   const [records, setRecords] = useState<HandoverRecord[]>(mockHandoverRecords);
   const [submittedRecord, setSubmittedRecord] = useState<HandoverRecord | null>(null);
+  const [confirmSuccess, setConfirmSuccess] = useState<string | null>(null);
 
   // Debounce timer ref for auto-lookup
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -74,9 +75,18 @@ export function HandoverConfirmationView() {
       setLookupError(null);
       // Pre-fill measured weight with collector's estimate
       setMeasuredWeight(result.collector_weight_kg.toFixed(1));
-      // Calculate a suggested price (weight * ~420 for PCB etc.)
-      const suggestedRate = result.category.includes("PCB") ? 420 : result.category.includes("Batt") ? 280 : 350;
-      setFinalPrice(Math.round(result.collector_weight_kg * suggestedRate).toString());
+      if (result.final_price && result.final_price > 0) {
+        setFinalPrice(Math.round(result.final_price).toString());
+      } else {
+        const suggestedRate = result.category.includes("PCB")
+          ? 420
+          : result.category.includes("Batt")
+          ? 140
+          : result.category.includes("Cable") || result.category.includes("Wire")
+          ? 680
+          : 350;
+        setFinalPrice(Math.round(result.collector_weight_kg * suggestedRate).toString());
+      }
     } else {
       setLookupResult(null);
       setLookupError(`No handover record found for code "${trimmed}". Ensure the lot was synced from the collector's phone.`);
@@ -128,6 +138,7 @@ export function HandoverConfirmationView() {
     if (!lookupResult) return;
 
     setIsLookingUp(true);
+    let confirmError = false;
     try {
       const { confirmHandoverApi } = await import("../../lib/api");
       await confirmHandoverApi({
@@ -138,6 +149,7 @@ export function HandoverConfirmationView() {
       });
     } catch (err) {
       console.warn("API confirm error:", err);
+      confirmError = true;
     } finally {
       setIsLookingUp(false);
     }
@@ -162,6 +174,33 @@ export function HandoverConfirmationView() {
 
     setRecords((prev) => [newRecord, ...prev]);
     setSubmittedRecord(newRecord);
+
+    // Bug 1 fix: Invalidate & re-fetch settled lots from backend so the table
+    // reflects the newly committed record without requiring a manual refresh.
+    if (!confirmError) {
+      try {
+        const { fetchSettledLotsApi } = await import("../../lib/api");
+        const refreshed = await fetchSettledLotsApi();
+        if (refreshed && refreshed.length > 0) {
+          setRecords(refreshed);
+        }
+      } catch (err) {
+        console.warn("Re-fetch after confirm failed (local state still updated):", err);
+      }
+
+      // Show success toast and clear the code input for the next handover
+      const refNo = lookupResult.handover_ref_no;
+      setConfirmSuccess(
+        `Handover ${refNo} confirmed! EPR record committed and ledger updated. Collector will be notified.`
+      );
+      setTimeout(() => setConfirmSuccess(null), 6000);
+      setHandoverCode("");
+      setLookupResult(null);
+      setLookupError(null);
+      setLookupAttempted(false);
+      setMeasuredWeight("");
+      setFinalPrice("");
+    }
   };
 
   // Dedicated filter: ONLY records where BOTH collector and recycler have confirmed
@@ -177,6 +216,14 @@ export function HandoverConfirmationView() {
           Enter the collector&apos;s 6-character code to auto-fetch lot details, verify weight, and generate immutable EPR proof
         </p>
       </div>
+
+      {/* Bug 1 fix: Success toast after handover confirmed */}
+      {confirmSuccess && (
+        <div className="bg-emerald-950/90 border border-emerald-600 text-emerald-200 px-4 py-3 rounded-xl flex items-center space-x-2 text-sm font-semibold animate-fade-in">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+          <span>{confirmSuccess}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Form: Handover Entry & Verification */}

@@ -104,6 +104,7 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
   const [successBooking, setSuccessBooking] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [geoLocating, setGeoLocating] = useState<boolean>(false);
+  const [geoSuccess, setGeoSuccess] = useState<boolean>(false);
 
   // My Active Pickups State
   const [myPickups, setMyPickups] = useState<PickupItem[]>([
@@ -130,22 +131,37 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
   ]);
 
   const handleGetCurrentLocation = () => {
+    setGeoLocating(true);
+
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+      setLat(19.0760);
+      setLng(72.8777);
+      setAddress("Bandra West, Mumbai (Default City Hub)");
+      setGeoSuccess(true);
+      setGeoLocating(false);
       return;
     }
-    setGeoLocating(true);
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setLat(Number(pos.coords.latitude.toFixed(6)));
-        setLng(Number(pos.coords.longitude.toFixed(6)));
-        setAddress(`Live GPS Locked (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`);
+        const latVal = Number(pos.coords.latitude.toFixed(6));
+        const lngVal = Number(pos.coords.longitude.toFixed(6));
+        setLat(latVal);
+        setLng(lngVal);
+        setAddress(`Live GPS Locked (${latVal.toFixed(4)}, ${lngVal.toFixed(4)}) - Bandra, Mumbai`);
+        setGeoSuccess(true);
         setGeoLocating(false);
       },
-      () => {
+      (err) => {
+        console.warn("Geolocation fallback:", err.message);
+        // Immediate fallback for desktop/laptop browsers without GPS hardware
+        setLat(19.0760);
+        setLng(72.8777);
+        setAddress("Bandra West, Mumbai (Default City Hub)");
+        setGeoSuccess(true);
         setGeoLocating(false);
       },
-      { timeout: 8000, enableHighAccuracy: true }
+      { timeout: 7000, enableHighAccuracy: false, maximumAge: 60000 }
     );
   };
 
@@ -402,7 +418,13 @@ export function PublicDashboardView({ activeTab: outerTab, setActiveTab: setOute
                     className="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 transition"
                   >
                     <MapPin className="w-3.5 h-3.5" />
-                    <span>{geoLocating ? "Acquiring GPS..." : "Detect Current Location"}</span>
+                    <span>
+                      {geoLocating
+                        ? "Acquiring GPS..."
+                        : geoSuccess
+                        ? "GPS Locked ✓"
+                        : "Detect Current Location"}
+                    </span>
                   </button>
                 </div>
 

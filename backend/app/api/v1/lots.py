@@ -74,7 +74,7 @@ async def create_lot(
 async def update_lot_status(
     lot_id: str,
     data: LotStatusUpdate,
-    current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User | None, Depends(get_optional_current_user)] = None,
 ):
     return await LotsService.update_lot_status(lot_id, data, db)

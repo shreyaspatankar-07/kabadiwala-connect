@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 
 import '../auth/session_service.dart';
+import '../config/app_config.dart';
 import '../../data/local_database.dart';
 
 class HandoverInitiateResult {
@@ -110,12 +114,18 @@ class OfflineHandoverService {
     final collectorHash =
         sha256.convert(utf8.encode(effectiveCollectorId)).toString().substring(0, 16);
 
+    // Look up local transaction to include real category and quoted price in payload
+    final txQuery = _db.select(_db.localTransactions)..where((t) => t.lotId.equals(lotId));
+    final lotTx = await txQuery.getSingleOrNull();
+
     final payloadMap = {
       'collector_id_hash': collectorHash,
       'gps_lat': (gpsLat * 1000000).round() / 1000000,
       'gps_lng': (gpsLng * 1000000).round() / 1000000,
       'handover_ref_no': refNo,
       'lot_id': lotId,
+      'category': lotTx?.category ?? 'Cables',
+      'quoted_price': lotTx?.quotedPrice ?? 1550.0,
       'photo_hashes': photoHashes,
       'timestamp': now.toIso8601String(),
       'weight_kg': (weightKg * 100).round() / 100,
@@ -170,6 +180,9 @@ class OfflineHandoverService {
           ),
         );
 
+    // 4. Fire non-blocking immediate live sync push if online
+    unawaited(_tryLiveServerPush(refNo, effectiveCollectorId, payloadMap));
+
     return HandoverInitiateResult(
       lotId: lotId,
       handoverRefNo: refNo,
@@ -178,6 +191,41 @@ class OfflineHandoverService {
       timestamp: now,
       weightKg: weightKg,
     );
+  }
+
+  Future<void> _tryLiveServerPush(String refNo, String collectorId, Map<String, dynamic> payload) async {
+    final urlsToTry = [
+      AppConfig.apiBaseUrl,
+      ...AppConfig.candidateUrls,
+    ];
+    for (final base in urlsToTry.toSet()) {
+      try {
+        final body = jsonEncode({
+          'operations': [
+            {
+              'client_tx_id': payload['lot_id'] ?? refNo,
+              'action': 'record_handover',
+              'payload': payload,
+              'client_timestamp': DateTime.now().toUtc().toIso8601String(),
+            }
+          ]
+        });
+        final response = await http
+            .post(
+              Uri.parse('$base/sync/push'),
+              headers: {'Content-Type': 'application/json'},
+              body: body,
+            )
+            .timeout(const Duration(seconds: 4));
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          debugPrint('[OfflineHandoverService] Live push succeeded → $base for ref $refNo');
+          return;
+        }
+      } catch (e) {
+        debugPrint('[OfflineHandoverService] Live push error on $base: $e');
+      }
+    }
+  }
   }
 
   /// Confirms handover offline by scanning QR or typing 6-char ref code.

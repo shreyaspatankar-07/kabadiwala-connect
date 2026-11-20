@@ -308,8 +308,25 @@ class HandoverService:
                     "timestamp": now_utc.isoformat(),
                 },
             )
+            # Bug 1 fix: also notify recycler portal so it can update
+            # the lot card status without a manual page refresh.
+            await manager.broadcast_to_recyclers(
+                [effective_recycler],
+                {
+                    "type": "handover.confirmed",
+                    "lot_id": tx.lot_id,
+                    "handover_ref_no": target_ref_no,
+                    "transaction_status": tx.transaction_status.value,
+                    "is_disputed": is_disputed,
+                    "measured_weight_kg": meas_weight,
+                    "final_price": final_price,
+                    "record_hash": new_record_hash,
+                    "timestamp": now_utc.isoformat(),
+                },
+            )
         except Exception:  # noqa: BLE001
             pass
+
 
         return HandoverConfirmResponse(
             lot_id=tx.lot_id,
@@ -369,12 +386,31 @@ class HandoverService:
         )
         traceability = trace_res.scalar_one_or_none()
 
-        # 2. Match by lot_id containing clean_code
+        # 2. Match by lot_id containing clean_code or SyncQueue
         if not traceability:
             trace_res = await db.execute(
                 select(Traceability).where(Traceability.lot_id.ilike(f"%{clean_code}%"))
             )
             traceability = trace_res.scalar_one_or_none()
+
+        # Check SyncQueue for pending handover operations matching clean_code
+        if not traceability:
+            sync_res = await db.execute(
+                select(SyncQueue)
+                .where(SyncQueue.action == "record_handover")
+                .order_by(desc(SyncQueue.created_at))
+            )
+            for sq in sync_res.scalars().all():
+                payload = sq.payload or {}
+                if payload.get("handover_ref_no", "").strip().upper() == clean_code:
+                    sq_lot_id = payload.get("lot_id")
+                    if sq_lot_id:
+                        tx_match_res = await db.execute(
+                            select(Transaction).where(Transaction.lot_id == sq_lot_id)
+                        )
+                        matched_tx = tx_match_res.scalar_one_or_none()
+                        if matched_tx:
+                            break
 
         # 3. If no exact Traceability match, search by transaction lot_id or find latest unconfirmed lot
         if not traceability:
@@ -491,7 +527,7 @@ class HandoverService:
             category=tx.category if tx else "Unknown",
             collector_weight_kg=float(traceability.weight_kg),
             measured_weight_kg=float(tx.weight_kg) if tx else None,
-            final_price=float(tx.final_price) if tx and tx.final_price is not None else None,
+            final_price=float(tx.final_price) if tx and tx.final_price is not None else (float(tx.quoted_price) if tx and tx.quoted_price is not None else None),
             timestamp=traceability.timestamp,
             recycler_confirmed=traceability.recycler_confirmation,
             confirmed_at=traceability.confirmed_at,

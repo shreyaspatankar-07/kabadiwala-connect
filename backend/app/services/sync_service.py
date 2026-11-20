@@ -7,7 +7,7 @@ from geoalchemy2.elements import WKTElement
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.schema import DownstreamStatus, SafetyContent, SyncActionStatus, SyncQueue, Traceability
+from app.models.schema import DownstreamStatus, SafetyContent, SyncActionStatus, SyncQueue, Traceability, Transaction, TransactionStatus
 from app.schemas.ledger import LedgerEntryCreate
 from app.schemas.lots import LotCreate, LotStatusUpdate
 from app.schemas.sync import (
@@ -96,6 +96,31 @@ class SyncService:
                                 created_at=now_utc,
                             )
                             db.add(new_trace)
+
+                        # Ensure Transaction record reflects the handover state, category and price
+                        tx_res = await db.execute(select(Transaction).where(Transaction.lot_id == lot_id))
+                        tx = tx_res.scalar_one_or_none()
+                        now_utc = datetime.now(UTC)
+                        if tx:
+                            tx.transaction_status = TransactionStatus.HANDOVER_PENDING
+                            if "category" in op.payload:
+                                tx.category = op.payload["category"]
+                            if "quoted_price" in op.payload:
+                                tx.quoted_price = float(op.payload["quoted_price"])
+                                tx.final_price = float(op.payload["quoted_price"])
+                        elif op.payload.get("category"):
+                            new_tx = Transaction(
+                                lot_id=lot_id,
+                                client_lot_id=lot_id,
+                                collector_id=collector_id or "KC-C-7821",
+                                category=op.payload["category"],
+                                weight_kg=float(op.payload.get("weight_kg", 5.0)),
+                                quoted_price=float(op.payload.get("quoted_price", 1550.0)),
+                                final_price=float(op.payload.get("quoted_price", 1550.0)),
+                                transaction_status=TransactionStatus.HANDOVER_PENDING,
+                                created_at=now_utc,
+                            )
+                            db.add(new_tx)
 
                 processed_ids.append(op.client_tx_id)
 
